@@ -55,11 +55,3 @@ Private Function TryFitTableMap(ByVal ListObject As ListObject, ByVal RemoteMap 
         End If
     Next i
 End Function
-
-Private Function GetRemote() As Remote
-    Dim DataStore2 As DataStore
-    Set DataStore2 = New DataStore
-    DataStore2.Load
-    
-    Set GetRemote = DataStore2.Remote
-End Function
