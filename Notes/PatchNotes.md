@@ -1,4 +1,8 @@
 # Patch Notes
+## v0.5.4-beta (2025/08/06)
+- [x] Hash Lengths increased from 4 characters to full 40-character length.
+- [x] RemoteValues now only loads Latest KeyxField Value.
+ 
 ## v0.5.3-beta (2025/08/05)
 - [x] Fixed bug with not being able to Add New Fields via Remote Manager UI.
 - [x] Temporarily disabled Column Sorting in Remote Manager UI for Fields.
