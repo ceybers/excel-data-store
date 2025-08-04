@@ -13,6 +13,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
 '@IgnoreModule ArgumentWithIncompatibleObjectType, HungarianNotation
 '@Folder "RemoteDataStore.Views"
 Option Explicit
@@ -57,8 +58,11 @@ Private Sub OnCancel()
 End Sub
 
 Private Sub UpdateControls()
-    LoadRemoteKeyPathsToTreeView This.ViewModel.KeyPaths, Me.tvKeyPaths
     LoadRemoteFieldsToListView This.ViewModel.Fields, Me.lvFields
+End Sub
+
+Private Sub LateLoadKeys()
+    LoadRemoteKeyPathsToTreeView This.ViewModel.KeyPaths, Me.tvKeyPaths
 End Sub
 
 Private Sub LoadRemoteKeyPathsToTreeView(ByVal KeyPaths As Collection, ByVal Treeview As Treeview)
@@ -210,6 +214,10 @@ Private Sub MultiPage1_Change()
         .Visible = False
         .Visible = True
     End With
+    
+    If Me.MultiPage1.Value Then
+        LateLoadKeys
+    End If
 End Sub
 
 Private Sub tvKeyPaths_DblClick()
