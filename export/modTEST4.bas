@@ -12,6 +12,17 @@ Public Sub TESTClearTable()
     RangeToClear.ClearContents
 End Sub
 
+'@EntryPoint
+Public Sub TESTRandomiseTable()
+    Dim ListObject As ListObject
+    Set ListObject = TESTListObject
+    Dim RangeToRandomise As Range
+    Set RangeToRandomise = ListObject.DataBodyRange.Offset(0, 1).Resize(ListObject.DataBodyRange.Rows.Count, ListObject.ListColumns.Count - 1)
+    
+    RangeToRandomise.Formula2 = "=RAND()"
+    RangeToRandomise.Value2 = RangeToRandomise.Value2
+End Sub
+
 Private Function TESTListObject() As ListObject
     If Not Selection.ListObject Is Nothing Then
         Set TESTListObject = Selection.ListObject
