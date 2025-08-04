@@ -4,6 +4,10 @@ Option Explicit
 
 '@EntryPoint
 Public Sub TableMapUI()
+    Log.StartLogging
+    Log.Message "TableMapUI PullAll", "TableMapUI"
+    
+    Log.Message "MappedTableFactory.CreateMappedTable", "TableMapUI"
     Dim MappedTable As MappedTable
     Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=False)
     If MappedTable Is Nothing Then
@@ -11,24 +15,36 @@ Public Sub TableMapUI()
         Exit Sub
     End If
     
+    Log.Message "RemoteFactory.GetRemote.Reload", "TableMapUI"
     RemoteFactory.GetRemote.Reload
 
+    Log.Message "TableMapVM.Load LO TM GR", "TableMapUI"
     Dim ViewModel As TableMapVM
     Set ViewModel = New TableMapVM
     ViewModel.Load MappedTable.ListObject, MappedTable.TableMap, RemoteFactory.GetRemote
     
+    Log.Message "Entering UserForm...", "TableMapUI"
     Dim View As IView
     Set View = New TableMapView
     If View.ShowDialog(ViewModel) Then
+        Log.Message "...exited UserForm", "TableMapUI"
+        Log.Message "ViewModel.Save", "TableMapUI"
         ViewModel.Save
+        Log.StopLogging
         Exit Sub
     Else
+        Log.Message "...exited UserForm", "TableMapUI"
+        Log.StopLogging
         Exit Sub
     End If
 End Sub
 
 '@EntryPoint
 Public Sub PullAll()
+    Log.StartLogging
+    Log.Message "@EntryPoint PullAll"
+    
+    Log.Message "MappedTableFactory.CreateMappedTable"
     Dim MappedTable As MappedTable
     Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=False)
     If MappedTable Is Nothing Then
@@ -36,11 +52,14 @@ Public Sub PullAll()
         Exit Sub
     End If
     
+    Log.Message "New PullQuery"
     With New PullQuery
         Set .MappedTable = MappedTable
         Set .Remote = RemoteFactory.GetRemote
         .Run
     End With
+    
+    Log.StopLogging
 End Sub
 
 '@EntryPoint
@@ -78,6 +97,10 @@ End Sub
 
 '@EntryPoint
 Public Sub Push()
+    Log.StartLogging
+    Log.Message "@EntryPoint PushAll"
+    
+    Log.Message "MappedTableFactory.CreateMappedTable"
     Dim MappedTable As MappedTable
     Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=False)
     If MappedTable Is Nothing Then
@@ -85,11 +108,13 @@ Public Sub Push()
         Exit Sub
     End If
     
+    Log.Message "New PushQuery"
     With New PushQuery
         Set .MappedTable = MappedTable
         Set .Remote = RemoteFactory.GetRemote
         .Run
     End With
+    Log.StopLogging
 End Sub
 
 '@EntryPoint
@@ -111,6 +136,7 @@ End Sub
 '@EntryPoint
 Public Sub DataStoreUI()
     RemoteFactory.GetRemote.Reload
+    RemoteFactory.GetRemote.Show
     
     Dim ViewModel As RemoteViewModel
     Set ViewModel = New RemoteViewModel
