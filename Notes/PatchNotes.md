@@ -1,9 +1,14 @@
 # Patch Notes
-## v0.5.4-beta (2025/08/06)
+## v0.5.5-beta (2025/08/04)
+- [x] Implemented DebugEx library for logging.
+- [x] Changed Remote* LoadFromArray to ByRef instead of copying the array for each call for each row. 
+- [x] Fixed performance issue with matching Keys to KeyIDs to rows in worksheet.
+
+## v0.5.4-beta (2025/08/04)
 - [x] Hash Lengths increased from 4 characters to full 40-character length.
 - [x] RemoteValues now only loads Latest KeyxField Value.
  
-## v0.5.3-beta (2025/08/05)
+## v0.5.3-beta (2025/08/04)
 - [x] Fixed bug with not being able to Add New Fields via Remote Manager UI.
 - [x] Temporarily disabled Column Sorting in Remote Manager UI for Fields.
  

@@ -22,6 +22,9 @@
 - Rollback Commits.
 - Backdating Commits (i.e., storing Historical SCD data)
 
+## Maps
+- [ ] BUG Pull/Push not using the most recent Map for a table when it has more than one map.
+
 ## GUI
 - Remote Manager UI to select TreeView/ListView items by Key, not Index.
 - Filter remote fields to only fields that already have values for this KeyPath
