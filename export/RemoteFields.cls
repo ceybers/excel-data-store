@@ -11,8 +11,9 @@ Attribute VB_Exposed = False
 '@Folder "RemoteDataStore.Models.Plural"
 Option Explicit
 
+Private Const DO_DEBUG As Boolean = False
 Private Const ARRAY_WIDTH As Long = 7
-Private Const HASH_LEN As Long = 4
+Private Const HASH_LEN As Long = 40
 
 Private Type TState
     Worksheet As Worksheet
@@ -55,6 +56,7 @@ Private Sub LoadFromWorksheet()
     If DataBodyRange Is Nothing Then Exit Sub
     
     Dim WorksheetValues As Variant
+    If DO_DEBUG Then Debug.Print "RemoteFields.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False)
     WorksheetValues = DataBodyRange.Value2
     
     Dim i As Long

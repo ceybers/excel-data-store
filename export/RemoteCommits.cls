@@ -11,8 +11,9 @@ Attribute VB_Exposed = False
 '@Folder("RemoteDataStore.Models.Plural")
 Option Explicit
 
+Private Const DO_DEBUG As Boolean = False
 Private Const ARRAY_WIDTH As Long = 6
-Private Const HASH_LEN  As Long = 4
+Private Const HASH_LEN  As Long = 40
 
 Private Type TState
     Worksheet As Worksheet
@@ -47,8 +48,9 @@ Private Sub LoadFromWorksheet()
     If DataBodyRange Is Nothing Then Exit Sub
     
     Dim ExistingValues As Variant
+    If DO_DEBUG Then Debug.Print "RemoteCommits.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False)
     ExistingValues = DataBodyRange.Value2
-    
+        
     Dim i As Long
     For i = 1 To UBound(ExistingValues, 1)
         Dim NewRemoteCommit As RemoteCommit

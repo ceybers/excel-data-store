@@ -11,9 +11,9 @@ Attribute VB_Exposed = False
 '@Folder "RemoteDataStore.Models.Plural"
 Option Explicit
 
-'Private Const COL_ID_NAME As String = "ID"
+Private Const DO_DEBUG As Boolean = False
 Private Const ARRAY_WIDTH As Long = 9
-Private Const HASH_LEN As Long = 8
+Private Const HASH_LEN As Long = 40
 Private Const COL_LATEST_HASH As Long = 5
 
 Private Type TState
@@ -50,15 +50,23 @@ End Sub
 Private Sub LoadFromWorksheet()
     SortWorksheet
     
-    Dim DataBodyRange As Range
-    Set DataBodyRange = GetWorksheetDatabodyRange(This.Worksheet)
-    If DataBodyRange Is Nothing Then Exit Sub
-    
     Do While This.Item.Count > 0
         This.Item.Remove This.Item.Count
     Loop
     
+    Dim DataBodyRange As Range
+    Set DataBodyRange = GetWorksheetDatabodyRange(This.Worksheet)
+    If DataBodyRange Is Nothing Then Exit Sub
+    
+    Dim LatestHashRange As Range
+    Set LatestHashRange = This.Worksheet.Columns.Item(COL_LATEST_HASH).SpecialCells(xlCellTypeConstants)
+    If Not LatestHashRange Is Nothing Then
+        If DO_DEBUG Then Debug.Print "RemoteValues.LoadFromWorksheet taking intersect of " & DataBodyRange.Address(False, False) & " and " & LatestHashRange.Address(False, False)
+        Set DataBodyRange = Application.Intersect(DataBodyRange, LatestHashRange.EntireRow)
+    End If
+    
     Dim WorksheetValues As Variant
+    If DO_DEBUG Then Debug.Print "RemoteValues.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False)
     WorksheetValues = DataBodyRange.Value2
     
     Dim i As Long

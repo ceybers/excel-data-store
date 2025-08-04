@@ -11,6 +11,8 @@ Attribute VB_Exposed = False
 '@Folder "Version4.MapApplicator"
 Option Explicit
 
+Private Const DO_DEBUG As Boolean = False
+
 Private Type TPullQuery
     MappedTable As MappedTable
     Remote As Remote
@@ -34,6 +36,8 @@ Public Property Set Remote(ByVal RHS As Remote)
 End Property
 
 Public Sub Run()
+    This.Remote.Reload
+    
     Dim KeyIDs As Variant
     KeyIDs = This.MappedTable.GetKeyIDs
     
@@ -63,6 +67,7 @@ Private Sub UpdateFromRemote(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant,
             vv(KeyIndex, 1) = NewValues(k, f)
         Next k
         
+        If DO_DEBUG Then Debug.Print "PullQuery.UpdateFromRemote writing to " & ListColumn.DataBodyRange.Address(False, False)
         ListColumn.DataBodyRange.Value2 = vv
     Next f
 End Sub

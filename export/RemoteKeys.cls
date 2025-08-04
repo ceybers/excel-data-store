@@ -10,8 +10,9 @@ Attribute VB_Exposed = False
 '@Folder "RemoteDataStore.Models.Plural"
 Option Explicit
 
+Private Const DO_DEBUG As Boolean = False
 Private Const ARRAY_WIDTH As Long = 7
-Private Const HASH_LEN  As Long = 4
+Private Const HASH_LEN  As Long = 40
 
 Private Type TState
     Worksheet As Worksheet
@@ -53,6 +54,7 @@ Private Sub LoadFromWorksheet()
     If DataBodyRange Is Nothing Then Exit Sub
     
     Dim WorksheetValues As Variant
+    If DO_DEBUG Then Debug.Print "RemoteKeys.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False)
     WorksheetValues = DataBodyRange.Value2
     
     Dim i As Long
@@ -65,11 +67,13 @@ Private Sub LoadFromWorksheet()
 End Sub
 
 Private Sub GenerateUniquePaths() ' TODO What a round-about mess
+    If Count = 0 Then Exit Sub
+    
     Dim AllPaths As Variant
-    ReDim AllPaths(1 To This.Item.Count)
+    ReDim AllPaths(1 To Count)
     
     Dim i As Long
-    For i = 1 To This.Item.Count
+    For i = 1 To Count
         Dim ThisRemoteKey As RemoteKey
         Set ThisRemoteKey = This.Item.Item(i)
         AllPaths(i) = ThisRemoteKey.Path

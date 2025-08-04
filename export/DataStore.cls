@@ -11,7 +11,7 @@ Attribute VB_Exposed = False
 '@Folder "RemoteDataStore.Models"
 Option Explicit
 
-Private Const DO_DEBUG As Boolean = True
+Private Const DO_DEBUG As Boolean = False
 Private Const DEFAULT_REPO_PATH As String = "C:\Users\User\Repos\Private\excel-dev\excel-but-git\"
 Private Const DEFAULT_REPO_NAME As String = "repo-datastore.xlsx"
 Private Const SETTINGS_FILENAME As String = "excel-but-git.ini"

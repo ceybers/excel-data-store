@@ -10,6 +10,7 @@ Attribute VB_Exposed = False
 '@Folder "RemoteDataStore.Models"
 Option Explicit
 
+Private Const DO_DEBUG As Boolean = False
 Private Const WS_KEYS_NAME As String = "Keys"
 Private Const WS_FIELDS_NAME As String = "Fields"
 Private Const WS_VALUES_NAME  As String = "Values"
@@ -52,27 +53,30 @@ Public Property Get Tables() As RemoteTables
     Set Tables = This.RemoteTables
 End Property
 
-
 Public Sub Load(ByVal Workbook As Workbook)
+    If DO_DEBUG Then Debug.Print "Remote.Load()"
+    Set This.Workbook = Workbook
+    Reload
+End Sub
+
+Public Sub Reload()
     With This
-        Set .Workbook = Workbook
-        
         Set .RemoteKeys = New RemoteKeys
-        .RemoteKeys.Load Workbook.Worksheets.Item(WS_KEYS_NAME)
+        .RemoteKeys.Load This.Workbook.Worksheets.Item(WS_KEYS_NAME)
         
         Set .RemoteFields = New RemoteFields
-        .RemoteFields.Load Workbook.Worksheets.Item(WS_FIELDS_NAME)
+        .RemoteFields.Load This.Workbook.Worksheets.Item(WS_FIELDS_NAME)
         
         Set .RemoteValues = New RemoteValues
-        .RemoteValues.Load Workbook.Worksheets.Item(WS_VALUES_NAME)
+        .RemoteValues.Load This.Workbook.Worksheets.Item(WS_VALUES_NAME)
         
         Set .RemoteMaps = New RemoteMaps
-        .RemoteMaps.Load Workbook.Worksheets.Item(WS_MAPS_NAME)
+        .RemoteMaps.Load This.Workbook.Worksheets.Item(WS_MAPS_NAME)
         
         Set .RemoteTables = New RemoteTables
-        .RemoteTables.Load Workbook.Worksheets.Item(WS_TABLES_NAME)
+        .RemoteTables.Load This.Workbook.Worksheets.Item(WS_TABLES_NAME)
         
         Set .RemoteCommits = New RemoteCommits
-        .RemoteCommits.Load Workbook.Worksheets.Item(WS_COMMITS_NAME)
+        .RemoteCommits.Load This.Workbook.Worksheets.Item(WS_COMMITS_NAME)
     End With
 End Sub
