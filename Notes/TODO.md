@@ -23,6 +23,7 @@
 - Backdating Commits (i.e., storing Historical SCD data)
 
 ## GUI
+- Remote Manager UI to select TreeView/ListView items by Key, not Index.
 - Filter remote fields to only fields that already have values for this KeyPath
 - Handle cases where mapping/fields are empty (uninit)
 - Handle cases where mapping is present but no fields are mapped yet (only table & key)

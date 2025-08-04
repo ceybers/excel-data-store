@@ -167,9 +167,9 @@ Private Sub LoadRemoteFieldsToListView(ByVal RemoteFields As RemoteFields, ByVal
     End If
 End Sub
 
-Private Sub lvKeys_ColumnClick(ByVal ColumnHeader As MSComctlLib.ColumnHeader)
-    ListViewColumnClickSort Me.lvKeys, ColumnHeader.Index
-End Sub
+'Private Sub lvKeys_ColumnClick(ByVal ColumnHeader As MSComctlLib.ColumnHeader)
+'    ListViewColumnClickSort Me.lvKeys, ColumnHeader.Index
+'End Sub
 
 'Private Sub lvFields_ColumnClick(ByVal ColumnHeader As MSComctlLib.ColumnHeader)
     ' TODO FIX Sorting breaks the Selection/Details feature

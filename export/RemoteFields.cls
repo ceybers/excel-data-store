@@ -150,6 +150,7 @@ Public Sub AddNew(ByVal Path As String, ByVal Name As String, ByVal Caption As S
     Set NewRemoteField = CreateNewField(Path, Name, Caption)
 
     This.Item.Add NewRemoteField
+    This.IsDirty = True
     
     Save 'Saving in the same procedure that Adds because it is called from outside the class module
 End Sub
@@ -157,7 +158,7 @@ End Sub
 Private Function TryGetRemoteFieldFromPathAndName(ByVal Path As String, ByVal Name As String, ByRef OutRemoteField As RemoteField) As Boolean
     Dim ThisRemoteField As RemoteField
     For Each ThisRemoteField In This.Item
-        If ThisRemoteField.Path = Path And ThisRemoteField.Name = Name Then
+        If ThisRemoteField.ID <> FIELD_ID_ADDNEW And ThisRemoteField.Path = Path And ThisRemoteField.Name = Name Then
             Set OutRemoteField = ThisRemoteField
             TryGetRemoteFieldFromPathAndName = True
             Exit Function

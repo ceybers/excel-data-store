@@ -1,4 +1,8 @@
 # Patch Notes
+## v0.5.3-beta (2025/08/05)
+- [x] Fixed bug with not being able to Add New Fields via Remote Manager UI.
+- [x] Temporarily disabled Column Sorting in Remote Manager UI for Fields.
+ 
 ## v0.5.2-beta (2025/08/04)
 - [x] Added icons to UI forms.
 - [x] Moved MsgBox strings to Constants resource file.
