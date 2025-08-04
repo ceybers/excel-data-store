@@ -11,7 +11,7 @@ Attribute VB_Exposed = False
 '@Folder "RemoteDataStore.Models"
 Option Explicit
 
-Private Const DO_DEBUG As Boolean = False
+Private Const DO_DEBUG As Boolean = True
 Private Const DEFAULT_REPO_PATH As String = "C:\Users\User\Repos\Private\excel-dev\excel-but-git\"
 Private Const DEFAULT_REPO_NAME As String = "repo-datastore.xlsx"
 Private Const SETTINGS_FILENAME As String = "excel-but-git.ini"
@@ -44,21 +44,23 @@ Public Sub Unload()
 End Sub
 
 Private Sub GetDataStoreFullPath()
-    Dim UserSettings As ISettings
+    Static UserSettings As ISettings
+    If Not UserSettings Is Nothing Then Exit Sub
+    
     Set UserSettings = MyDocSettings.Create(SETTINGS_UUID, SETTINGS_FILENAME)
     
     With UserSettings
         This.RepoPath = .GetSetting(SETTING_REPOPATH)
         This.RepoName = .GetSetting(SETTING_REPONAME)
     
-        If .GetSetting(SETTING_REPOPATH) = vbNullString Then
-            .SetSetting SETTING_REPOPATH, DEFAULT_REPO_PATH
+        If This.RepoPath = vbNullString Then
             This.RepoPath = DEFAULT_REPO_PATH
+            .SetSetting SETTING_REPOPATH, DEFAULT_REPO_PATH
         End If
         
-        If .GetSetting(SETTING_REPONAME) = vbNullString Then
-            .SetSetting SETTING_REPONAME, DEFAULT_REPO_NAME
+        If This.RepoName = vbNullString Then
             This.RepoName = DEFAULT_REPO_NAME
+            .SetSetting SETTING_REPONAME, DEFAULT_REPO_NAME
         End If
     End With
 End Sub
