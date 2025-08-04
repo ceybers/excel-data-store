@@ -1,0 +1,239 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "RemoteValues"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+'@IgnoreModule ProcedureNotUsed
+'@Folder "RemoteDataStore.Models.Plural"
+Option Explicit
+
+'Private Const COL_ID_NAME As String = "ID"
+Private Const ARRAY_WIDTH As Long = 9
+Private Const HASH_LEN As Long = 8
+Private Const COL_LATEST_HASH As Long = 5
+
+Private Type TState
+    Worksheet As Worksheet
+    Item As Collection
+    LatestHash As Variant
+    IsDirty As Boolean
+End Type
+Private This As TState
+
+Private Sub Class_Initialize()
+    Set This.Item = New Collection
+End Sub
+
+Public Property Get Count() As Long
+    Count = This.Item.Count
+End Property
+
+Public Property Get Item(ByVal Index As Long) As RemoteValue
+    Set Item = This.Item.Item(Index)
+End Property
+
+Public Sub Load(ByVal Worksheet As Worksheet)
+    Set This.Worksheet = Worksheet
+    
+    RebuildCache
+End Sub
+
+Public Sub RebuildCache()
+    LoadFromWorksheet
+    LoadLatestHash
+End Sub
+
+Private Sub LoadFromWorksheet()
+    SortWorksheet
+    
+    Dim DataBodyRange As Range
+    Set DataBodyRange = GetWorksheetDatabodyRange(This.Worksheet)
+    If DataBodyRange Is Nothing Then Exit Sub
+    
+    Do While This.Item.Count > 0
+        This.Item.Remove This.Item.Count
+    Loop
+    
+    Dim WorksheetValues As Variant
+    WorksheetValues = DataBodyRange.Value2
+    
+    Dim i As Long
+    For i = 1 To UBound(WorksheetValues, 1)
+        Dim NewRemoteValue As RemoteValue
+        Set NewRemoteValue = New RemoteValue
+        NewRemoteValue.LoadFromArray WorksheetValues, i
+        This.Item.Add Item:=NewRemoteValue
+    Next i
+End Sub
+
+Private Sub LoadLatestHash()
+    Dim LatestHash As Variant
+    LatestHash = This.Worksheet.Columns.Item(COL_LATEST_HASH).SpecialCells(xlCellTypeConstants).Value2
+    
+    If VarType(LatestHash) < vbArray Then
+        This.LatestHash = Empty
+    Else
+        This.LatestHash = ArrayTransform.ColumnToArray(LatestHash)
+    End If
+End Sub
+
+Private Sub SortWorksheet()
+    This.Worksheet.UsedRange.Sort Key1:=This.Worksheet.Columns.Item(COL_LATEST_HASH), Header:=xlYes
+End Sub
+
+Public Sub Save()
+    Debug.Assert Not This.Worksheet Is Nothing
+    
+    If This.IsDirty = False Then Exit Sub
+    
+    ClearWorksheet
+    
+    Dim UpdatedValues As Variant
+    ReDim UpdatedValues(1 To Count, 1 To ARRAY_WIDTH)
+    
+    Dim i As Long
+    For i = 1 To Count
+        Dim ThisRemoteValue As RemoteValue
+        Set ThisRemoteValue = This.Item.Item(i)
+        ThisRemoteValue.SaveToArray UpdatedValues, i
+    Next i
+    
+    SetNumberFormats
+    
+    RangeSetValueFromVariant This.Worksheet.Range("A2"), UpdatedValues
+    
+    SortWorksheet
+    
+    RebuildCache
+End Sub
+
+Private Sub ClearWorksheet()
+    This.Worksheet.AutoFilterMode = False
+    If This.Worksheet.UsedRange Is Nothing Then Exit Sub
+    If This.Worksheet.UsedRange.Rows.Count = 1 Then Exit Sub
+    This.Worksheet.UsedRange.Offset(1).Delete
+End Sub
+
+Private Sub SetNumberFormats()
+    With This.Worksheet.Columns
+        .Item(1).NumberFormat = NUMFMT_TEXT ' ID
+        .Item(2).NumberFormat = NUMFMT_TEXT ' KeyID
+        .Item(3).NumberFormat = NUMFMT_TEXT ' FieldID
+        .Item(6).NumberFormat = NUMFMT_DATE ' CTime
+        .Item(7).NumberFormat = NUMFMT_DATE ' MTime
+        .Item(8).NumberFormat = NUMFMT_DATE ' DTime
+        .Item(9).NumberFormat = NUMFMT_TEXT ' CommitID
+    End With
+End Sub
+
+Public Function GetChangeMask(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, ByVal Values As Variant) As Variant
+    Dim Result As Variant
+    ReDim Result(1 To UBound(KeyIDs), 1 To UBound(FieldIDs))
+
+    If IsEmpty(This.LatestHash) Then
+        ' TODO CHK Should this not be 1 for all elements?
+        GetChangeMask = Result
+        Exit Function
+    End If
+    
+    Dim i As Long
+    For i = 1 To UBound(KeyIDs)
+        Dim j As Long
+        For j = 1 To UBound(FieldIDs)
+            Result(i, j) = IIf(Values(i, j) = GetValue(KeyIDs(i), FieldIDs(j)), 0, 1)
+        Next j
+    Next i
+    
+    GetChangeMask = Result
+End Function
+
+Public Function GetValues(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant) As Variant
+    Dim Result As Variant
+    ReDim Result(1 To UBound(KeyIDs), 1 To UBound(FieldIDs))
+    GetValues = Result
+    
+    If IsEmpty(This.LatestHash) Then Exit Function
+
+    Dim i As Long
+    For i = 1 To UBound(KeyIDs)
+        Dim j As Long
+        For j = 1 To UBound(FieldIDs)
+            Result(i, j) = GetValue(KeyIDs(i), FieldIDs(j))
+        Next j
+    Next i
+    
+    GetValues = Result
+End Function
+
+Private Function GetValue(ByVal KeyID As String, ByVal FieldID As String) As Variant
+    Dim Query As String
+    Query = KeyID & "x" & FieldID
+        
+    Dim Index As Long
+    Index = ArraySearch.BinarySearch(This.LatestHash, Query)
+    If Index = -1 Then Exit Function
+    
+    GetValue = This.Item.Item(Index - 1).Value
+End Function
+
+Public Sub UpsertValues(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, ByVal Values As Variant, ByVal CommitID As String)
+    Dim i As Long
+    For i = 1 To UBound(KeyIDs)
+        Dim j As Long
+        For j = 1 To UBound(FieldIDs)
+            UpsertValue KeyIDs(i), FieldIDs(j), Values(i, j), CommitID
+        Next j
+    Next i
+    
+    Save
+End Sub
+
+Private Sub UpsertValue(ByVal KeyID As String, ByVal FieldID As String, ByVal Value As Variant, ByVal CommitID As String)
+    Dim ExistingLatestRemoteValue As RemoteValue
+    If TryGetLatestValue(KeyID, FieldID, ExistingLatestRemoteValue) Then
+        If ExistingLatestRemoteValue.Value = Value Then
+            Exit Sub ' No Change (A -> A)
+        Else
+            This.IsDirty = True ' CHG (A -> B)
+            ExistingLatestRemoteValue.Latest = vbNullString
+            ExistingLatestRemoteValue.ModificationTime = Application.Evaluate("=NOW()")
+        End If
+    Else
+        This.IsDirty = True ' NEW (0 -> A)
+    End If
+    
+    This.Item.Add Item:=CreateNewValue(KeyID, FieldID, Value, CommitID)
+End Sub
+
+Private Function TryGetLatestValue(ByVal KeyID As String, ByVal FieldID As String, ByRef OutRemoteValue As RemoteValue) As Boolean
+    If IsEmpty(This.LatestHash) Then Exit Function
+    
+    Dim Query As String
+    Query = KeyID & "x" & FieldID
+    
+    Dim Index As Long
+    Index = ArraySearch.BinarySearch(This.LatestHash, Query)
+    If Index < 1 Then Exit Function
+    
+    Set OutRemoteValue = This.Item.Item(Index - 1)
+    TryGetLatestValue = True
+End Function
+
+Private Function CreateNewValue(ByVal KeyID As String, ByVal FieldID As String, ByVal Value As Variant, ByVal CommitID As String) As RemoteValue
+    Dim NewRemoteValue As RemoteValue
+    Set NewRemoteValue = New RemoteValue
+    With NewRemoteValue
+        .KeyID = KeyID
+        .FieldID = FieldID
+        .Value = Value
+        .Latest = KeyID & "x" & FieldID
+        .CreationTime = Application.Evaluate("=NOW()")
+        .CommitID = CommitID
+        .ID = Left$(HashSHA1(.Latest & .CreationTime), HASH_LEN)
+    End With
+    Set CreateNewValue = NewRemoteValue
+End Function

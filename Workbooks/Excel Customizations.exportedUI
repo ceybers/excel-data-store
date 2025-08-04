@@ -1,0 +1,59 @@
+<mso:cmd app="Excel" dt="1" />
+<mso:customUI xmlns:x1="http://schemas.microsoft.com/office/2009/07/customui/macro" xmlns:mso="http://schemas.microsoft.com/office/2009/07/customui">
+<mso:ribbon>
+<mso:qat>
+<mso:sharedControls>
+<mso:control idQ="mso:FileNewDefault" visible="false"/>
+<mso:control idQ="mso:FileOpenUsingBackstage" visible="false"/>
+<mso:control idQ="mso:FileSave" visible="true"/>
+<mso:control idQ="mso:FileSendAsAttachment" visible="false"/>
+<mso:control idQ="mso:FilePrintQuick" visible="false"/>
+<mso:control idQ="mso:PrintPreviewAndPrint" visible="false"/>
+<mso:control idQ="mso:Spelling" visible="false"/>
+<mso:control idQ="mso:Undo" visible="true"/>
+<mso:control idQ="mso:Redo" visible="true"/>
+<mso:control idQ="mso:SortAscendingExcel" visible="false"/>
+<mso:control idQ="mso:SortDescendingExcel" visible="false"/>
+<mso:control idQ="mso:PointerModeOptions" visible="false"/>
+<mso:control idQ="mso:MacroPlay" visible="true"/>
+<mso:control idQ="mso:VisualBasic" visible="true"/>
+</mso:sharedControls>
+</mso:qat>
+<mso:tabs>
+<mso:tab idQ="mso:TabHome">
+<mso:group id="mso_c1.5B6EB3D8" label="DEV" autoScale="true">
+<mso:button idQ="x1:C:_Users_User_Repos_Private_excel-dev_DataOperator_DataOperator.xlsm_AAA_0_5B6ED0A7" label="AAA" imageMso="ListMacros" onAction="C:\Users\User\Repos\Private\excel-dev\DataOperator\DataOperator.xlsm!AAA" visible="true"/>
+</mso:group>
+</mso:tab>
+<mso:tab idQ="mso:TabAddIns" visible="false"/>
+<mso:tab idQ="mso:HelpTab" visible="false"/>
+<mso:tab id="mso_c1.DACA8F" label="Data Store">
+
+<mso:group id="mso_c2.DACA8F" label="Map" autoScale="true">
+<mso:button idQ="x1:C:_Users_User_Repos_Private_excel-data-store_Workbooks_excel-data-store.xlsm_TableMapUI_0_F3E8DB" label="Map Table" imageMso="CreateQueryFromWizard" onAction="C:\Users\User\Repos\Private\excel-data-store\Workbooks\excel-data-store.xlsm!TableMapUI" visible="true"/>
+</mso:group>
+
+<mso:group id="mso_c3.DAF085" label="Pull" autoScale="false">
+<mso:button size="large" idQ="x1:C:_Users_User_Repos_Private_excel-data-store_Workbooks_excel-data-store.xlsm_PullAll_0_DBAE09" label="Pull" imageMso="FieldList" onAction="C:\Users\User\Repos\Private\excel-data-store\Workbooks\excel-data-store.xlsm!PullAll" visible="true"/>
+<mso:button size="normal" idQ="x1:C:_Users_User_Repos_Private_excel-data-store_Workbooks_excel-data-store.xlsm_PullPartial_1_DBAE09" label="Pull Selected" imageMso="TableRowSelect" onAction="C:\Users\User\Repos\Private\excel-data-store\Workbooks\excel-data-store.xlsm!PullPartial" visible="true"/>
+<mso:button size="normal" idQ="x1:C:_Users_User_Repos_Private_excel-data-store_Workbooks_excel-data-store.xlsm_PullHighlightOnly_2_DBAE09" label="Highlight Only" imageMso="DataValidationCircleInvalid" onAction="C:\Users\User\Repos\Private\excel-data-store\Workbooks\excel-data-store.xlsm!PullHighlightOnly" visible="true"/>
+</mso:group>
+
+<mso:group id="mso_c1.F0BBBF" label="Push" autoScale="false">
+<mso:button size="large" idQ="x1:C:_Users_User_Repos_Private_excel-data-store_Workbooks_excel-data-store.xlsm_Push_0_F0FB96" label="Push" imageMso="CacheListData" onAction="C:\Users\User\Repos\Private\excel-data-store\Workbooks\excel-data-store.xlsm!Push" visible="true"/>
+<mso:button size="normal" idQ="x1:C:_Users_User_Repos_Private_excel-data-store_Workbooks_excel-data-store.xlsm_PushPartial_1_F0FB96" label="Push Selected" imageMso="TableRowSelect" onAction="C:\Users\User\Repos\Private\excel-data-store\Workbooks\excel-data-store.xlsm!PushPartial" visible="true"/>
+</mso:group>
+
+<mso:group id="mso_c1.F55461" label="Remote" autoScale="true">
+<mso:button idQ="x1:C:_Users_User_Repos_Private_excel-data-store_Workbooks_excel-data-store.xlsm_DataStoreUI_0_F58370" label="Manage Remote" imageMso="GroupPrintPreviewData" onAction="C:\Users\User\Repos\Private\excel-data-store\Workbooks\excel-data-store.xlsm!DataStoreUI" visible="true"/>
+</mso:group>
+
+<mso:group id="mso_c1.F822B4" label="TEST" autoScale="true">
+<mso:button idQ="x1:C:_Users_User_Repos_Private_excel-data-store_Workbooks_excel-data-store.xlsm_TESTClearTable_0_F83C37" label="Clear" imageMso="Clear" onAction="C:\Users\User\Repos\Private\excel-data-store\Workbooks\excel-data-store.xlsm!TESTClearTable" visible="true"/>
+</mso:group>
+
+</mso:tab>
+</mso:tabs>
+</mso:ribbon>
+</mso:customUI>
+

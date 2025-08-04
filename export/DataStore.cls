@@ -1,0 +1,100 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "DataStore"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+'@IgnoreModule ProcedureNotUsed
+'@Folder "RemoteDataStore.Models"
+Option Explicit
+
+Private Const DO_DEBUG As Boolean = True
+Private Const DEFAULT_REPO_PATH As String = "C:\Users\User\Repos\Private\excel-dev\excel-but-git\"
+Private Const DEFAULT_REPO_NAME As String = "repo-datastore.xlsx"
+Private Const SETTINGS_FILENAME As String = "excel-but-git.ini"
+Private Const SETTINGS_UUID As String = "{ff144951-2f4a-4072-8016-6ffb7a338ae1}"
+Private Const SETTING_REPOPATH As String = "RepoPath"
+Private Const SETTING_REPONAME As String = "RepoName"
+Private Const MAGIC_PHRASE_A1 As String = "DATASTORE"
+
+Private Type TState
+    RepoPath As String
+    RepoName As String
+    Workbook As Workbook
+    Remote As Remote
+End Type
+Private This As TState
+
+Public Property Get Remote() As Remote
+    Set Remote = This.Remote
+End Property
+
+Public Sub Load()
+    GetDataStoreFullPath
+    GetOrOpenDataStore
+    CreateRemote
+End Sub
+
+Public Sub Unload()
+    If This.Workbook Is Nothing Then Exit Sub
+    This.Workbook.Close SaveChanges:=True
+End Sub
+
+Private Sub GetDataStoreFullPath()
+    Dim UserSettings As ISettings
+    Set UserSettings = MyDocSettings.Create(SETTINGS_UUID, SETTINGS_FILENAME)
+    
+    With UserSettings
+        This.RepoPath = .GetSetting(SETTING_REPOPATH)
+        This.RepoName = .GetSetting(SETTING_REPONAME)
+    
+        If .GetSetting(SETTING_REPOPATH) = vbNullString Then
+            .SetSetting SETTING_REPOPATH, DEFAULT_REPO_PATH
+            This.RepoPath = DEFAULT_REPO_PATH
+        End If
+        
+        If .GetSetting(SETTING_REPONAME) = vbNullString Then
+            .SetSetting SETTING_REPONAME, DEFAULT_REPO_NAME
+            This.RepoName = DEFAULT_REPO_NAME
+        End If
+    End With
+End Sub
+
+Private Sub GetOrOpenDataStore()
+    If Not TryGetWorkbook(This.RepoName, This.Workbook) Then
+        TryOpenWorkbook
+    End If
+End Sub
+
+Private Sub TryOpenWorkbook()
+    Dim WorkbookFilename As String
+    WorkbookFilename = This.RepoPath & "\" & This.RepoName
+    
+    On Error GoTo ErrorCouldNotOpenWorkbook
+    Application.Workbooks.Open Filename:=WorkbookFilename, Notify:=False
+    On Error GoTo 0
+    
+    Set This.Workbook = Application.Workbooks.Item(This.RepoName)
+    
+    This.Workbook.Windows.Item(1).Visible = False
+    If DO_DEBUG Then This.Workbook.Windows.Item(1).Visible = True
+    Exit Sub
+    
+ErrorCouldNotOpenWorkbook:
+    MsgBox MSG_CANT_OPEN_DATASTORE_WB, vbExclamation + vbOKOnly, APP_TITLE
+End Sub
+
+Private Sub CreateRemote()
+    Debug.Assert Not This.Workbook Is Nothing
+    If This.Workbook Is Nothing Then Exit Sub
+    If This.Workbook.Worksheets.Item(1).Range("A1").Value2 <> MAGIC_PHRASE_A1 Then
+        MsgBox MSG_DATASTORE_WB_INVALID, vbExclamation + vbOKOnly, APP_TITLE
+        Exit Sub
+    End If
+    
+    Set This.Remote = New Remote
+    This.Remote.Load This.Workbook
+End Sub

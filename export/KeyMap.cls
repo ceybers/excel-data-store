@@ -1,0 +1,111 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "KeyMap"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+'@Folder "Version4.TableMap"
+Option Explicit
+
+Private Type TKeyMap
+    Items As Collection
+    KeyColumnName As String
+    KeyPath As String
+End Type
+Private This As TKeyMap
+
+Public Property Get KeyColumnName() As String
+    KeyColumnName = This.KeyColumnName
+End Property
+
+Public Property Let KeyColumnName(ByVal RHS As String)
+    This.KeyColumnName = RHS
+End Property
+
+Public Property Get KeyPath() As String
+    KeyPath = This.KeyPath
+End Property
+
+Public Property Let KeyPath(ByVal RHS As String)
+    This.KeyPath = RHS
+End Property
+
+Public Property Get Count() As Long
+    Count = This.Items.Count
+End Property
+
+Public Sub Add(ByVal KeyValue As String, ByVal RowIndex As Long)
+    Dim MappedKey As MappedKey
+    Set MappedKey = New MappedKey
+    With MappedKey
+        .KeyValue = KeyValue
+        .RowIndex = RowIndex
+    End With
+    This.Items.Add Item:=MappedKey
+End Sub
+
+Public Function Serialize() As String
+    Dim Result As String
+    Result = KeyColumnName & Chr$(ASCII_US) & KeyPath
+    
+    Serialize = Result
+End Function
+
+Public Sub Deserialize(ByVal SerializedString As String)
+    Dim SplitString As Variant
+    SplitString = Split(SerializedString, Chr$(ASCII_US))
+    Debug.Assert UBound(SplitString) = 1
+    
+    KeyColumnName = SplitString(0)
+    KeyPath = SplitString(1)
+End Sub
+
+Public Sub DEBUGPrint()
+    Debug.Print "KeyColumnName = "; KeyColumnName
+    Debug.Print "KeyPath = "; KeyPath
+End Sub
+
+Private Sub Class_Initialize()
+    Set This.Items = New Collection
+End Sub
+
+Public Sub ResolveIDs(ByVal Remote As Remote)
+    Dim Keys As Variant
+    ReDim Keys(1 To Count)
+    
+    Dim i As Long
+    For i = 1 To Count
+        Keys(i) = This.Items.Item(i).KeyValue
+    Next i
+    
+    Dim KeyIDs As Variant
+    KeyIDs = Remote.Keys.GetIDsFromQuery(KeyPath, Keys)
+    
+    For i = 1 To Count
+        This.Items.Item(i).KeyID = KeyIDs(i)
+    Next i
+End Sub
+
+Public Function GetRowFromKeyID(ByVal KeyID As String) As Long
+    Dim i As Long
+    For i = 1 To Count
+        If This.Items.Item(i).KeyID = KeyID Then
+            GetRowFromKeyID = This.Items.Item(i).RowIndex
+        End If
+    Next i
+End Function
+
+Public Function GetKeyIDs() As Variant
+    Dim Result As Variant
+    ReDim Result(1 To Count)
+    
+    Dim i As Long
+    For i = 1 To Count
+        Result(i) = This.Items.Item(i).KeyID
+    Next i
+    
+    GetKeyIDs = Result
+End Function
