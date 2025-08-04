@@ -11,7 +11,7 @@ Attribute VB_Exposed = False
 '@Folder "Version4.MapApplicator"
 Option Explicit
 
-Private Const DO_DEBUG As Boolean = False
+Private Const DO_DEBUG As Boolean = True
 
 Private Type TPullQuery
     MappedTable As MappedTable
@@ -36,18 +36,25 @@ Public Property Set Remote(ByVal RHS As Remote)
 End Property
 
 Public Sub Run()
+    If DO_DEBUG Then Debug.Print "PullQuery.Run Start"
+    
     This.Remote.Reload
     
     Dim KeyIDs As Variant
+    If DO_DEBUG Then Debug.Print "PullQuery.Run GetKeyIDs"
     KeyIDs = This.MappedTable.GetKeyIDs
     
     Dim FieldIDs As Variant
+    If DO_DEBUG Then Debug.Print "PullQuery.Run GetFields"
     FieldIDs = This.MappedTable.GetFieldIDs
     If IsEmpty(FieldIDs) Then Exit Sub
     
     Dim NewValues As Variant
+    If DO_DEBUG Then Debug.Print "PullQuery.Run GetValues"
     NewValues = This.Remote.Values.GetValues(KeyIDs, FieldIDs)
     UpdateFromRemote KeyIDs, FieldIDs, NewValues
+    
+    If DO_DEBUG Then Debug.Print "PullQuery.Run End"
 End Sub
 
 Private Sub UpdateFromRemote(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, ByVal NewValues As Variant)

@@ -11,7 +11,7 @@ Attribute VB_Exposed = False
 '@Folder "RemoteDataStore.Models.Plural"
 Option Explicit
 
-Private Const DO_DEBUG As Boolean = False
+Private Const DO_DEBUG As Boolean = True
 Private Const ARRAY_WIDTH As Long = 6
 Private Const HASH_LEN  As Long = 40
 

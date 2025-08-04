@@ -13,7 +13,7 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements ISettings
 
-Private Const DO_DEBUG As Boolean = False
+Private Const DO_DEBUG As Boolean = True
 
 Private Const SUBFOLDER As String = "Documents\Excel Macros"
 Private Const FLAGS_HEADER As String = "[flags]"
@@ -211,8 +211,6 @@ Private Sub LoadFromFile()
 End Sub
 
 Private Sub LoadSection(ByVal SectionHeading As String, ByVal Dictionary As Scripting.Dictionary)
-    If DO_DEBUG Then Debug.Print "Loaded "; UBound(This.Lines); " lines"
-    
     Dim SectionStart As Long
     For SectionStart = 1 To UBound(This.Lines)
         If This.Lines(SectionStart) = SectionHeading Then Exit For

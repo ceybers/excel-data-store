@@ -10,7 +10,7 @@ Attribute VB_Exposed = False
 '@Folder "RemoteDataStore.Models"
 Option Explicit
 
-Private Const DO_DEBUG As Boolean = False
+Private Const DO_DEBUG As Boolean = True
 Private Const WS_KEYS_NAME As String = "Keys"
 Private Const WS_FIELDS_NAME As String = "Fields"
 Private Const WS_VALUES_NAME  As String = "Values"
@@ -30,26 +30,40 @@ End Type
 Private This As TState
 
 Public Property Get Keys() As RemoteKeys
+    If DO_DEBUG Then Debug.Print "Remote.Keys Property Get"
     Set Keys = This.RemoteKeys
 End Property
 
 Public Property Get Fields() As RemoteFields
+    If DO_DEBUG Then Debug.Print "Remote.Fields Property Get"
+    If This.RemoteFields Is Nothing Then
+            Set This.RemoteFields = New RemoteFields
+            This.RemoteFields.Load This.Workbook.Worksheets.Item(WS_FIELDS_NAME)
+    End If
     Set Fields = This.RemoteFields
 End Property
 
 Public Property Get Values() As RemoteValues
+    If DO_DEBUG Then Debug.Print "Remote.Values Property Get"
+    If This.RemoteValues Is Nothing Then
+        Set This.RemoteValues = New RemoteValues
+        This.RemoteValues.Load This.Workbook.Worksheets.Item(WS_VALUES_NAME)
+    End If
     Set Values = This.RemoteValues
 End Property
 
 Public Property Get Commits() As RemoteCommits
+    If DO_DEBUG Then Debug.Print "Remote.Commits Property Get"
     Set Commits = This.RemoteCommits
 End Property
 
 Public Property Get Maps() As RemoteMaps
+    If DO_DEBUG Then Debug.Print "Remote.Maps Property Get"
     Set Maps = This.RemoteMaps
 End Property
 
 Public Property Get Tables() As RemoteTables
+    If DO_DEBUG Then Debug.Print "Remote.Tables Property Get"
     Set Tables = This.RemoteTables
 End Property
 
@@ -64,11 +78,15 @@ Public Sub Reload()
         Set .RemoteKeys = New RemoteKeys
         .RemoteKeys.Load This.Workbook.Worksheets.Item(WS_KEYS_NAME)
         
-        Set .RemoteFields = New RemoteFields
-        .RemoteFields.Load This.Workbook.Worksheets.Item(WS_FIELDS_NAME)
+        If Not .RemoteFields Is Nothing Then
+            Set .RemoteFields = New RemoteFields
+            .RemoteFields.Load This.Workbook.Worksheets.Item(WS_FIELDS_NAME)
+        End If
         
-        Set .RemoteValues = New RemoteValues
-        .RemoteValues.Load This.Workbook.Worksheets.Item(WS_VALUES_NAME)
+        If Not .RemoteValues Is Nothing Then
+            Set .RemoteValues = New RemoteValues
+            .RemoteValues.Load This.Workbook.Worksheets.Item(WS_VALUES_NAME)
+        End If
         
         Set .RemoteMaps = New RemoteMaps
         .RemoteMaps.Load This.Workbook.Worksheets.Item(WS_MAPS_NAME)
