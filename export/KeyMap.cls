@@ -14,6 +14,7 @@ Private Type TKeyMap
     Items As Collection
     KeyColumnName As String
     KeyPath As String
+    KeyIDs As Collection
 End Type
 Private This As TKeyMap
 
@@ -70,11 +71,15 @@ End Sub
 
 Private Sub Class_Initialize()
     Set This.Items = New Collection
+    Set This.KeyIDs = New Collection
 End Sub
 
 Public Sub ResolveIDs(ByVal Remote As Remote)
+    Log.Message "KeyMap ResolveIDs", "KeyMap"
     Dim Keys As Variant
     ReDim Keys(1 To Count)
+    
+    Set This.KeyIDs = New Collection
     
     Dim i As Long
     For i = 1 To Count
@@ -86,19 +91,29 @@ Public Sub ResolveIDs(ByVal Remote As Remote)
     
     For i = 1 To Count
         This.Items.Item(i).KeyID = KeyIDs(i)
+        ' TODO Assumes Key Column has no duplicates. Crashes if not!
+        If KeyIDs(i) <> vbNullString Then
+            This.KeyIDs.Add Item:=i, Key:=KeyIDs(i)
+        End If
     Next i
 End Sub
 
 Public Function GetRowFromKeyID(ByVal KeyID As String) As Long
-    Dim i As Long
-    For i = 1 To Count
-        If This.Items.Item(i).KeyID = KeyID Then
-            GetRowFromKeyID = This.Items.Item(i).RowIndex
-        End If
-    Next i
+    GetRowFromKeyID = This.KeyIDs.Item(KeyID)
+    Exit Function
+    
+    'Dim i As Long
+    'For i = 1 To Count
+    '    If This.Items.Item(i).KeyID = KeyID Then
+    '        GetRowFromKeyID = This.Items.Item(i).RowIndex
+    '        Exit Function
+    '    End If
+    'Next i
 End Function
 
 Public Function GetKeyIDs() As Variant
+    If Count = 0 Then Exit Function
+    
     Dim Result As Variant
     ReDim Result(1 To Count)
     
