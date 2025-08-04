@@ -70,7 +70,8 @@ Public Property Let Message(ByVal RHS As String)
     This.Message = RHS
 End Property
 
-Public Sub LoadFromArray(ByVal VariantArray As Variant, ByVal Row As Long)
+'@Ignore ParameterCanBeByVal
+Public Sub LoadFromArray(ByRef VariantArray As Variant, ByVal Row As Long)
     With This
         .CommitID = VariantArray(Row, 1)
         .TableID = VariantArray(Row, 2)

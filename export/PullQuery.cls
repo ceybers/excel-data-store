@@ -36,28 +36,39 @@ Public Property Set Remote(ByVal RHS As Remote)
 End Property
 
 Public Sub Run()
-    If DO_DEBUG Then Debug.Print "PullQuery.Run Start"
+    Log.Message "PullQuery.Run()", "PullQuery", Info_Level
     
+    Log.Message "This.Remote.Load", "PullQuery", Info_Level
     This.Remote.Reload
     
     Dim KeyIDs As Variant
-    If DO_DEBUG Then Debug.Print "PullQuery.Run GetKeyIDs"
+    Log.Message "This.MappedTable.GetKeyIDs", "PullQuery", Info_Level
     KeyIDs = This.MappedTable.GetKeyIDs
     
     Dim FieldIDs As Variant
-    If DO_DEBUG Then Debug.Print "PullQuery.Run GetFields"
+    Log.Message "PullQuery.Run GetFields", "PullQuery", Info_Level
     FieldIDs = This.MappedTable.GetFieldIDs
     If IsEmpty(FieldIDs) Then Exit Sub
     
     Dim NewValues As Variant
-    If DO_DEBUG Then Debug.Print "PullQuery.Run GetValues"
+    Log.Message "PullQuery.Run GetValues", "PullQuery", Info_Level
     NewValues = This.Remote.Values.GetValues(KeyIDs, FieldIDs)
+    Log.Message "PullQuery.Run UpdateFromRemote", "PullQuery", Info_Level
     UpdateFromRemote KeyIDs, FieldIDs, NewValues
     
-    If DO_DEBUG Then Debug.Print "PullQuery.Run End"
+    Log.Message "PullQuery.Run() End", "PullQuery", Info_Level
 End Sub
 
 Private Sub UpdateFromRemote(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, ByVal NewValues As Variant)
+    Log.Message "PullQuery.UpdateFromRemote creating KeyIndexes", "PullQuery", Info_Level
+    Dim KeyIndexes As Variant
+    ReDim KeyIndexes(1 To UBound(KeyIDs))
+    Dim i As Long
+    For i = 1 To UBound(KeyIDs)
+        KeyIndexes(i) = This.MappedTable.GetRowIndexFromKeyID(KeyIDs(i))
+    Next i
+    
+    Log.Message "PullQuery.UpdateFromRemote Looping through Fields", "PullQuery", Info_Level
     Dim f As Long
     For f = 1 To UBound(FieldIDs)
         Dim ListColumn As ListColumn
@@ -67,14 +78,11 @@ Private Sub UpdateFromRemote(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant,
         vv = ListColumn.DataBodyRange.Value2
         
         Dim k As Long
-        For k = 1 To UBound(KeyIDs)
-            Dim KeyIndex As Long
-            KeyIndex = This.MappedTable.GetRowIndexFromKeyID(KeyIDs(k))
-            
-            vv(KeyIndex, 1) = NewValues(k, f)
+        For k = 1 To UBound(KeyIndexes)
+            vv(KeyIndexes(k), 1) = NewValues(k, f)
         Next k
         
-        If DO_DEBUG Then Debug.Print "PullQuery.UpdateFromRemote writing to " & ListColumn.DataBodyRange.Address(False, False)
+        Log.Message "PullQuery.UpdateFromRemote writing to " & ListColumn.DataBodyRange.Address(False, False), "PullQuery", Info_Level
         ListColumn.DataBodyRange.Value2 = vv
     Next f
 End Sub

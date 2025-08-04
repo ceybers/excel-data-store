@@ -96,7 +96,8 @@ Public Property Let LastPush(ByVal RHS As Date)
     This.LastPush = RHS
 End Property
 
-Public Sub LoadFromArray(ByVal VariantArray As Variant, ByVal Row As Long)
+'@Ignore ParameterCanBeByVal
+Public Sub LoadFromArray(ByRef VariantArray As Variant, ByVal Row As Long)
     With This
         .ID = VariantArray(Row, 1)
         .SerializedString = VariantArray(Row, 2)

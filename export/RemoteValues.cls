@@ -61,16 +61,19 @@ Private Sub LoadFromWorksheet()
     Dim LatestHashRange As Range
     Set LatestHashRange = This.Worksheet.Columns.Item(COL_LATEST_HASH).SpecialCells(xlCellTypeConstants)
     If Not LatestHashRange Is Nothing Then
-        If DO_DEBUG Then Debug.Print "RemoteValues.LoadFromWorksheet taking intersect of " & DataBodyRange.Address(False, False) & " and " & LatestHashRange.Address(False, False)
+        Log.Message "RemoteValues.LoadFromWorksheet taking intersect of " & DataBodyRange.Address(False, False) & " and " & LatestHashRange.Address(False, False), "RemoteValues", Info_Level
         Set DataBodyRange = Application.Intersect(DataBodyRange, LatestHashRange.EntireRow)
     End If
     
     Dim WorksheetValues As Variant
-    If DO_DEBUG Then Debug.Print "RemoteValues.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False)
+    Log.Message "RemoteValues.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False), "RemoteValues", Info_Level
     WorksheetValues = DataBodyRange.Value2
     
     Dim i As Long
     For i = 1 To UBound(WorksheetValues, 1)
+        'If i Mod 100 = 0 Then
+        '    Log.Message "RemoteValues.LoadFromWorksheet " & i & " of " & UBound(WorksheetValues), "RemoteValues", Debug_level
+        'End If
         Dim NewRemoteValue As RemoteValue
         Set NewRemoteValue = New RemoteValue
         NewRemoteValue.LoadFromArray WorksheetValues, i

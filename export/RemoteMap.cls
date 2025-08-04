@@ -69,7 +69,8 @@ Public Property Let DeletionTime(ByVal RHS As Date)
     This.DeletionTime = RHS
 End Property
 
-Public Sub LoadFromArray(ByVal VariantArray As Variant, ByVal Row As Long)
+'@Ignore ParameterCanBeByVal
+Public Sub LoadFromArray(ByRef VariantArray As Variant, ByVal Row As Long)
     With This
         .ID = VariantArray(Row, 1)
         .SerializedString = VariantArray(Row, 2)

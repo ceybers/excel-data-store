@@ -30,12 +30,12 @@ End Type
 Private This As TState
 
 Public Property Get Keys() As RemoteKeys
-    If DO_DEBUG Then Debug.Print "Remote.Keys Property Get"
+    Log.Message "Remote.Keys Property Get", "Remote", verbose_Level
     Set Keys = This.RemoteKeys
 End Property
 
 Public Property Get Fields() As RemoteFields
-    If DO_DEBUG Then Debug.Print "Remote.Fields Property Get"
+    Log.Message "Remote.Fields Property Get", "Remote", verbose_Level
     If This.RemoteFields Is Nothing Then
             Set This.RemoteFields = New RemoteFields
             This.RemoteFields.Load This.Workbook.Worksheets.Item(WS_FIELDS_NAME)
@@ -44,7 +44,7 @@ Public Property Get Fields() As RemoteFields
 End Property
 
 Public Property Get Values() As RemoteValues
-    If DO_DEBUG Then Debug.Print "Remote.Values Property Get"
+    Log.Message "Remote.Values Property Get", "Remote", verbose_Level
     If This.RemoteValues Is Nothing Then
         Set This.RemoteValues = New RemoteValues
         This.RemoteValues.Load This.Workbook.Worksheets.Item(WS_VALUES_NAME)
@@ -53,23 +53,31 @@ Public Property Get Values() As RemoteValues
 End Property
 
 Public Property Get Commits() As RemoteCommits
-    If DO_DEBUG Then Debug.Print "Remote.Commits Property Get"
+    Log.Message "Remote.Commits Property Get", "Remote", verbose_Level
     Set Commits = This.RemoteCommits
 End Property
 
 Public Property Get Maps() As RemoteMaps
-    If DO_DEBUG Then Debug.Print "Remote.Maps Property Get"
+    Log.Message "Remote.Maps Property Get", "Remote", verbose_Level
     Set Maps = This.RemoteMaps
 End Property
 
 Public Property Get Tables() As RemoteTables
-    If DO_DEBUG Then Debug.Print "Remote.Tables Property Get"
+    Log.Message "Remote.Tables Property Get", "Remote", verbose_Level
     Set Tables = This.RemoteTables
 End Property
 
 Public Sub Load(ByVal Workbook As Workbook)
-    If DO_DEBUG Then Debug.Print "Remote.Load()"
+    Log.Message "Remote.Load()", "Remote", Info_Level
     Set This.Workbook = Workbook
+    
+    Dim DEBUGRepoState As String
+    DEBUGRepoState = "Repo State = " & _
+        This.Workbook.Worksheets.Item(WS_KEYS_NAME).UsedRange.Rows.Count & "k " & _
+        This.Workbook.Worksheets.Item(WS_FIELDS_NAME).UsedRange.Rows.Count & "f " & _
+        This.Workbook.Worksheets.Item(WS_VALUES_NAME).UsedRange.Rows.Count & "v"
+    
+    Log.Message DEBUGRepoState, "Remote", Debug_level
     Reload
 End Sub
 
@@ -98,3 +106,8 @@ Public Sub Reload()
         .RemoteCommits.Load This.Workbook.Worksheets.Item(WS_COMMITS_NAME)
     End With
 End Sub
+
+Public Sub Show()
+    This.Workbook.Windows.Item(1).Visible = True
+End Sub
+

@@ -55,6 +55,15 @@ Public Sub Run()
 End Sub
 
 Private Function UpdateToRemote(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant) As Variant
+    Log.Message "PushQuery.UpdateToRemote creating KeyIndexes", "PushQuery", Info_Level
+    Dim KeyIndexes As Variant
+    ReDim KeyIndexes(1 To UBound(KeyIDs))
+    Dim i As Long
+    For i = 1 To UBound(KeyIDs)
+        KeyIndexes(i) = This.MappedTable.GetRowIndexFromKeyID(KeyIDs(i))
+    Next i
+    
+    Log.Message "PushQuery.UpdateToRemote Looping through Fields", "PushQuery", Info_Level
     Dim Result As Variant
     ReDim Result(1 To UBound(KeyIDs), 1 To UBound(FieldIDs))
     
@@ -67,11 +76,8 @@ Private Function UpdateToRemote(ByVal KeyIDs As Variant, ByVal FieldIDs As Varia
         vv = ListColumn.DataBodyRange.Value2
         
         Dim k As Long
-        For k = 1 To UBound(KeyIDs)
-            Dim KeyIndex As Long
-            KeyIndex = This.MappedTable.GetRowIndexFromKeyID(KeyIDs(k))
-            
-            Result(k, f) = vv(KeyIndex, 1)
+        For k = 1 To UBound(KeyIndexes)
+            Result(k, f) = vv(KeyIndexes(k), 1)
         Next k
     Next f
     

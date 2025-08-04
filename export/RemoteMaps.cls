@@ -48,7 +48,7 @@ Private Sub LoadFromWorksheet()
     If DataBodyRange Is Nothing Then Exit Sub
     
     Dim WorksheetValues As Variant
-    If DO_DEBUG Then Debug.Print "RemoteMaps.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False)
+    Log.Message "RemoteMaps.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False), "RemoteMaps", Info_Level
     WorksheetValues = DataBodyRange.Value2
     
     Dim i As Long
