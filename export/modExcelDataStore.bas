@@ -10,6 +10,8 @@ Public Sub TableMapUI()
         MsgBox MSG_MAP_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
         Exit Sub
     End If
+    
+    RemoteFactory.GetRemote.Reload
 
     Dim ViewModel As TableMapVM
     Set ViewModel = New TableMapVM
@@ -108,13 +110,11 @@ End Sub
 
 '@EntryPoint
 Public Sub DataStoreUI()
-    Dim Model As DataStore
-    Set Model = New DataStore
-    Model.Load
+    RemoteFactory.GetRemote.Reload
     
     Dim ViewModel As RemoteViewModel
     Set ViewModel = New RemoteViewModel
-    ViewModel.Load Model.Remote
+    ViewModel.Load RemoteFactory.GetRemote
     
     Dim RemoteView As IView
     Set RemoteView = New RemoteView
