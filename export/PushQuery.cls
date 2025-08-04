@@ -34,6 +34,8 @@ Public Property Set Remote(ByVal RHS As Remote)
 End Property
 
 Public Sub Run()
+    This.Remote.Reload
+    
     Dim KeyIDs As Variant
     KeyIDs = This.MappedTable.GetKeyIDs
     

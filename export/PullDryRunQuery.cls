@@ -37,6 +37,8 @@ Public Property Set Remote(ByVal RHS As Remote)
 End Property
 
 Public Sub Run()
+    This.Remote.Reload
+    
     RemoveHighlights This.MappedTable.ListObject
     
     Dim KeyIDs As Variant
