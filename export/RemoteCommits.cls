@@ -48,7 +48,7 @@ Private Sub LoadFromWorksheet()
     If DataBodyRange Is Nothing Then Exit Sub
     
     Dim ExistingValues As Variant
-    Log.Message "RemoteCommits.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False), "RemoteCommits", Info_Level
+    Log.Message "RemoteCommits.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False), "RCommits", Info_Level
     ExistingValues = DataBodyRange.Value2
         
     Dim i As Long

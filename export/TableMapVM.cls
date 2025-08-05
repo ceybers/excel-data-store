@@ -26,6 +26,14 @@ Public Property Get Name() As String
     Name = This.ListObject.Name
 End Property
 
+Public Property Get TableID() As String
+    TableID = This.TableMap.TableID
+End Property
+
+Public Property Get MapID() As String
+    MapID = This.TableMap.MapID
+End Property
+
 Public Property Get SelectedKey() As String
     SelectedKey = This.TableMap.KeyMap.KeyColumnName
 End Property
@@ -59,7 +67,10 @@ Public Sub Load(ByVal ListObject As ListObject, ByVal TableMap As TableMap, ByVa
     Set This.TableMap = TableMap
     Set This.Remote = Remote
     
+    Log.Message "Load() LoadMappedFields", "TableMapVM"
     LoadMappedFields
+    
+    Log.Message "Load() LoadMappedFields", "TableMapVM"
     UpdateMappedFields
 End Sub
 
@@ -173,7 +184,7 @@ Public Sub Save()
 End Sub
 
 Private Function UpdateRemoteMaps() As String
-     Dim MapSerStr As String
+    Dim MapSerStr As String
     MapSerStr = This.TableMap.Serialize
     
     Dim RemoteMap As RemoteMap

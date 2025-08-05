@@ -3,6 +3,7 @@ Attribute VB_Name = "TableMapRemoteLoader"
 Option Explicit
 
 Public Function TryGetTableMapFromRemote(ByVal ListObject As ListObject, ByRef OutTableMap As TableMap) As Boolean
+    Log.Message "TryGetTableMapFromRemote", "TMapRLoadr"
     Dim SerializedTable As SerializedTable
     Set SerializedTable = New SerializedTable
     Set SerializedTable.ListObject = ListObject
@@ -17,12 +18,16 @@ Public Function TryGetTableMapFromRemote(ByVal ListObject As ListObject, ByRef O
         Dim RemoteTable As RemoteTable
         Set RemoteTable = RemoteTables.Item(i)
         
+        Log.Message " Deserialize(" & i & ")", "TMapRLoadr"
         SerializedTable.Deserialize RemoteTable.SerializedString
         
         If SerializedTable.TryMatch = LISTOBJECT_NAME Or SerializedTable.TryMatch = WORKSHEET_NAME Then
+            Log.Message "  GetRemote.Maps.TryGetByID()", "TMapRLoadr"
             If GetRemote.Maps.TryGetByID(RemoteTable.MapID, RemoteMap) = True Then
                 Dim TableMap As TableMap
+                Log.Message "   TryFitTableMap", "TMapRLoadr"
                 If TryFitTableMap(ListObject, RemoteMap, TableMap) Then
+                    Log.Message "    TryFitTableMap = True", "TMapRLoadr"
                     TableMap.Deserialize RemoteMap.SerializedString
                     TableMap.TableID = RemoteTable.ID
                     TableMap.MapID = RemoteMap.ID

@@ -47,7 +47,7 @@ Private Sub LoadFromWorksheet()
     If DataBodyRange Is Nothing Then Exit Sub
     
     Dim WorksheetValues As Variant
-    Log.Message "RemoteTables.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False), "RemoteTables", Info_Level
+    Log.Message "RemoteTables.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False), "RTables", Info_Level
     WorksheetValues = DataBodyRange.Value2
     
     Dim i As Long
@@ -60,9 +60,14 @@ Private Sub LoadFromWorksheet()
 End Sub
 
 Public Sub Save()
+    Log.Message "Save()", "RTables", Info_Level
+    
     Debug.Assert Not This.Worksheet Is Nothing
     
-    If This.IsDirty = False Then Exit Sub
+    If This.IsDirty = False Then
+        Log.Message "IsDirty = False", "RTables", Info_Level
+        Exit Sub
+    End If
     
     ClearWorksheet
     
@@ -78,6 +83,7 @@ Public Sub Save()
     
     SetNumberFormats
     
+    Log.Message "Writing " & Count & " rows to worksheet", "RTables"
     RangeSetValueFromVariant This.Worksheet.Range("A2"), UpdateValues
     
     SortWorksheet

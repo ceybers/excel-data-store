@@ -7,6 +7,7 @@ Public Function Log() As IDebugEx
     If mLog Is Nothing Then
         Set mLog = DebugEx.Create
         'mLog.AddProvider ImmediateLoggingProvider.Create
+        'mLog.AddProvider FileLoggingProvider.Create
     End If
     Set Log = mLog
 End Function

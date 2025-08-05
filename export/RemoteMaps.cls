@@ -48,7 +48,7 @@ Private Sub LoadFromWorksheet()
     If DataBodyRange Is Nothing Then Exit Sub
     
     Dim WorksheetValues As Variant
-    Log.Message "RemoteMaps.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False), "RemoteMaps", Info_Level
+    Log.Message "RemoteMaps.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False), "RMaps", Info_Level
     WorksheetValues = DataBodyRange.Value2
     
     Dim i As Long
@@ -61,9 +61,14 @@ Private Sub LoadFromWorksheet()
 End Sub
 
 Public Sub Save()
+    Log.Message "Save()", "RMaps", Info_Level
+    
     Debug.Assert Not This.Worksheet Is Nothing
     
-    If This.IsDirty = False Then Exit Sub
+    If This.IsDirty = False Then
+        Log.Message "IsDirty = False", "RMaps", Info_Level
+        Exit Sub
+    End If
     
     ClearWorksheet
     
@@ -79,6 +84,7 @@ Public Sub Save()
     
     SetNumberFormats
     
+    Log.Message "Writing " & Count & " rows to worksheet", "RMaps"
     RangeSetValueFromVariant This.Worksheet.Range("A2"), UpdatedValues
     
     SortWorksheet

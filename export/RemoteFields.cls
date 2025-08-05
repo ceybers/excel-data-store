@@ -56,7 +56,7 @@ Private Sub LoadFromWorksheet()
     If DataBodyRange Is Nothing Then Exit Sub
     
     Dim WorksheetValues As Variant
-    Log.Message "RemoteFields.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False), "RemoteFields", Info_Level
+    Log.Message "RemoteFields.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False), "RFields", Info_Level
     WorksheetValues = DataBodyRange.Value2
     
     Dim i As Long
