@@ -41,6 +41,11 @@ Private Sub cmdKeysExport_Click()
     This.ViewModel.ExportKeys
 End Sub
 
+Private Sub cmdRebuildIDs_Click()
+    This.ViewModel.Rebuild
+    Me.cmdRebuildIDs.Enabled = False
+End Sub
+
 Private Function IView_ShowDialog(ByVal ViewModel As Object) As Boolean
     Set This.ViewModel = ViewModel
     This.IsCancelled = False
@@ -58,6 +63,10 @@ Private Sub OnCancel()
 End Sub
 
 Private Sub UpdateControls()
+    Me.MultiPage1.Value = 0
+End Sub
+
+Private Sub LateLoadFields()
     LoadRemoteFieldsToListView This.ViewModel.Fields, Me.lvFields
 End Sub
 
@@ -77,9 +86,11 @@ Private Sub LoadRemoteKeyPathsToTreeView(ByVal KeyPaths As Collection, ByVal Tre
     
     Dim RootNode As Node
     Set RootNode = Treeview.Nodes.Add(Key:="N000", Text:="Keys")
-    RootNode.Expanded = False
+    RootNode.Expanded = True
     
     If KeyPaths.Count = 0 Then Exit Sub
+    
+    RootNode.Expanded = False
     
     Dim i As Long
     For i = 1 To KeyPaths.Count
@@ -210,13 +221,20 @@ Private Sub MultiPage1_Change()
     ' BUG ListView on a MultiPage that is not the default Page when opened will be visually positioned at 0,0
     ' the first time the user switches to that page. If the user changes to a different page and back it will
     ' appear in the correction position. Alternatively, make it invisible then visible again.
-    With Me.lvKeys
-        .Visible = False
-        .Visible = True
-    End With
-    
-    If Me.MultiPage1.Value Then
-        LateLoadKeys
+    If Me.MultiPage1.Value = 1 Then
+        If Me.tvKeyPaths.Nodes.Count = 0 Then
+            LateLoadKeys
+        End If
+        Me.tvKeyPaths.Visible = False
+        Me.tvKeyPaths.Visible = True
+        Me.lvKeys.Visible = False
+        Me.lvKeys.Visible = True
+    ElseIf Me.MultiPage1.Value = 2 Then
+        If Me.lvFields.ListItems.Count = 0 Then
+            Me.lvFields.Visible = False
+        End If
+        LateLoadFields
+        Me.lvFields.Visible = True
     End If
 End Sub
 

@@ -17,3 +17,5 @@ Public Const MSG_MAP_NO_TABLE As String = "Please select a table first before ru
 Public Const MSG_PULL_NO_TABLE As String = "Please select a table first before running the Pull command."
 Public Const MSG_PUSH_NO_TABLE As String = "Please select a table first before running the Push command."
 
+Public Const MSG_REMOTE_REBUILD_KEYS As String = "Remote Keys Table rebuild OK!"
+Public Const MSG_REMOTE_REBUILD_FIELDS As String = "Remote Fields Table rebuild OK!"

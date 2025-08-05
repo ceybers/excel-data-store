@@ -61,3 +61,7 @@ End Sub
 Public Sub ExportKeys()
     MsgBox "NYI"
 End Sub
+
+Public Sub Rebuild()
+    This.Remote.Rebuild
+End Sub

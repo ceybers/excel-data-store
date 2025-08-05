@@ -7,7 +7,6 @@
 - Key management, including soft-deletion/deprecation.
 
 ## Fields
-- Rebuild blank IDs (for manually inserting new fields without using the UI)
 - Remote Field Manager UI (read/write)
 - Rename existing Fields. 
 - Delete existing Fields 

@@ -135,18 +135,29 @@ End Sub
 
 '@EntryPoint
 Public Sub DataStoreUI()
+    Log.StartLogging
+    Log.Message "@EntryPoint DataStoreUI", "DataStoreUI"
+    
+    Log.Message "RemoteFactory.GetRemote.Reload", "DataStoreUI"
     RemoteFactory.GetRemote.Reload
+    
+    Log.Message "RemoteFactory.GetRemote.Show", "DataStoreUI"
     RemoteFactory.GetRemote.Show
     
     Dim ViewModel As RemoteViewModel
     Set ViewModel = New RemoteViewModel
+    Log.Message "ViewModel.Load RemoteFactory.GetRemote", "DataStoreUI"
     ViewModel.Load RemoteFactory.GetRemote
     
     Dim RemoteView As IView
     Set RemoteView = New RemoteView
+    Log.Message "Entering UserForm...", "DataStoreUI"
     If RemoteView.ShowDialog(ViewModel) Then
+        Log.Message "...exited UserForm", "DataStoreUI"
         Exit Sub
     Else
+        Log.Message "...exited UserForm", "DataStoreUI"
         Exit Sub
     End If
+    Log.StopLogging
 End Sub

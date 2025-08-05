@@ -1,4 +1,7 @@
 # Patch Notes
+## v0.5.6-beta (2025/08/05)
+- [x] Remote can now rebuild missing IDs on Keys and Fields.
+
 ## v0.5.5-beta (2025/08/04)
 - [x] Implemented DebugEx library for logging.
 - [x] Changed Remote* LoadFromArray to ByRef instead of copying the array for each call for each row. 

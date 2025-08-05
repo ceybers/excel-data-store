@@ -111,3 +111,10 @@ Public Sub Show()
     This.Workbook.Windows.Item(1).Visible = True
 End Sub
 
+Public Sub Rebuild()
+    RebuildRemoteTable This.Workbook.Worksheets.Item(WS_KEYS_NAME), Array("KeyID", "Path", "Key", "Caption", "CreationTime", "ModificationTime", "DeletionTime")
+    MsgBox MSG_REMOTE_REBUILD_KEYS, vbInformation + vbOKOnly, APP_TITLE
+    RebuildRemoteTable This.Workbook.Worksheets.Item(WS_FIELDS_NAME), Array("FieldID", "Path", "Name", "Caption", "CreationTime", "ModificationTime", "DeletionTime")
+    MsgBox MSG_REMOTE_REBUILD_FIELDS, vbInformation + vbOKOnly, APP_TITLE
+End Sub
+
