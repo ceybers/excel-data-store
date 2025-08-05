@@ -64,6 +64,10 @@ End Property
 
 Public Property Get Tables() As RemoteTables
     Log.Message "Remote.Tables Property Get", "Remote", verbose_Level
+    If This.RemoteTables Is Nothing Then
+        Set This.RemoteTables = New RemoteTables
+        This.RemoteTables.Load This.Workbook.Worksheets.Item(WS_TABLES_NAME)
+    End If
     Set Tables = This.RemoteTables
 End Property
 
@@ -99,8 +103,10 @@ Public Sub Reload()
         Set .RemoteMaps = New RemoteMaps
         .RemoteMaps.Load This.Workbook.Worksheets.Item(WS_MAPS_NAME)
         
-        Set .RemoteTables = New RemoteTables
-        .RemoteTables.Load This.Workbook.Worksheets.Item(WS_TABLES_NAME)
+        'If Not .RemoteTables Is Nothing Then
+            Set .RemoteTables = New RemoteTables
+            .RemoteTables.Load This.Workbook.Worksheets.Item(WS_TABLES_NAME)
+        'End If
         
         Set .RemoteCommits = New RemoteCommits
         .RemoteCommits.Load This.Workbook.Worksheets.Item(WS_COMMITS_NAME)
