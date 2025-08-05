@@ -40,6 +40,10 @@ Public Sub Load(ByVal Worksheet As Worksheet)
 End Sub
 
 Private Sub LoadFromWorksheet()
+    Do While This.Item.Count > 0
+        This.Item.Remove 1
+    Loop
+    
     SortWorksheet
     
     Dim DataBodyRange As Range
@@ -87,6 +91,8 @@ Public Sub Save()
     RangeSetValueFromVariant This.Worksheet.Range("A2"), UpdateValues
     
     SortWorksheet
+    
+    LoadFromWorksheet
 End Sub
 
 Private Sub ClearWorksheet()
@@ -108,7 +114,9 @@ Private Sub SetNumberFormats()
 End Sub
 
 Private Sub SortWorksheet()
-    This.Worksheet.UsedRange.Sort Key1:=This.Worksheet.Columns.Item(1), Header:=xlYes
+    This.Worksheet.UsedRange.Sort Header:=xlYes, _
+        Key1:=This.Worksheet.Columns.Item(6), Order1:=xlDescending, _
+        Key2:=This.Worksheet.Columns.Item(5), Order2:=xlDescending
 End Sub
 
 Public Function AddOrGet(ByVal SerializedString As String, ByVal Caption As String, ByVal MapID As String) As RemoteTable
@@ -118,6 +126,8 @@ Public Function AddOrGet(ByVal SerializedString As String, ByVal Caption As Stri
     Dim RemoteTable As RemoteTable
     If TryGetByID(NewID, RemoteTable) Then
         Set AddOrGet = RemoteTable
+        RemoteTable.ModificationTime = Application.Evaluate("=NOW()")
+        This.IsDirty = True
         Exit Function
     Else
         Set AddOrGet = Add(SerializedString, Caption, MapID)
@@ -141,7 +151,11 @@ Public Function Add(ByVal SerializedString As String, ByVal Caption As String, B
         .CreationTime = Application.Evaluate("=NOW()")
     End With
     
-    This.Item.Add NewRemoteTable
+    If This.Item.Count > 0 Then
+        This.Item.Add Item:=NewRemoteTable, before:=1
+    Else
+        This.Item.Add Item:=NewRemoteTable
+    End If
     This.IsDirty = True
     
     Set Add = NewRemoteTable
