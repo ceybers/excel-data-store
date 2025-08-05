@@ -1,4 +1,7 @@
 # TODO
+## General
+- [ ] BUG FIX Partial Pull, Partial Push and Highlight Changes not working properly.
+
 ## Keys
 - Synonym resolving for Keys (sym-links).
 - Pull Keys-only action
@@ -22,7 +25,7 @@
 - Backdating Commits (i.e., storing Historical SCD data)
 
 ## Maps
-- [ ] BUG Pull/Push not using the most recent Map for a table when it has more than one map.
+- [x] ~~BUG Pull/Push not using the most recent Map for a table when it has more than one map.~~
 
 ## GUI
 - Remote Manager UI to select TreeView/ListView items by Key, not Index.

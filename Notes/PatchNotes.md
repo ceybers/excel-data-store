@@ -1,6 +1,9 @@
 # Patch Notes
 ## v0.5.6-beta (2025/08/05)
 - [x] Remote can now rebuild missing IDs on Keys and Fields.
+- [x] Remote UI now loads from Remote on demand instead of upfront.
+- [x] The most updated Table Map should be used after saving an existing Table Map.
+- [x] BUG FIX Highlight Changes would crash if there was a Duplicate Values conditional format present.
 
 ## v0.5.5-beta (2025/08/04)
 - [x] Implemented DebugEx library for logging.

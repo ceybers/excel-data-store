@@ -88,6 +88,8 @@ End Sub
 
 Private Sub UpdateControls()
     Me.txtTableName.Value = This.ViewModel.Name
+    Me.txtTableID.Value = This.ViewModel.TableID
+    Me.txtMapID.Value = This.ViewModel.MapID
     
     LoadListColumnsToComboBox Me.cboLocalKey, This.ViewModel.GetListColumns
     LoadComboBoxFromCollection Me.cboRemoteKey, This.ViewModel.KeyPaths
