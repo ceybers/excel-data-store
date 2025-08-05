@@ -53,6 +53,7 @@ Public Sub Run()
     
     Dim ChangedValues As Variant
     ChangedValues = This.Remote.Values.GetChangeMask(KeyIDs, FieldIDs, ExistingValues)
+    
     HighlightChanges KeyIDs, FieldIDs, ChangedValues
 End Sub
 
@@ -81,6 +82,8 @@ Private Function UpdateToRemote(ByVal KeyIDs As Variant, ByVal FieldIDs As Varia
 End Function
 
 Private Sub HighlightChanges(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, ByVal ChangeMask As Variant)
+    Stop
+    
     Dim Changes As Collection
     Set Changes = New Collection
     
@@ -126,12 +129,16 @@ Private Sub RemoveHighlights(ByVal ListObject As ListObject)
 End Sub
 
 Private Function TryGetFormatConditionByFormula(ByVal Formula As String, ByVal Range As Range, ByRef OutFormatCondition As FormatCondition) As Boolean
-    Dim ThisFormatCondition As FormatCondition
+    Dim ThisFormatCondition As Object
     For Each ThisFormatCondition In Range.FormatConditions
-        If ThisFormatCondition.Formula1 = Formula Then
-            Set OutFormatCondition = ThisFormatCondition
-            TryGetFormatConditionByFormula = True
-            Exit Function
+        If TypeOf ThisFormatCondition Is FormatCondition Then
+            Dim ThisFormatConditionB As FormatCondition
+            Set ThisFormatConditionB = ThisFormatCondition
+            If ThisFormatConditionB.Formula1 = Formula Then
+                Set OutFormatCondition = ThisFormatConditionB
+                TryGetFormatConditionByFormula = True
+                Exit Function
+            End If
         End If
     Next ThisFormatCondition
 End Function
