@@ -25,7 +25,7 @@ Data is `Pushed` from the table in the top left to the central repository at the
 ## 📝 Notes
 - 🩹 [Patch Notes](Notes/PatchNotes.md)
 - 🚧 [TODO](Notes/TODO.md)
-- ☕ [History behind Table Transfer Tool](Notes/History.md)
+- ☕ [History behind Excel Data Store](Notes/History.md)
   
 ## 🙏 Thanks
 - Developed using [Rubberduck VBA](https://github.com/rubberduck-vba/Rubberduck) and greatly inspired by [Mathieu Guindon](https://github.com/retailcoder/)'s blog posts.
