@@ -42,6 +42,10 @@ Private Sub cmdOpen_Click()
     Me.Hide
 End Sub
 
+Private Sub lblTableImage_DblClick(ByVal Cancel As MSForms.ReturnBoolean)
+    frmAbout.Show
+End Sub
+
 Private Sub lvTableMaps_DblClick()
     If Not This.ViewModel.GetSelectedMatch Is Nothing Then
         Me.Hide

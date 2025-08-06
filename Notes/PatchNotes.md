@@ -1,4 +1,10 @@
 # Patch Notes
+## v0.6.1-beta (2025/08/06)
+- [x] Pull and Push (Full and Partial) now count changes and asks for confirmation before committing changes.
+- [x] Highlight can now highlight Key and Mapped Fields 
+- [x] Remove all Highlights EntryPoint on ribbon.
+- [x] New icons for ribbon and UserForms.
+
 ## v0.6.0-beta (2025/08/06)
 - [x] The best fitting Table Map is now picked when opening the TableMap UI or running Pull/Push.
   - Scored based on table name, worksheet name, workbook name, workbook path, whether the Key column is present in the table, and how many of the Fields in the Table Map are present in the selected table.

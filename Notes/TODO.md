@@ -1,6 +1,6 @@
 # TODO
 ## General
-- [ ] BUG FIX Partial Pull, Partial Push and Highlight Changes not working properly.
+- [x] ~~BUG FIX Partial Pull, Partial Push and Highlight Changes not working properly.~~
 
 ## Keys
 - Synonym resolving for Keys (sym-links).

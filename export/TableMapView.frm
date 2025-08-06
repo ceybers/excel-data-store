@@ -13,7 +13,6 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-
 '@IgnoreModule ArgumentWithIncompatibleObjectType, HungarianNotation
 '@Folder "Version4.Views"
 Option Explicit
@@ -43,7 +42,7 @@ Private Sub cboRemoteKey_Change()
     This.ViewModel.SelectKeyPathByString Me.cboRemoteKey.Value
 End Sub
 
-Private Sub imgLocalTable_Click()
+Private Sub imgLocalTable_DblClick(ByVal Cancel As MSForms.ReturnBoolean)
     frmAbout.Show
 End Sub
 
