@@ -5,15 +5,56 @@ Option Explicit
 '@EntryPoint
 Public Sub TableMapUI()
     Log.StartLogging
-    Log.Message "TableMapUI TableMapUI", "TableMapUI"
+    Log.Message "TableMapMatcherUI", "TMapMatchUI"
     
-    Log.Message "MappedTableFactory.CreateMappedTable", "TableMapUI"
-    Dim MappedTable As MappedTable
-    Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=False, Resolve:=False)
-    If MappedTable Is Nothing Then
+    Dim VM As TableMapMatcherVM
+    Set VM = New TableMapMatcherVM
+    VM.Load
+    If VM.IsValid = False Then
         MsgBox MSG_MAP_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
         Exit Sub
     End If
+    
+    VM.GetBestMappedTable
+    Log.StopLogging
+        
+    TableMapUIWithMappedTable VM.MappedTable
+End Sub
+
+'@EntryPoint
+Public Sub TableMapMatchesUI()
+    Log.StartLogging
+    Log.Message "TableMapMatcherUI", "TMapMatchUI"
+    
+    Dim VM As TableMapMatcherVM
+    Set VM = New TableMapMatcherVM
+    VM.Load
+    If VM.IsValid = False Then
+        MsgBox MSG_MAP_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
+        Exit Sub
+    End If
+    
+    Log.Message "Entering UserForm...", "TableMapUI", UI_Level
+    Dim View As IView
+    Set View = New TableMapMatcher
+    If View.ShowDialog(VM) Then
+        Log.Message "...exited UserForm", "TableMapUI", UI_Level
+        Log.Message "ViewModel.Save", "TableMapUI"
+        VM.Save
+        Log.StopLogging
+        
+        TableMapUIWithMappedTable VM.MappedTable
+        Exit Sub
+    Else
+        Log.Message "...exited UserForm", "TableMapUI", UI_Level
+        Log.StopLogging
+        Exit Sub
+    End If
+End Sub
+
+Private Sub TableMapUIWithMappedTable(ByVal MappedTable As MappedTable)
+    Log.StartLogging
+    Log.Message "TableMapUI", "TableMapUI"
     
     Log.Message "RemoteFactory.GetRemote.Reload", "TableMapUI"
     RemoteFactory.GetRemote.Reload
@@ -23,17 +64,17 @@ Public Sub TableMapUI()
     Set ViewModel = New TableMapVM
     ViewModel.Load MappedTable.ListObject, MappedTable.TableMap, RemoteFactory.GetRemote
     
-    Log.Message "Entering UserForm...", "TableMapUI"
+    Log.Message "Entering UserForm...", "TableMapUI", UI_Level
     Dim View As IView
     Set View = New TableMapView
     If View.ShowDialog(ViewModel) Then
-        Log.Message "...exited UserForm", "TableMapUI"
+        Log.Message "...exited UserForm", "TableMapUI", UI_Level
         Log.Message "ViewModel.Save", "TableMapUI"
         ViewModel.Save
         Log.StopLogging
         Exit Sub
     Else
-        Log.Message "...exited UserForm", "TableMapUI"
+        Log.Message "...exited UserForm", "TableMapUI", UI_Level
         Log.StopLogging
         Exit Sub
     End If
@@ -182,12 +223,12 @@ Public Sub DataStoreUI()
     
     Dim RemoteView As IView
     Set RemoteView = New RemoteView
-    Log.Message "Entering UserForm...", "DataStoreUI"
+    Log.Message "Entering UserForm...", "DataStoreUI", UI_Level
     If RemoteView.ShowDialog(ViewModel) Then
-        Log.Message "...exited UserForm", "DataStoreUI"
+        Log.Message "...exited UserForm", "DataStoreUI", UI_Level
         Exit Sub
     Else
-        Log.Message "...exited UserForm", "DataStoreUI"
+        Log.Message "...exited UserForm", "DataStoreUI", UI_Level
         Exit Sub
     End If
     Log.StopLogging

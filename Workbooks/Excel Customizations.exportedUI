@@ -22,8 +22,10 @@
 <mso:tabs>
 <mso:tab id="mso_c1.DACA8F" label="Data Store">
 
-<mso:group id="mso_c2.DACA8F" label="Map" autoScale="true">
-<mso:button idQ="x1:excel-data-store.xlam_TableMapUI_0_F3E8DB" label="Map Table" imageMso="CreateQueryFromWizard" onAction="C:\Users\User\Repos\Private\excel-data-store\Workbooks\excel-data-store.xlsm!TableMapUI" visible="true"/>
+<mso:group id="mso_c2.DACA8F" label="Map" autoScale="false">
+<mso:button size="large" idQ="x1:excel-data-store.xlam_TableMapUI_0_F3E8DB" label="Map Table" imageMso="CreateQueryFromWizard" onAction="C:\Users\User\Repos\Private\excel-data-store\Workbooks\excel-data-store.xlsm!TableMapUI" visible="true"/>
+<mso:button size="normal" idQ="x1:excel-data-store.xlam_TableMapMatchesUI_0_11421962" label="View Maps" imageMso="TableFind" onAction="C:\Users\User\Repos\Public\excel-data-store\Workbooks\excel-data-store.xlsm!TableMapMatchesUI" visible="true"/>
+
 </mso:group>
 
 <mso:group id="mso_c3.DAF085" label="Pull" autoScale="false">
@@ -43,10 +45,10 @@
 
 <mso:group id="mso_c1.F822B4" label="TEST" autoScale="true">
 <mso:button idQ="x1:excel-data-store.xlam_TESTClearTable_0_F83C37" label="Clear" imageMso="Clear" onAction="C:\Users\User\Repos\Private\excel-data-store\Workbooks\excel-data-store.xlsm!TESTClearTable" visible="true"/>
+<mso:button idQ="x1:excel-data-store.xlam_TESTRandomiseTable_0_6D6688D" label="Randomise" imageMso="ListMacros" onAction="C:\Users\User\Repos\Public\excel-data-store\Workbooks\excel-data-store.xlsm!TESTRandomiseTable" visible="true"/>
 </mso:group>
 
 </mso:tab>
 </mso:tabs>
 </mso:ribbon>
 </mso:customUI>
-
