@@ -8,7 +8,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '@IgnoreModule ProcedureNotUsed
-'@Folder "Version4.MapApplicator"
+'@Folder "Version4.Queries"
 Option Explicit
 
 Private Type TPullQuery
@@ -36,12 +36,34 @@ End Property
 Public Sub Run()
     This.Remote.Reload
     
+    RangeHighlighter.RemoveHighlights This.MappedTable.ListObject
+    
     Dim KeyIDs As Variant
     KeyIDs = This.MappedTable.GetKeyIDs
     
     Dim FieldIDs As Variant
     FieldIDs = This.MappedTable.GetFieldIDs
     If IsEmpty(FieldIDs) Then Exit Sub
+    
+    Dim ExistingValues As Variant
+    ExistingValues = This.MappedTable.GetExistingValuesFromTable(KeyIDs, FieldIDs)
+    
+    Dim ChangeCount As Long
+    ChangeCount = This.Remote.Values.GetChangeCount(KeyIDs, FieldIDs, ExistingValues)
+    
+    Dim ChangedValues As Variant
+    ChangedValues = This.Remote.Values.GetChangeMask(KeyIDs, FieldIDs, ExistingValues)
+    
+    This.MappedTable.HighlightChanges KeyIDs, FieldIDs, ChangedValues, hcBeforePush
+    
+    If ChangeCount = 0 Then
+        MsgBox MSG_PUSH_NOCHANGES, vbInformation + vbOKOnly, APP_TITLE
+    ElseIf vbNo = MsgBox(Replace$(MSG_PUSH_CONFIRM, "{0}", ChangeCount), vbQuestion + vbYesNo + vbDefaultButton2, APP_TITLE) Then
+        Exit Sub
+    End If
+    
+    RangeHighlighter.RemoveHighlights This.MappedTable.ListObject
+    This.MappedTable.HighlightChanges KeyIDs, FieldIDs, ChangedValues, hcAfterPush
     
     Dim Commit As RemoteCommit
     Set Commit = This.Remote.Commits.Add(This.MappedTable.TableID, This.MappedTable.MapID, This.MappedTable.Caption)

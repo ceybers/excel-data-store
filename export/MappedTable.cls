@@ -123,3 +123,74 @@ Public Function GetExistingValuesFromTable(ByVal KeyIDs As Variant, ByVal FieldI
     
     GetExistingValuesFromTable = Result
 End Function
+
+Public Sub HighlightChanges(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, ByVal ChangeMask As Variant, ByVal HighlightColor As HighlightColor)
+    Dim Changes As Collection
+    Set Changes = New Collection
+    
+    Dim f As Long
+    For f = 1 To UBound(FieldIDs)
+        Dim ListColumn As ListColumn
+        Set ListColumn = GetListColumnFromFieldID(FieldIDs(f))
+        
+        Dim k As Long
+        For k = 1 To UBound(KeyIDs)
+            Dim KeyIndex As Long
+            KeyIndex = GetRowIndexFromKeyID(KeyIDs(k))
+            
+            If ChangeMask(k, f) = 1 Then
+                Changes.Add ListColumn.DataBodyRange.Cells.Item(KeyIndex, 1)
+            End If
+        Next k
+    Next f
+    
+    If Changes.Count = 0 Then Exit Sub
+
+    If Changes.Count = 1 Then
+        HighlightRange Changes.Item(1), HighlightColor
+        Exit Sub
+    End If
+    
+    Dim ChangeRange As Range
+    Set ChangeRange = Changes.Item(1)
+
+    Dim i As Long
+    For i = 2 To Changes.Count
+        Set ChangeRange = Application.Union(ChangeRange, Changes.Item(i))
+    Next i
+    
+    HighlightRange ChangeRange, HighlightColor
+End Sub
+
+Public Sub HighlightMappedFields()
+    RangeHighlighter.RemoveHighlights This.ListObject
+    
+    Dim KeyListColumn As ListColumn
+    If TryGetListColumn(This.TableMap.KeyMap.KeyColumnName, This.ListObject, KeyListColumn) Then
+        RangeHighlighter.HighlightRange KeyListColumn.Range.Cells(1, 1), hcKey
+    End If
+    
+    Dim MappedListColumns As Collection
+    Set MappedListColumns = New Collection
+    
+    Dim i As Long
+    For i = 1 To This.TableMap.FieldMap.Count
+        Dim MappedField As MappedField
+        Set MappedField = This.TableMap.FieldMap.Item(i)
+        Dim ListColumn As ListColumn
+        If TryGetListColumn(MappedField.ListColumnName, This.ListObject, ListColumn) Then
+            MappedListColumns.Add ListColumn.Range.Cells(1, 1)
+        End If
+    Next i
+    
+    If MappedListColumns.Count = 0 Then Exit Sub
+    
+    Dim HighlightRange As Range
+    Set HighlightRange = MappedListColumns.Item(1)
+
+    For i = 2 To MappedListColumns.Count
+        Set HighlightRange = Application.Union(HighlightRange, MappedListColumns.Item(i))
+    Next i
+    
+    RangeHighlighter.HighlightRange HighlightRange, hcHeaders
+End Sub

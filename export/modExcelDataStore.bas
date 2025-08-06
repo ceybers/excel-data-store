@@ -132,12 +132,36 @@ Public Sub PullPartial()
 End Sub
 
 '@EntryPoint
-Public Sub PullHighlightOnly()
-    Log.StartLogging
-    Log.Message "@EntryPoint PullHighlightOnly"
-    
+Public Sub HighlightAll()
+    DoHighlight PartialSelection:=False
+End Sub
+
+'@EntryPoint
+Public Sub HighlightSelection()
+    DoHighlight PartialSelection:=True
+End Sub
+
+'@EntryPoint
+Public Sub HighlightRemove()
+    If Selection.ListObject Is Nothing Then Exit Sub
+    RangeHighlighter.RemoveHighlights Selection.ListObject
+End Sub
+
+'@EntryPoint
+Public Sub HighlightMappedFields()
     Dim MappedTable As MappedTable
     Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=True, Resolve:=True)
+    If MappedTable Is Nothing Then Exit Sub
+    MappedTable.HighlightMappedFields
+End Sub
+
+
+Private Sub DoHighlight(ByVal PartialSelection As Boolean)
+    Log.StartLogging
+    Log.Message "DoHighlight()"
+    
+    Dim MappedTable As MappedTable
+    Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=PartialSelection, Resolve:=True)
     If MappedTable Is Nothing Then
         MsgBox MSG_PULL_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
         Exit Sub
@@ -154,6 +178,7 @@ Public Sub PullHighlightOnly()
     
     Log.StopLogging
 End Sub
+
 
 '@EntryPoint
 Public Sub Push()

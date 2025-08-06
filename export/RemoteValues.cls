@@ -161,6 +161,29 @@ Public Function GetChangeMask(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant
     
     GetChangeMask = Result
 End Function
+
+Public Function GetChangeCount(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, ByVal Values As Variant) As Long
+    Dim Result As Long
+
+    If IsEmpty(This.LatestHash) Then
+        GetChangeCount = UBound(KeyIDs) * UBound(FieldIDs)
+        Exit Function
+    End If
+    
+    
+    Dim i As Long
+    For i = 1 To UBound(KeyIDs)
+        Dim j As Long
+        For j = 1 To UBound(FieldIDs)
+            If Values(i, j) <> GetValue(KeyIDs(i), FieldIDs(j)) Then
+                Result = Result + 1
+            End If
+        Next j
+    Next i
+    
+    GetChangeCount = Result
+End Function
+
 Private Sub SetFullChangeMask(ByRef ValuesVariant As Variant)
     Dim i As Long
     For i = 1 To UBound(ValuesVariant, 1)

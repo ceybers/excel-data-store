@@ -8,7 +8,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '@IgnoreModule ProcedureNotUsed
-'@Folder "Version4.MapApplicator"
+'@Folder "Version4.Queries"
 Option Explicit
 
 Private Const DO_DEBUG As Boolean = True
@@ -41,6 +41,8 @@ Public Sub Run()
     Log.Message "This.Remote.Load", "PullQuery", Info_Level
     This.Remote.Reload
     
+    RangeHighlighter.RemoveHighlights This.MappedTable.ListObject
+    
     Dim KeyIDs As Variant
     Log.Message "This.MappedTable.GetKeyIDs", "PullQuery", Info_Level
     KeyIDs = This.MappedTable.GetKeyIDs
@@ -49,6 +51,26 @@ Public Sub Run()
     Log.Message "PullQuery.Run GetFields", "PullQuery", Info_Level
     FieldIDs = This.MappedTable.GetFieldIDs
     If IsEmpty(FieldIDs) Then Exit Sub
+    
+    Dim ExistingValues As Variant
+    ExistingValues = This.MappedTable.GetExistingValuesFromTable(KeyIDs, FieldIDs)
+    
+    Dim ChangedValues As Variant
+    ChangedValues = This.Remote.Values.GetChangeMask(KeyIDs, FieldIDs, ExistingValues)
+    
+    This.MappedTable.HighlightChanges KeyIDs, FieldIDs, ChangedValues, hcBeforePull
+    
+    Dim ChangeCount As Long
+    ChangeCount = This.Remote.Values.GetChangeCount(KeyIDs, FieldIDs, ExistingValues)
+    
+    If ChangeCount = 0 Then
+        MsgBox MSG_PULL_NOCHANGES, vbInformation + vbOKOnly, APP_TITLE
+    ElseIf vbNo = MsgBox(Replace$(MSG_PULL_CONFIRM, "{0}", ChangeCount), vbQuestion + vbYesNo + vbDefaultButton2, APP_TITLE) Then
+        Exit Sub
+    End If
+    
+    RangeHighlighter.RemoveHighlights This.MappedTable.ListObject
+    This.MappedTable.HighlightChanges KeyIDs, FieldIDs, ChangedValues, hcAfterPull
     
     Dim NewValues As Variant
     Log.Message "PullQuery.Run GetValues", "PullQuery", Info_Level
