@@ -34,7 +34,7 @@ Public Sub Add(ByVal ListColumnName As String, ByVal FieldID As String)
         .ListColumnName = ListColumnName
         .FieldID = FieldID
     End With
-    This.Items.Add NewMappedField
+    This.Items.Add Item:=NewMappedField, Key:=FieldID
 End Sub
 
 Public Sub SelectField(ByVal ListColumnName As String)
@@ -83,7 +83,7 @@ Public Sub Deserialize(ByVal SerializedString As String)
         Dim MappedField As MappedField
         Set MappedField = New MappedField
         MappedField.Deserialize SplitString(i)
-        This.Items.Add MappedField
+        This.Items.Add Item:=MappedField, Key:=MappedField.FieldID
     Next i
 End Sub
 
@@ -121,15 +121,7 @@ Public Function GetFieldIDs() As Variant
 End Function
 
 Public Function GetByFieldID(ByVal FieldID As String) As MappedField
-    Dim i As Long
-    For i = 1 To Count
-        Dim MappedField As MappedField
-        Set MappedField = This.Items.Item(i)
-        If MappedField.FieldID = FieldID Then
-            Set GetByFieldID = MappedField
-            Exit Function
-        End If
-    Next i
+    Set GetByFieldID = This.Items.Item(FieldID)
 End Function
 
 Public Function TryGetMappedFieldByName(ByVal Name As String, ByRef OutMappedField As MappedField) As Boolean

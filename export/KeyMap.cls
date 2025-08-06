@@ -93,7 +93,7 @@ Public Sub ResolveIDs(ByVal Remote As Remote)
         This.Items.Item(i).KeyID = KeyIDs(i)
         ' TODO Assumes Key Column has no duplicates. Crashes if not!
         If KeyIDs(i) <> vbNullString Then
-            This.KeyIDs.Add Item:=i, Key:=KeyIDs(i)
+            This.KeyIDs.Add Item:=This.Items.Item(i).RowIndex, Key:=KeyIDs(i)
         End If
     Next i
 End Sub

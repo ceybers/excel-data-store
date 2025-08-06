@@ -146,7 +146,7 @@ Public Function GetChangeMask(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant
     ReDim Result(1 To UBound(KeyIDs), 1 To UBound(FieldIDs))
 
     If IsEmpty(This.LatestHash) Then
-        ' TODO CHK Should this not be 1 for all elements?
+        SetFullChangeMask Result
         GetChangeMask = Result
         Exit Function
     End If
@@ -161,6 +161,15 @@ Public Function GetChangeMask(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant
     
     GetChangeMask = Result
 End Function
+Private Sub SetFullChangeMask(ByRef ValuesVariant As Variant)
+    Dim i As Long
+    For i = 1 To UBound(ValuesVariant, 1)
+        Dim j As Long
+        For j = 1 To UBound(ValuesVariant, 2)
+            ValuesVariant(i, j) = 1
+        Next j
+    Next i
+End Sub
 
 Public Function GetValues(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant) As Variant
     Dim Result As Variant

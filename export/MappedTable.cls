@@ -99,3 +99,27 @@ End Function
 Public Function GetRowIndexFromKeyID(ByVal KeyID As String) As Long
     GetRowIndexFromKeyID = This.TableMap.KeyMap.GetRowFromKeyID(KeyID)
 End Function
+
+Public Function GetExistingValuesFromTable(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant) As Variant
+    Dim Result As Variant
+    ReDim Result(1 To UBound(KeyIDs), 1 To UBound(FieldIDs))
+    
+    Dim f As Long
+    For f = 1 To UBound(FieldIDs)
+        Dim ListColumn As ListColumn
+        Set ListColumn = GetListColumnFromFieldID(FieldIDs(f))
+        
+        Dim vv As Variant
+        vv = ListColumn.DataBodyRange.Value2
+        
+        Dim k As Long
+        For k = 1 To UBound(KeyIDs)
+            Dim KeyIndex As Long
+            KeyIndex = GetRowIndexFromKeyID(KeyIDs(k))
+            
+            Result(k, f) = vv(KeyIndex, 1)
+        Next k
+    Next f
+    
+    GetExistingValuesFromTable = Result
+End Function
