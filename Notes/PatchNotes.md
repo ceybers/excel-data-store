@@ -1,4 +1,9 @@
 # Patch Notes
+## v0.6.0-beta (2025/08/06)
+- [x] The best fitting Table Map is now picked when opening the TableMap UI or running Pull/Push.
+  - Scored based on table name, worksheet name, workbook name, workbook path, whether the Key column is present in the table, and how many of the Fields in the Table Map are present in the selected table.
+- [x] UI for browsing Table Maps in the Data Store, including results of how well they match the selected table.   
+
 ## v0.5.6-beta (2025/08/05)
 - [x] Remote can now rebuild missing IDs on Keys and Fields.
 - [x] Remote UI now loads from Remote on demand instead of upfront.
