@@ -117,6 +117,8 @@ Public Function AddOrGet(ByVal SerializedString As String, ByVal Caption As Stri
     Dim RemoteMap As RemoteMap
     If TryGetByID(NewID, RemoteMap) Then
         Set AddOrGet = RemoteMap
+        RemoteMap.ModificationTime = Application.Evaluate("=NOW()")
+        This.IsDirty = True
         Exit Function
     Else
         Set AddOrGet = Add(SerializedString, Caption)

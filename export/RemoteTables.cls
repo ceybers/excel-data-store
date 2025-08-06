@@ -149,6 +149,7 @@ Public Function Add(ByVal SerializedString As String, ByVal Caption As String, B
         .Caption = Caption
         .MapID = MapID
         .CreationTime = Application.Evaluate("=NOW()")
+        .ModificationTime = Application.Evaluate("=NOW()")
     End With
     
     If This.Item.Count > 0 Then
