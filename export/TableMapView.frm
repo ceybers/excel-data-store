@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} TableMapView 
    Caption         =   "TableMapView"
-   ClientHeight    =   7020
+   ClientHeight    =   7815
    ClientLeft      =   120
    ClientTop       =   465
-   ClientWidth     =   9360.001
+   ClientWidth     =   12555
    OleObjectBlob   =   "TableMapView.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -187,8 +187,8 @@ Private Sub LoadRemoteFieldsToListView(ByVal ListView As MSComctlLib.ListView, B
         .ColumnHeaders.Add Text:="Name"
         .ColumnHeaders.Add Text:="Name"
         .ColumnHeaders.Item(1).Width = 96 '(.Width / 2) - 8
-        .ColumnHeaders.Item(2).Width = 72 '(.Width / 3) - 8
-        .ColumnHeaders.Item(3).Width = 72 '(.Width / 3) - 8
+        .ColumnHeaders.Item(2).Width = 96 '(.Width / 3) - 8 = 72
+        .ColumnHeaders.Item(3).Width = 96 '(.Width / 3) - 8
     End With
    
     Dim i As Long
