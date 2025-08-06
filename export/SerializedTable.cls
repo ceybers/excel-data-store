@@ -28,6 +28,26 @@ Private Type TSerializedTable
 End Type
 Private This As TSerializedTable
 
+Public Property Get WorkbookFullName() As String
+    WorkbookFullName = This.WorkbookFullName
+End Property
+
+Public Property Get WorkbookPath() As String
+    WorkbookPath = This.WorkbookPath
+End Property
+
+Public Property Get WorkbookName() As String
+    WorkbookName = This.WorkbookName
+End Property
+
+Public Property Get WorksheetName() As String
+    WorksheetName = This.WorksheetName
+End Property
+
+Public Property Get ListObjectName() As String
+    ListObjectName = This.ListObjectName
+End Property
+
 Public Property Get ListObject() As ListObject
     Set ListObject = This.ListObject
 End Property
