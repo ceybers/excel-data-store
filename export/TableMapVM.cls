@@ -177,24 +177,32 @@ End Sub
 Public Sub Save()
     UpdateFieldMap
     
-    Dim RemoteMapID As String
-    RemoteMapID = UpdateRemoteMaps
+    UpdateRemoteMapsAndTables
     
-    UpdateRemoteTables RemoteMapID
+    'Dim RemoteMapID As String
+    'RemoteMapID = UpdateRemoteMaps
+    
+    'UpdateRemoteTables RemoteMapID
 End Sub
 
-Private Function UpdateRemoteMaps() As String
+Private Function UpdateRemoteMapsAndTables() As String
     Dim MapSerStr As String
     MapSerStr = This.TableMap.Serialize
     
+    ' TODO Why is the ViewModel setting RemoteMap.Caption?
+    Dim Caption As String
+    Caption = This.TableMap.KeyMap.KeyColumnName & " @ " & This.ListObject.Name & " [" & This.TableMap.FieldMap.Count & "]"
+    
     Dim RemoteMap As RemoteMap
-    Set RemoteMap = This.Remote.Maps.AddOrGet(MapSerStr, This.ListObject.Name)
+    Set RemoteMap = This.Remote.Maps.AddOrGet(MapSerStr, Caption)
     This.Remote.Maps.Save
     
-    UpdateRemoteMaps = RemoteMap.ID
+    'UpdateRemoteMaps = RemoteMap.ID
+    
+    UpdateRemoteTables RemoteMap.ID, Caption
 End Function
 
-Private Sub UpdateRemoteTables(ByVal MapID As String)
+Private Sub UpdateRemoteTables(ByVal MapID As String, ByVal MapCaption As String)
     Dim SerializedTable As SerializedTable
     Set SerializedTable = New SerializedTable
     Set SerializedTable.ListObject = This.ListObject
@@ -202,8 +210,12 @@ Private Sub UpdateRemoteTables(ByVal MapID As String)
     Dim TblSerStr As String
     TblSerStr = SerializedTable.Serialize
     
+    ' TODO Why is the ViewModel setting RemoteTable.Caption?
+    Dim Caption As String
+    Caption = MapCaption & " in " & This.ListObject.Parent.Parent.Name ' WB/Filename
+    
     Dim RemoteTable As RemoteTable
-    Set RemoteTable = This.Remote.Tables.AddOrGet(TblSerStr, This.ListObject.Name, MapID)
+    Set RemoteTable = This.Remote.Tables.AddOrGet(TblSerStr, Caption, MapID)
     This.Remote.Tables.Save
 End Sub
 
