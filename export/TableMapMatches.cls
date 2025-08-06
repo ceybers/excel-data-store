@@ -103,7 +103,13 @@ Public Function GetBestMappedTable() As MappedTable
         End If
     Next i
     
-    If BestIndex > 0 Then
-        Set GetBestMappedTable = GetMappedTableByIndex(BestIndex)
+    If Highscore = 0 Or BestIndex = 0 Then
+        Dim MappedTable As MappedTable
+        Set MappedTable = New MappedTable
+        MappedTable.Load This.ListObject, New TableMap
+        Set GetBestMappedTable = MappedTable
+        Exit Function
     End If
+    
+    Set GetBestMappedTable = GetMappedTableByIndex(BestIndex)
 End Function
