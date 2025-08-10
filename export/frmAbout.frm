@@ -14,6 +14,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
+
 '@IgnoreModule HungarianNotation
 '@Folder "Version4.Views"
 Option Explicit

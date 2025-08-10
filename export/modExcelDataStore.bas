@@ -1,4 +1,5 @@
 Attribute VB_Name = "modExcelDataStore"
+'@IgnoreModule FunctionReturnValueDiscarded
 '@Folder("Version4")
 Option Explicit
 
@@ -18,7 +19,8 @@ Public Sub TableMapUI()
     VM.GetBestMappedTable
     Log.StopLogging
         
-    TableMapUIWithMappedTable VM.MappedTable
+    'TableMapUIWithMappedTable VM.MappedTable
+    TableMapUIWithMappedTable2 VM.MappedTable
 End Sub
 
 '@EntryPoint
@@ -43,7 +45,7 @@ Public Sub TableMapMatchesUI()
         VM.Save
         Log.StopLogging
         
-        TableMapUIWithMappedTable VM.MappedTable
+        TableMapUIWithMappedTable2 VM.MappedTable
         Exit Sub
     Else
         Log.Message "...exited UserForm", "TableMapUI", UI_Level
@@ -52,25 +54,24 @@ Public Sub TableMapMatchesUI()
     End If
 End Sub
 
-Private Sub TableMapUIWithMappedTable(ByVal MappedTable As MappedTable)
+
+Public Sub TableMapUIWithMappedTable2(ByVal MappedTable As MappedTable)
     Log.StartLogging
     Log.Message "TableMapUI", "TableMapUI"
     
     Log.Message "RemoteFactory.GetRemote.Reload", "TableMapUI"
     RemoteFactory.GetRemote.Reload
 
-    Log.Message "TableMapVM.Load LO TM GR", "TableMapUI"
+    Log.Message "TableMapVM.Load MT GR", "TableMapUI"
     Dim ViewModel As TableMapVM
     Set ViewModel = New TableMapVM
-    ViewModel.Load MappedTable.ListObject, MappedTable.TableMap, RemoteFactory.GetRemote
+    ViewModel.Load MappedTable, RemoteFactory.GetRemote
     
     Log.Message "Entering UserForm...", "TableMapUI", UI_Level
     Dim View As IView
     Set View = New TableMapView
     If View.ShowDialog(ViewModel) Then
         Log.Message "...exited UserForm", "TableMapUI", UI_Level
-        Log.Message "ViewModel.Save", "TableMapUI"
-        ViewModel.Save
         Log.StopLogging
         Exit Sub
     Else

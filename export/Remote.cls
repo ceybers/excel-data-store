@@ -10,7 +10,6 @@ Attribute VB_Exposed = False
 '@Folder "RemoteDataStore.Models"
 Option Explicit
 
-Private Const DO_DEBUG As Boolean = True
 Private Const WS_KEYS_NAME As String = "Keys"
 Private Const WS_FIELDS_NAME As String = "Fields"
 Private Const WS_VALUES_NAME  As String = "Values"

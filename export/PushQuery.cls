@@ -67,8 +67,6 @@ Public Sub Run()
     
     Dim Commit As RemoteCommit
     Set Commit = This.Remote.Commits.Add(This.MappedTable.TableID, This.MappedTable.MapID, This.MappedTable.Caption)
-    'Commit.Caption = This.MappedTable.Caption & Mid$(Commit.Caption, 17, 22) ' Include Table Name and Workbook Name in Commit
-    'This.Remote.Commits.Save
     
     Dim ValuesToPush As Variant
     ValuesToPush = UpdateToRemote(KeyIDs, FieldIDs)

@@ -1,5 +1,5 @@
 Attribute VB_Name = "MappedTableFactory"
-'@Folder "TableMapMatcher.Model"
+'@Folder "TableMapMatcher.Factories"
 Option Explicit
 
 Public Function CreateMappedTable(ByVal PartialSelection As Boolean, ByVal Resolve As Boolean) As MappedTable

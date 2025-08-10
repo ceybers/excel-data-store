@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} TableMapView 
-   Caption         =   "TableMapView"
-   ClientHeight    =   7815
+   Caption         =   "Data Store Table Mapper"
+   ClientHeight    =   6615
    ClientLeft      =   120
    ClientTop       =   465
-   ClientWidth     =   12555
+   ClientWidth     =   9000.001
    OleObjectBlob   =   "TableMapView.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -13,7 +13,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-'@IgnoreModule ArgumentWithIncompatibleObjectType, HungarianNotation
+
+'@IgnoreModule ImplicitDefaultMemberAccess, ArgumentWithIncompatibleObjectType, HungarianNotation
 '@Folder "Version4.Views"
 Option Explicit
 
@@ -25,41 +26,101 @@ Private Type TState
 End Type
 Private This As TState
 
-Private Sub cmdOK_Click()
-    Me.Hide
-End Sub
-
 Private Sub cmdCancel_Click()
     OnCancel
 End Sub
-
-Private Sub cboLocalKey_Change()
-    This.ViewModel.SelectKeyByName Me.cboLocalKey.Text
-    UpdateSelectedItems
+Private Sub cmdAutoMap_Click()
+    If vbYes = MsgBox(MSG_AUTOMAP, vbQuestion + vbYesNo + vbDefaultButton2, APP_TITLE) Then
+        This.ViewModel.DoAutoMap
+        UpdateControls
+    End If
 End Sub
 
-Private Sub cboRemoteKey_Change()
-    This.ViewModel.SelectKeyPathByString Me.cboRemoteKey.Value
+Private Sub cmdReset_Click()
+    If vbYes = MsgBox(MSG_RESETALL, vbQuestion + vbYesNo + vbDefaultButton2, APP_TITLE) Then
+        This.ViewModel.DoResetAll
+        UpdateControls
+    End If
 End Sub
 
-Private Sub imgLocalTable_DblClick(ByVal Cancel As MSForms.ReturnBoolean)
+Private Sub cmdSaveMap_Click()
+    This.ViewModel.DoSave
+    Me.Hide
+End Sub
+
+Private Sub cboKeyPaths_Change()
+    This.ViewModel.SelectKeyPathByKey Me.cboKeyPaths.Value
+    UpdateControls
+End Sub
+
+Private Sub imgTableMap_Click()
     frmAbout.Show
 End Sub
 
-Private Sub lvLocalFields_ItemClick(ByVal Item As MSComctlLib.ListItem)
-    This.ViewModel.SelectLocalFieldByIndex Item.Index
-    UpdateSelectedItems
+Private Sub lvMappedFields_DblClick()
+    If Not Me.lvMappedFields.SelectedItem Is Nothing Then
+        If This.ViewModel.TryAutoMapSelected() Then
+            UpdateControls
+        End If
+    End If
 End Sub
 
-Private Sub lvRemoteFields_ItemClick(ByVal Item As MSComctlLib.ListItem)
-    This.ViewModel.SelectRemoteFieldByIndex Item.Index
-    UpdateSelectedItems
+Private Sub lvMappedFields_ItemClick(ByVal Item As MSComctlLib.ListItem)
+    This.ViewModel.SelectLocalByKey Item.Key
+    UpdateControls
 End Sub
 
-Private Sub lvLocalFields_DblClick()
-    This.ViewModel.SelectLocalFieldByIndex Me.lvLocalFields.SelectedItem.Index
-    This.ViewModel.TryAutoMapSelected
-    UpdateSelectedItems
+Private Sub tvRemoteFields_DblClick()
+    If Not Me.tvRemoteFields.SelectedItem Is Nothing Then
+        This.ViewModel.SelectRemoteByKey Me.tvRemoteFields.SelectedItem.Key
+        UpdateControls
+    End If
+End Sub
+
+Private Sub tvRemoteFields_Expand(ByVal Node As MSComctlLib.Node)
+    If PathHelpers.IsNodePath(Node.Key) Then
+        Node.Image = IMG_FOLDEROPEN
+    End If
+End Sub
+
+Private Sub tvRemoteFields_Collapse(ByVal Node As MSComctlLib.Node)
+    If PathHelpers.IsNodePath(Node.Key) Then
+        Node.Image = IMG_FOLDERCLSD
+    End If
+End Sub
+
+Private Sub tvRemoteFields_KeyDown(KeyCode As Integer, ByVal Shift As Integer)
+    If KeyCode = 13 Then
+        If Not Me.tvRemoteFields.SelectedItem Is Nothing Then
+            This.ViewModel.SelectRemoteByKey Me.tvRemoteFields.SelectedItem.Key
+        UpdateControls
+        End If
+        Me.lvMappedFields.SetFocus
+        KeyCode = 0
+    End If
+End Sub
+
+Private Sub tvRemoteFields_NodeClick(ByVal Node As MSComctlLib.Node)
+    This.ViewModel.SelectRemoteByKey Node.Key
+    UpdateControls
+End Sub
+
+Private Sub txtLocalFieldSearch_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    If KeyCode = 13 Then
+        This.ViewModel.LocalFields.Search Me.txtLocalFieldSearch.Value
+        UpdateControls
+        Me.lvMappedFields.SetFocus
+        KeyCode = 0
+    End If
+End Sub
+
+Private Sub txtRemoteFieldSearch_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    If KeyCode = 13 Then
+        This.ViewModel.RemoteFields.Search Me.txtRemoteFieldSearch.Value
+        UpdateControls
+        Me.tvRemoteFields.SetFocus
+        KeyCode = 0
+    End If
 End Sub
 
 Private Sub UserForm_QueryClose(Cancel As Integer, CloseMode As Integer)
@@ -73,6 +134,7 @@ Private Function IView_ShowDialog(ByVal ViewModel As Object) As Boolean
     Set This.ViewModel = ViewModel
     This.IsCancelled = False
     
+    InitializeControls
     UpdateControls
     
     Me.Show
@@ -85,168 +147,180 @@ Private Sub OnCancel()
     Me.Hide
 End Sub
 
-Private Sub UpdateControls()
-    Me.txtTableName.Value = This.ViewModel.Name
-    Me.txtTableID.Value = This.ViewModel.TableID
-    Me.txtMapID.Value = This.ViewModel.MapID
+Private Sub InitializeControls()
+    Me.txtTableName = This.ViewModel.Name
     
-    LoadListColumnsToComboBox Me.cboLocalKey, This.ViewModel.GetListColumns
-    LoadComboBoxFromCollection Me.cboRemoteKey, This.ViewModel.KeyPaths
+    LoadKeyPathsToComboBox This.ViewModel.KeyPaths, Me.cboKeyPaths
     
-    LoadLocalFieldsToListView Me.lvLocalFields, This.ViewModel.LocalFields
-    LoadRemoteFieldsToListView Me.lvRemoteFields, This.ViewModel.RemoteFields
+    InitLocalFieldsListView Me.lvMappedFields
+    LoadLocalFieldsToListView This.ViewModel.LocalFields, Me.lvMappedFields
+    
+    InitRemoteFieldsTreeView Me.tvRemoteFields
+    LoadRemotePathsToTreeView This.ViewModel.RemoteFields, Me.tvRemoteFields
+    LoadRemoteFieldsToTreeView This.ViewModel.RemoteFields, Me.tvRemoteFields
+    
+    UpdateControls
 End Sub
 
-Private Sub LoadListColumnsToComboBox(ByVal ComboBox As ComboBox, ByVal ListColumns As ListColumns)
-    ComboBox.Clear
-    
-    Dim ListColumn As ListColumn
-    For Each ListColumn In ListColumns
-        ComboBox.AddItem ListColumn.Name, (ListColumn.Index - 1)
-    Next ListColumn
-    
-    If This.ViewModel.SelectedKey <> vbNullString Then
-        ComboBox.Text = This.ViewModel.SelectedKey
-    End If
-End Sub
-
-Private Sub LoadComboBoxFromCollection(ByVal ComboBox As ComboBox, ByVal Collection As Collection)
-    ComboBox.Clear
-    If Collection.Count = 0 Then Exit Sub
-    
+Private Sub LoadKeyPathsToComboBox(ByVal KeyPaths As KeyPathsVM, ByVal ComboBox As ComboBox)
     Dim i As Long
-    For i = 1 To Collection.Count
-        ComboBox.AddItem Collection.Item(i), i - 1
-    Next i
-    
-    If This.ViewModel.SelectedKeyPath <> vbNullString Then
-        ComboBox.Value = This.ViewModel.SelectedKeyPath
-    End If
+    For i = 1 To KeyPaths.Count
+        ComboBox.AddItem KeyPaths.Item(i)
+    Next
+    ComboBox.Enabled = False
 End Sub
 
-Private Sub LoadLocalFieldsToListView(ByVal ListView As MSComctlLib.ListView, ByVal LocalFields As Collection)
+Private Sub InitLocalFieldsListView(ByVal ListView As ListView)
     With ListView
-        .ListItems.Clear
-        .ColumnHeaders.Clear
-        .LabelEdit = lvwManual
-        .HideSelection = False
+        .BorderStyle = ccNone
+        .LabelEdit = tvwManual
         .FullRowSelect = True
+        .HideSelection = False
         .View = lvwReport
-        .ColumnHeaders.Add Text:="Local"
-        .ColumnHeaders.Add Text:="Remote"
-        .ColumnHeaders.Item(1).Width = (.Width / 2) - 8
-        .ColumnHeaders.Item(2).Width = (.Width / 2) - 8
+        Set .SmallIcons = frmPictures16.GetImageList
     End With
-    
+    With ListView.ColumnHeaders
+        .Add Text:=LV_COL_LCN, Width:=(ListView.Width / 2)
+        .Add Text:=LV_COL_MAP, Width:=(ListView.Width / 2) - 16
+    End With
+End Sub
+
+Private Sub LoadLocalFieldsToListView(ByVal LocalFields As LocalFieldsVM, ByVal ListView As ListView)
     Dim i As Long
     For i = 1 To LocalFields.Count
-        Dim LocalField As MappedFieldVM
+        Dim ListItem As ListItem
+        Set ListItem = ListView.ListItems.Add(Key:=LocalFields.Item(i).Key, _
+            Text:=LocalFields.Item(i).Name)
+        ListItem.ListSubItems.Add Text:=vbNullString
+    Next i
+End Sub
+
+Private Sub UpdateLocalFieldsInListView(ByVal LocalFields As LocalFieldsVM, ByVal ListView As ListView)
+    Dim i As Long
+    For i = 1 To LocalFields.Count
+        Dim LocalField As LocalFieldVM
         Set LocalField = LocalFields.Item(i)
         
         Dim ListItem As ListItem
-        Set ListItem = ListView.ListItems.Add(Text:=LocalField.Name)
-        ListItem.ListSubItems.Add Text:=LocalField.MappedToCaption
-    Next i
-    
-    If ListView.ListItems.Count > 1 Then
-        ListView.ListItems.Item(1).Selected = True
-        This.ViewModel.SelectLocalFieldByIndex 1
-    End If
-    
-    UpdateLocalFieldsInListView ListView, LocalFields
-End Sub
-
-Private Sub UpdateLocalFieldsInListView(ByVal ListView As MSComctlLib.ListView, ByVal LocalFields As Collection)
-    Dim i As Long
-    For i = 1 To ListView.ListItems.Count
-        Dim LocalField As MappedFieldVM
-        Set LocalField = LocalFields.Item(i)
+        Set ListItem = ListView.ListItems.Item(i)
         
-        With ListView.ListItems.Item(i)
-            .ListSubItems.Item(1).Text = LocalField.MappedToCaption
-            If LocalField.IsKey Then
-                .ListSubItems.Item(1).Text = "(Key column)"
-            End If
-            .ListSubItems.Item(1).ForeColor = IIf(LocalField.IsMapped, RGB(0, 0, 0), RGB(128, 128, 128))
-            .ForeColor = IIf(LocalField.IsKey, RGB(128, 128, 128), RGB(0, 0, 0))
-        End With
+        If This.ViewModel.LocalFields.Selected.Key = LocalField.Key Then
+            ListItem.Selected = True
+        Else
+            ListItem.Selected = False
+        End If
+        
+        If LocalField.IsMapped Then
+            ListItem.SmallIcon = IMG_MAPPED
+            ListItem.ListSubItems.Item(1) = LocalField.MappedToCaption
+        ElseIf LocalField.IsKey Then
+            ListItem.SmallIcon = IMG_KEY
+            ListItem.ListSubItems.Item(1) = LV_CAP_UNMAPPED
+        Else
+            ListItem.SmallIcon = IMG_BLANK
+            ListItem.ListSubItems.Item(1) = vbNullString
+        End If
     Next i
-    
 End Sub
 
-Private Sub LoadRemoteFieldsToListView(ByVal ListView As MSComctlLib.ListView, ByVal RemoteFields As RemoteFields)
-    With ListView
-        .ListItems.Clear
-        .ColumnHeaders.Clear
-        .LabelEdit = lvwManual
+Private Sub InitRemoteFieldsTreeView(ByVal TreeView As TreeView)
+    Debug.Assert TreeView.Nodes.Count = 0
+    
+    With TreeView
+        .BorderStyle = ccNone
+        .LabelEdit = tvwManual
         .HideSelection = False
-        .FullRowSelect = True
-        .View = lvwReport
-        .ColumnHeaders.Add Text:="Caption"
-        .ColumnHeaders.Add Text:="Name"
-        .ColumnHeaders.Add Text:="Name"
-        .ColumnHeaders.Item(1).Width = 96 '(.Width / 2) - 8
-        .ColumnHeaders.Item(2).Width = 96 '(.Width / 3) - 8 = 72
-        .ColumnHeaders.Item(3).Width = 96 '(.Width / 3) - 8
+        .Style = tvwTreelinesPictureText
+        Set .ImageList = frmPictures16.GetImageList
+        .Indentation = 16
     End With
-   
+    
+    TreeView.Nodes.Add Key:=NODE_KEY_UNMAPPED, Text:=TV_CAP_UNMAPPED
+    TreeView.Nodes.Add Key:=NODE_KEY_ROOT, Text:=TV_CAP_ROOT, Image:=IMG_FIELDS
+End Sub
+
+Private Sub LoadRemotePathsToTreeView(ByVal RemoteFields As RemoteFieldsVM, ByVal TreeView As TreeView)
+    Dim i As Long
+    For i = 1 To RemoteFields.Paths.Count
+        Dim p As String
+        p = RemoteFields.Paths.Item(i)
+        
+        Dim prev As Long
+        prev = InStrRev(p, "\")
+        
+        Dim ParentNode As Node
+        If prev = 0 Then
+            Set ParentNode = TreeView.Nodes.Item(NODE_KEY_ROOT)
+        Else
+            Set ParentNode = TreeView.Nodes.Item(PathHelpers.PrefixNode(Left$(p, prev - 1)))
+        End If
+        
+        Dim Caption As String
+        If prev = 0 Then
+            Caption = p
+        Else
+            Caption = Mid$(p, prev + 1, Len(p) - prev)
+        End If
+        
+        Dim Node As Node
+        Set Node = TreeView.Nodes.Add(Relative:=ParentNode, Relationship:=tvwChild, _
+            Key:=PathHelpers.PrefixNode(p), Text:=Caption, Image:=IMG_FOLDEROPEN)
+        Node.Expanded = True
+    Next i
+End Sub
+
+Private Sub LoadRemoteFieldsToTreeView(ByVal RemoteFields As RemoteFieldsVM, ByVal TreeView As TreeView)
     Dim i As Long
     For i = 1 To RemoteFields.Count
-        LoadRemoteFieldToListView ListView, RemoteFields.Item(i)
-    Next i
-End Sub
-
-Private Sub LoadRemoteFieldToListView(ByVal ListView As MSComctlLib.ListView, ByVal RemoteField As RemoteField)
-    Dim ListItem As ListItem
-    Set ListItem = ListView.ListItems.Add(Text:=RemoteField.Caption)
-    
-    ListItem.ListSubItems.Add Text:=RemoteField.Path
-    ListItem.ListSubItems.Add Text:=RemoteField.Name
-End Sub
-
-Private Sub UpdateSelectedItems()
-    If Not This.ViewModel.SelectedLocalField Is Nothing Then
-        Me.lvLocalFields.SelectedItem.ListSubItems.Item(1).Text = This.ViewModel.SelectedLocalField.MappedToCaption
-    End If
-    
-    Dim SelectedRemoteFieldIndex As Long
-    SelectedRemoteFieldIndex = This.ViewModel.SelectedRemoteFieldIndex
-    If SelectedRemoteFieldIndex > 0 Then
-        Me.lvRemoteFields.ListItems.Item(This.ViewModel.SelectedRemoteFieldIndex).Selected = True
-    End If
-    
-    Dim i As Long
-    For i = 1 To Me.lvLocalFields.ListItems.Count
-        If This.ViewModel.LocalFields.Item(i).IsKey Then
-            Me.lvLocalFields.ListItems.Item(i).ForeColor = RGB(128, 128, 128)
-        Else
-            Me.lvLocalFields.ListItems.Item(i).ForeColor = RGB(0, 0, 0)
+        If RemoteFields.Item(i).Path <> vbNullString Then
+            Dim ParentNode As Node
+            Set ParentNode = TreeView.Nodes.Item(PathHelpers.PrefixNode(RemoteFields.Item(i).Path))
+            
+            TreeView.Nodes.Add Relative:=ParentNode, Relationship:=tvwChild, _
+                Key:=RemoteFields.Item(i).Key, Text:=RemoteFields.Item(i).Name, _
+                Image:=IMG_FIELD
         End If
     Next i
     
-    If Not This.ViewModel.SelectedLocalField Is Nothing Then
-        Me.lvRemoteFields.Enabled = Not This.ViewModel.SelectedLocalField.IsKey
-    End If
-    
-    If This.ViewModel.SelectedKey <> vbNullString Then
-        Me.cboLocalKey.Value = This.ViewModel.SelectedKey
-    End If
-
-    'If This.ViewModel.SelectedRemoteKey <> vbNullString Then
-    '    Me.cboRemoteKey.Value = This.ViewModel.SelectedRemoteKey
-    'End If
-    
-    'If This.ViewModel.SelectedLocalFieldIndex > 0 Then
-    '    Me.lvLocalFields.ListItems.Item(This.ViewModel.SelectedLocalFieldIndex).Selected = True
-    'End If
-    
-    'If This.ViewModel.SelectedRemoteFieldIndex > 0 Then
-    '    Me.lvRemoteFields.ListItems.Item(This.ViewModel.SelectedRemoteFieldIndex).Selected = True
-    'End If
-    
-    'If This.ViewModel.SelectedLocalFieldIndex > 0 Then
-    '    Me.lvLocalFields.SelectedItem.ListSubItems.Item(1) = This.ViewModel.LocalFieldVMs.Item(This.ViewModel.SelectedLocalFieldIndex).MappedToCaption
-    'End If
-    
-    UpdateLocalFieldsInListView Me.lvLocalFields, This.ViewModel.LocalFields
+    TreeView.Nodes.Item(NODE_KEY_ROOT).Expanded = True
 End Sub
+
+Private Sub UpdateRemoteFieldsInTreeView(ByVal RemoteFields As RemoteFieldsVM, ByVal TreeView As TreeView)
+    Dim SelectedItem As RemoteFieldVM
+    Set SelectedItem = RemoteFields.Selected
+    If SelectedItem Is Nothing Then Exit Sub
+    
+    Dim i As Long
+    For i = 1 To TreeView.Nodes.Count
+        Dim Node As Node
+        Set Node = TreeView.Nodes.Item(i)
+        If Node.Key = SelectedItem.Key Then
+            Node.Selected = True
+        Else
+            Node.Selected = False
+        End If
+    Next
+End Sub
+
+Private Sub UpdateKeyPathsComboBox(ByVal ComboBox As ComboBox)
+    ComboBox.Value = This.ViewModel.KeyPaths.Selected
+    ComboBox.Enabled = False
+    If This.ViewModel.LocalFields.Selected Is Nothing Then Exit Sub
+    
+    If This.ViewModel.KeyPaths.IsMapped = True Then
+        If This.ViewModel.LocalFields.Selected.IsKey Then ComboBox.Enabled = True
+    Else
+        If This.ViewModel.LocalFields.Selected.IsMapped = False Then ComboBox.Enabled = True
+    End If
+End Sub
+
+Private Sub UpdateControls()
+    UpdateKeyPathsComboBox Me.cboKeyPaths
+    UpdateLocalFieldsInListView This.ViewModel.LocalFields, Me.lvMappedFields
+    UpdateRemoteFieldsInTreeView This.ViewModel.RemoteFields, Me.tvRemoteFields
+    
+    Me.cmdReset.Enabled = This.ViewModel.LocalFields.CanReset
+    Me.cmdSaveMap.Enabled = This.ViewModel.IsValid
+End Sub
+
+

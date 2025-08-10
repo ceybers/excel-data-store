@@ -1,4 +1,11 @@
 # Patch Notes
+## v0.6.2-beta (2025/08/10)
+- [x] New TableMapGUI:
+  - TreeView for browsing Fields in their paths.
+  - Search for Table Column Names and Field Names.
+  - AutoMap all.
+  - Reset all Column-Field mappings.
+
 ## v0.6.1-beta (2025/08/06)
 - [x] Pull and Push (Full and Partial) now count changes and asks for confirmation before committing changes.
 - [x] Highlight can now highlight Key and Mapped Fields 

@@ -13,6 +13,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
 '@IgnoreModule ArgumentWithIncompatibleObjectType, HungarianNotation
 '@Folder("TableMapMatcher.Views")
 Option Explicit
@@ -27,10 +28,6 @@ Private This As TState
 
 Private Sub cmdCancel_Click()
     OnCancel
-End Sub
-
-Private Sub txtTableImage_Click()
-    frmAbout.Show
 End Sub
 
 Private Sub cmdNew_Click()
@@ -99,14 +96,12 @@ Private Sub LoadListViewFromMatches(ByVal ListView As ListView, ByVal Matches As
         .FullRowSelect = True
         .View = lvwReport
     End With
+    
     With ListView.ColumnHeaders
         .Clear
-        .Add Text:="Caption"
-        .Add Text:="Score"
-        .Add Text:="Timestamp"
-        .Item(1).Width = 142
-        .Item(2).Width = 32
-        .Item(3).Width = 82
+        .Add Text:="Caption", Width:=142
+        .Add Text:="Score", Width:=32
+        .Add Text:="Timestamp", Width:=82
     End With
     
     Dim i As Long
@@ -138,12 +133,9 @@ Private Sub LoadListViewFromMatch(ByVal ListView As ListView, ByVal Match As Tab
     End With
     With ListView.ColumnHeaders
         .Clear
-        .Add Text:="Item"
-        .Add Text:="Value"
-        .Add Text:="Match?"
-        .Item(1).Width = 64
-        .Item(2).Width = 140
-        .Item(3).Width = 64
+        .Add Text:="Item", Width:=64
+        .Add Text:="Value", Width:=140
+        .Add Text:="Match?", Width:=64
     End With
     
     Dim i As Long

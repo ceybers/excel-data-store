@@ -2,6 +2,8 @@ Attribute VB_Name = "RangeHighlighter"
 '@Folder("Version4.Queries")
 Option Explicit
 
+Private Const COND_FMT_FORMULA As String = "=TRUE+N(""9dd8b78c-2b33-4313-8dcf-6c1870ee0ef4"")"
+
 Public Enum HighlightColor
     hcCompareOnly = 0
     hcBeforePull
@@ -11,8 +13,6 @@ Public Enum HighlightColor
     hcHeaders
     hcKey
 End Enum
-
-Private Const COND_FMT_FORMULA As String = "=TRUE+N(""9dd8b78c-2b33-4313-8dcf-6c1870ee0ef4"")"
 
 Public Sub HighlightRange(ByVal Range As Range, ByVal HighlightColor As HighlightColor)
     Dim FormatCondition  As FormatCondition
@@ -45,7 +45,7 @@ Private Function TryGetFormatConditionByFormula(ByVal Formula As String, ByVal R
     Next ThisFormatCondition
 End Function
 
-Private Function GetColor(ByVal ColorEnum As HighlightColor)
+Private Function GetColor(ByVal ColorEnum As HighlightColor) As Long
     Select Case ColorEnum
         Case hcCompareOnly
             GetColor = 6750105 ' Highlighter green

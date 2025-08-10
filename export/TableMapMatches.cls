@@ -22,7 +22,7 @@ Private Sub Class_Initialize()
     Set This.TableMaps = New Collection
 End Sub
 
-Public Property Get Count()
+Public Property Get Count() As Long
     Count = This.Matches.Count
 End Property
 
@@ -62,8 +62,6 @@ Public Sub Load()
             .MapID = RemoteMap.ID
         End With
         This.TableMaps.Add Item:=TableMap
-        
-        Log.Message RemoteTable.Caption & " = " & NewTableMapMatch.Score
     Next i
     
     Log.Message "Load() end", "TMapMatches"

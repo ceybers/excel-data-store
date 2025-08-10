@@ -1,4 +1,5 @@
 Attribute VB_Name = "modRebuildRemoteFields"
+'@IgnoreModule IndexedDefaultMemberAccess
 '@Folder "RemoteDataStore.Factories"
 Option Explicit
 
