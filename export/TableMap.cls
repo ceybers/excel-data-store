@@ -11,6 +11,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Type TTableMap
+    Caption As String
     TableID As String
     MapID As String
     KeyMap As KeyMap
@@ -23,6 +24,10 @@ Public Property Get IsMapped() As Boolean
     If This.KeyMap.KeyPath = vbNullString Then Exit Property
     If This.FieldMap.Count = 0 Then Exit Property
     IsMapped = True
+End Property
+
+Public Property Get Caption() As String
+    Caption = This.Caption
 End Property
 
 Public Property Get TableID() As String
@@ -65,4 +70,8 @@ Public Sub Deserialize(ByVal SerializedString As String)
     
     This.KeyMap.Deserialize SplitString(0)
     This.FieldMap.Deserialize SplitString(1)
+End Sub
+
+Public Sub SetCaption(ByVal ListObjectName As String)
+    This.Caption = This.KeyMap.KeyColumnName & " @ " & ListObjectName & " [" & This.FieldMap.Count & "]"
 End Sub

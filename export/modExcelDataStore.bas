@@ -18,7 +18,8 @@ Public Sub TableMapUI()
     VM.GetBestMappedTable
     Log.StopLogging
         
-    TableMapUIWithMappedTable VM.MappedTable
+    'TableMapUIWithMappedTable VM.MappedTable
+    TableMapUIWithMappedTable2 VM.MappedTable
 End Sub
 
 '@EntryPoint
@@ -43,7 +44,7 @@ Public Sub TableMapMatchesUI()
         VM.Save
         Log.StopLogging
         
-        TableMapUIWithMappedTable VM.MappedTable
+        TableMapUIWithMappedTable2 VM.MappedTable
         Exit Sub
     Else
         Log.Message "...exited UserForm", "TableMapUI", UI_Level

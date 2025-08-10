@@ -18,6 +18,10 @@ Private Type TMappedFieldVM
 End Type
 Private This As TMappedFieldVM
 
+Public Property Get Key() As String
+    Key = This.ListColumn.Name
+End Property
+
 Public Property Get IsKey() As Boolean
     IsKey = This.IsKey
 End Property
@@ -62,4 +66,8 @@ End Sub
 
 Public Sub MapTo(ByVal RemoteField As RemoteField)
     Set This.RemoteField = RemoteField
+End Sub
+
+Public Sub Unmap()
+    Set This.RemoteField = Nothing
 End Sub
