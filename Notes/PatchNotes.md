@@ -1,4 +1,7 @@
 # Patch Notes
+## v0.6.3-beta (2025/08/10)
+- [x] New View History UI for a single selected Value (Key x Field)
+
 ## v0.6.2-beta (2025/08/10)
 - [x] New TableMapGUI:
   - TreeView for browsing Fields in their paths.

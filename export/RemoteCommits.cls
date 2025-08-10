@@ -131,3 +131,15 @@ Private Function CreateNewCommit(ByVal TableID As String, ByVal MapID As String,
     
     Set CreateNewCommit = NewRemoteCommit
 End Function
+
+Public Function TryGetByID(ByVal ID As String, ByRef OutRemoteCommit As RemoteCommit) As Boolean
+    Dim i As Long
+    For i = 1 To Count
+        If Item(i).CommitID = ID Then
+            Set OutRemoteCommit = Item(i)
+            TryGetByID = True
+            Exit Function
+        End If
+    Next i
+End Function
+

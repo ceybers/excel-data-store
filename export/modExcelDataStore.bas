@@ -96,7 +96,7 @@ Public Sub PullAll()
     
     Log.Message "RemoteFactory.GetRemote.Reload", "PullAll"
     RemoteFactory.GetRemote.Reload
-    
+
     Log.Message "New PullQuery"
     With New PullQuery
         Set .MappedTable = MappedTable
@@ -130,6 +130,45 @@ Public Sub PullPartial()
     End With
     
     Log.StopLogging
+End Sub
+
+'@EntryPoint
+Public Sub TimelineSingle()
+    Log.StartLogging
+    Log.Message "@EntryPoint TlineSingle"
+    
+    Log.Message "MappedTableFactory.CreateMappedTable", "TlineSingle"
+    Dim MappedTable As MappedTable
+    ' DEBUG PartialSelection(single selection!)
+    Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=True, Resolve:=True)
+    If MappedTable Is Nothing Then
+        MsgBox MSG_PULL_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
+        Exit Sub
+    End If
+    
+    Log.Message "RemoteFactory.GetRemote.Reload", "TlineSingle"
+    RemoteFactory.GetRemote.Reload
+    
+    With New ValueTimelineQuery
+        Set .MappedTable = MappedTable
+        Set .Remote = RemoteFactory.GetRemote
+        .Run
+        
+        Dim VM As ValueTimelineVM
+        Set VM = New ValueTimelineVM
+        VM.Load .Results, RemoteFactory.GetRemote
+    End With
+    
+    Dim View As IView
+    Set View = New ValueTimelineView
+    If View.ShowDialog(VM) Then
+        Exit Sub
+    Else
+        Exit Sub
+    End If
+
+    Log.StopLogging
+    Exit Sub
 End Sub
 
 '@EntryPoint
