@@ -45,7 +45,7 @@ Private Function TryGetFormatConditionByFormula(ByVal Formula As String, ByVal R
     Next ThisFormatCondition
 End Function
 
-Private Function GetColor(ByVal ColorEnum As HighlightColor)
+Private Function GetColor(ByVal ColorEnum As HighlightColor) As Long
     Select Case ColorEnum
         Case hcCompareOnly
             GetColor = 6750105 ' Highlighter green

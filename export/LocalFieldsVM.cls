@@ -7,7 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder "Version062.ViewModels"
+'@Folder "Version4.ViewModels"
 Option Explicit
 
 Private Type TMappedFieldsVM
@@ -63,7 +63,7 @@ Private Sub CreateMappedFields()
 End Sub
 
 Public Sub SelectByKey(ByVal Key As String)
-    Set This.SelectedItem = This.Items(Key)
+    Set This.SelectedItem = This.Items.Item(Key)
 End Sub
 
 Public Sub MapSelectedTo(ByVal RemoteFieldVM As RemoteFieldVM)

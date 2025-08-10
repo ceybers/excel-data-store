@@ -7,7 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder "Version062.ViewModels"
+'@Folder "Version4.ViewModels"
 Option Explicit
 
 Private Type TRemoteFieldsVM
@@ -95,10 +95,10 @@ Public Function TrySelectByKey(ByVal Key As String) As Boolean
     TrySelectByKey = True
 End Function
 
-Public Function GetByKey(ByVal Key As String) As RemoteFieldVM
-    If Len(Key) <> 40 Then Exit Function
-    Set GetByKey = This.Items.Item(Key)
-End Function
+'Public Function GetByKey(ByVal Key As String) As RemoteFieldVM
+'    If Len(Key) <> 40 Then Exit Function
+'    Set GetByKey = This.Items.Item(Key)
+'End Function
 
 Public Sub Search(ByVal Query As String)
     Dim i As Long

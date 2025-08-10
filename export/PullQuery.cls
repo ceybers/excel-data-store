@@ -11,8 +11,6 @@ Attribute VB_Exposed = False
 '@Folder "Version4.Queries"
 Option Explicit
 
-Private Const DO_DEBUG As Boolean = True
-
 Private Type TPullQuery
     MappedTable As MappedTable
     Remote As Remote

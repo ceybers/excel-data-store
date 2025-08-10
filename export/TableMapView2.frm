@@ -13,8 +13,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-'@IgnoreModule ArgumentWithIncompatibleObjectType, HungarianNotation
-'@Folder "Version062.Views"
+'@IgnoreModule ImplicitDefaultMemberAccess, ArgumentWithIncompatibleObjectType, HungarianNotation
+'@Folder "Version4.Views"
 Option Explicit
 
 Implements IView
@@ -295,7 +295,6 @@ Private Sub UpdateRemoteFieldsInTreeView(ByVal RemoteFields As RemoteFieldsVM, B
         Set Node = TreeView.Nodes.Item(i)
         If Node.Key = SelectedItem.Key Then
             Node.Selected = True
-            
         Else
             Node.Selected = False
         End If
@@ -322,4 +321,5 @@ Private Sub UpdateControls()
     Me.cmdReset.Enabled = This.ViewModel.LocalFields.CanReset
     Me.cmdSaveMap.Enabled = This.ViewModel.IsValid
 End Sub
+
 

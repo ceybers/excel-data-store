@@ -1,5 +1,6 @@
 Attribute VB_Name = "PathHelpers"
-'@Folder "Version062.ViewModels"
+'@IgnoreModule AssignmentNotUsed
+'@Folder "Version4.ViewModels"
 Option Explicit
 
 Public Function CreatePathTreeItems(ByVal InputArray As Variant) As Variant
@@ -8,18 +9,20 @@ Public Function CreatePathTreeItems(ByVal InputArray As Variant) As Variant
     Debug.Assert UBound(InputArray) > 1
     
     ArraySort.QuickSort InputArray
-    InputArray = ArrayUnique.Unique(InputArray)
-    Debug.Assert UBound(InputArray) > 1
+
+    Dim InputArrayUnique As Variant
+    InputArrayUnique = ArrayUnique.Unique(InputArray)
+    Debug.Assert UBound(InputArrayUnique) > 1
     
     Dim Results As Variant
-    ReDim Results(1 To UBound(InputArray))
+    ReDim Results(1 To UBound(InputArrayUnique))
     
     Dim Cursor As Long
     
     Dim i As Long
-    For i = 1 To UBound(InputArray)
+    For i = 1 To UBound(InputArrayUnique)
         Dim Result As String
-        Result = InputArray(i)
+        Result = InputArrayUnique(i)
         Do While Result <> vbNullString
             Cursor = Cursor + 1
             Results(Cursor) = Result

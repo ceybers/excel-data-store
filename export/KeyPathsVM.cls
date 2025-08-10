@@ -7,7 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder "Version062.ViewModels"
+'@Folder "Version4.ViewModels"
 Option Explicit
 
 Private Const NO_KEYPATH_SET As String = "(No Key Path set)"

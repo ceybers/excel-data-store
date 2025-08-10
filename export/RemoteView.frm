@@ -74,8 +74,8 @@ Private Sub LateLoadKeys()
     LoadRemoteKeyPathsToTreeView This.ViewModel.KeyPaths, Me.tvKeyPaths
 End Sub
 
-Private Sub LoadRemoteKeyPathsToTreeView(ByVal KeyPaths As Collection, ByVal Treeview As Treeview)
-    With Treeview
+Private Sub LoadRemoteKeyPathsToTreeView(ByVal KeyPaths As Collection, ByVal TreeView As TreeView)
+    With TreeView
         If .Nodes.Count > 0 Then .Nodes.Remove 1
         .HideSelection = False
         .LabelEdit = tvwManual
@@ -85,7 +85,7 @@ Private Sub LoadRemoteKeyPathsToTreeView(ByVal KeyPaths As Collection, ByVal Tre
     End With
     
     Dim RootNode As Node
-    Set RootNode = Treeview.Nodes.Add(Key:="N000", Text:="Keys")
+    Set RootNode = TreeView.Nodes.Add(Key:="N000", Text:="Keys")
     RootNode.Expanded = True
     
     If KeyPaths.Count = 0 Then Exit Sub
@@ -96,12 +96,12 @@ Private Sub LoadRemoteKeyPathsToTreeView(ByVal KeyPaths As Collection, ByVal Tre
     For i = 1 To KeyPaths.Count
         Dim KeyPath As Variant
         KeyPath = KeyPaths.Item(i)
-        Treeview.Nodes.Add Relative:=RootNode, Relationship:=tvwChild, Key:=KeyPath, Text:=KeyPath
+        TreeView.Nodes.Add Relative:=RootNode, Relationship:=tvwChild, Key:=KeyPath, Text:=KeyPath
     Next i
     
-    If Treeview.Nodes.Count > 1 Then
-        Treeview.Nodes.Item(2).Selected = True
-        This.ViewModel.SelectKeyPathByString Treeview.Nodes.Item(2).Text
+    If TreeView.Nodes.Count > 1 Then
+        TreeView.Nodes.Item(2).Selected = True
+        This.ViewModel.SelectKeyPathByString TreeView.Nodes.Item(2).Text
         UpdateControlsSelectedKeyPath
     End If
     

@@ -167,7 +167,7 @@ Public Sub HighlightMappedFields()
     
     Dim KeyListColumn As ListColumn
     If TryGetListColumn(This.TableMap.KeyMap.KeyColumnName, This.ListObject, KeyListColumn) Then
-        RangeHighlighter.HighlightRange KeyListColumn.Range.Cells(1, 1), hcKey
+        RangeHighlighter.HighlightRange KeyListColumn.Range.Cells.Item(1, 1), hcKey
     End If
     
     Dim MappedListColumns As Collection
@@ -179,7 +179,7 @@ Public Sub HighlightMappedFields()
         Set MappedField = This.TableMap.FieldMap.Item(i)
         Dim ListColumn As ListColumn
         If TryGetListColumn(MappedField.ListColumnName, This.ListObject, ListColumn) Then
-            MappedListColumns.Add ListColumn.Range.Cells(1, 1)
+            MappedListColumns.Add ListColumn.Range.Cells.Item(1, 1)
         End If
     Next i
     

@@ -7,7 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder "Version062.ViewModels"
+'@Folder "Version4.ViewModels"
 Option Explicit
 
 Private Type TTableMapVM2
@@ -147,5 +147,6 @@ Private Sub UpdateRemoteTables(ByVal MapID As String, ByVal MapCaption As String
     
     Dim RemoteTable As RemoteTable
     Set RemoteTable = This.Remote.Tables.AddOrGet(TblSerStr, Caption, MapID)
+    
     This.Remote.Tables.Save
 End Sub

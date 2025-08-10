@@ -13,7 +13,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-'@Folder "Version062.Views"
+'@IgnoreModule HungarianNotation, MemberNotOnInterface
+'@Folder "Version4.Resources"
 Option Explicit
 
 Public Function GetImageList() As ImageList
