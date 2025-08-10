@@ -91,24 +91,17 @@ Public Sub ResolveIDs(ByVal Remote As Remote)
     
     For i = 1 To Count
         This.Items.Item(i).KeyID = KeyIDs(i)
-        ' TODO Assumes Key Column has no duplicates. Crashes if not!
         If KeyIDs(i) <> vbNullString Then
+            ' FIX TODO Assumes Key Column has no duplicates. Crashes if not!
+            On Error Resume Next
             This.KeyIDs.Add Item:=This.Items.Item(i).RowIndex, Key:=KeyIDs(i)
+            On Error GoTo 0
         End If
     Next i
 End Sub
 
 Public Function GetRowFromKeyID(ByVal KeyID As String) As Long
     GetRowFromKeyID = This.KeyIDs.Item(KeyID)
-    Exit Function
-    
-    'Dim i As Long
-    'For i = 1 To Count
-    '    If This.Items.Item(i).KeyID = KeyID Then
-    '        GetRowFromKeyID = This.Items.Item(i).RowIndex
-    '        Exit Function
-    '    End If
-    'Next i
 End Function
 
 Public Function GetKeyIDs() As Variant

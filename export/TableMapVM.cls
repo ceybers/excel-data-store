@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "TableMapVM2"
+Attribute VB_Name = "TableMapVM"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -102,7 +102,7 @@ Public Function TryAutoMapSelected() As Boolean
     TryAutoMapSelected = TryAutoMap(This.LocalFields.Selected)
 End Function
 
-Public Function TryAutoMap(ByVal LocalField As MappedFieldVM) As Boolean
+Public Function TryAutoMap(ByVal LocalField As LocalFieldVM) As Boolean
     Dim RemoteFieldVM As RemoteFieldVM
     If This.RemoteFields.TryGetByCaption(LocalField.Name, RemoteFieldVM) Then
         LocalField.MapTo RemoteFieldVM.RemoteField

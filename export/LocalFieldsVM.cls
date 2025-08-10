@@ -13,7 +13,7 @@ Option Explicit
 Private Type TMappedFieldsVM
     ListObject As ListObject
     Items As Collection
-    SelectedItem As MappedFieldVM
+    SelectedItem As LocalFieldVM
 End Type
 Private This As TMappedFieldsVM
 
@@ -21,11 +21,11 @@ Public Property Get Count() As Long
     Count = This.Items.Count
 End Property
 
-Public Property Get Item(ByVal Index As Long) As MappedFieldVM
+Public Property Get Item(ByVal Index As Long) As LocalFieldVM
     Set Item = This.Items.Item(Index)
 End Property
 
-Public Property Get Selected() As MappedFieldVM
+Public Property Get Selected() As LocalFieldVM
     Set Selected = This.SelectedItem
 End Property
 
@@ -51,8 +51,8 @@ End Sub
 Private Sub CreateMappedFields()
     Dim ListColumn As ListColumn
     For Each ListColumn In This.ListObject.ListColumns
-        Dim NewMappedField As MappedFieldVM
-        Set NewMappedField = New MappedFieldVM
+        Dim NewMappedField As LocalFieldVM
+        Set NewMappedField = New LocalFieldVM
         With NewMappedField
             .Load ListColumn
         End With
@@ -95,7 +95,7 @@ Public Sub SaveTo(ByVal TableMap As TableMap)
         
     Dim i As Long
     For i = 1 To Count
-        Dim ThisItem As MappedFieldVM
+        Dim ThisItem As LocalFieldVM
         Set ThisItem = Item(i)
         
         If ThisItem.IsKey Then
@@ -109,7 +109,7 @@ Public Sub SaveTo(ByVal TableMap As TableMap)
 End Sub
 
 Public Sub LoadFrom(ByVal TableMap As TableMap, ByVal Remote As Remote)
-    Dim KeyColumn As MappedFieldVM
+    Dim KeyColumn As LocalFieldVM
     If TryGetByName(TableMap.KeyMap.KeyColumnName, KeyColumn) Then
         KeyColumn.IsKey = True
     End If
@@ -121,7 +121,7 @@ Public Sub LoadFrom(ByVal TableMap As TableMap, ByVal Remote As Remote)
 End Sub
 
 Private Sub LoadMappedField(ByVal MappedField As MappedField, ByVal Remote As Remote)
-    Dim MappedFieldVM As MappedFieldVM
+    Dim MappedFieldVM As LocalFieldVM
     If TryGetByName(MappedField.ListColumnName, MappedFieldVM) = False Then Exit Sub
     
     Dim RemoteField As RemoteField
@@ -130,7 +130,7 @@ Private Sub LoadMappedField(ByVal MappedField As MappedField, ByVal Remote As Re
     MappedFieldVM.MapTo RemoteField
 End Sub
 
-Private Function TryGetByName(ByVal FieldName As String, ByRef OutMappedFieldVM As MappedFieldVM) As Boolean
+Private Function TryGetByName(ByVal FieldName As String, ByRef OutMappedFieldVM As LocalFieldVM) As Boolean
     Dim i As Long
     For i = 1 To Count
         If Item(i).Name = FieldName Then

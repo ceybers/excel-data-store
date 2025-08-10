@@ -63,13 +63,13 @@ Public Sub TableMapUIWithMappedTable2(ByVal MappedTable As MappedTable)
     RemoteFactory.GetRemote.Reload
 
     Log.Message "TableMapVM.Load MT GR", "TableMapUI"
-    Dim ViewModel As TableMapVM2
-    Set ViewModel = New TableMapVM2
+    Dim ViewModel As TableMapVM
+    Set ViewModel = New TableMapVM
     ViewModel.Load MappedTable, RemoteFactory.GetRemote
     
     Log.Message "Entering UserForm...", "TableMapUI", UI_Level
     Dim View As IView
-    Set View = New TableMapView2
+    Set View = New TableMapView
     If View.ShowDialog(ViewModel) Then
         Log.Message "...exited UserForm", "TableMapUI", UI_Level
         Log.StopLogging

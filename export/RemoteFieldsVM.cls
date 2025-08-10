@@ -95,11 +95,6 @@ Public Function TrySelectByKey(ByVal Key As String) As Boolean
     TrySelectByKey = True
 End Function
 
-'Public Function GetByKey(ByVal Key As String) As RemoteFieldVM
-'    If Len(Key) <> 40 Then Exit Function
-'    Set GetByKey = This.Items.Item(Key)
-'End Function
-
 Public Sub Search(ByVal Query As String)
     Dim i As Long
     For i = 1 To Count

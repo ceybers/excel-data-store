@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "MappedFieldVM"
+Attribute VB_Name = "LocalFieldVM"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -55,14 +55,6 @@ End Property
 Public Sub Load(ByVal ListColumn As ListColumn)
     Set This.ListColumn = ListColumn
 End Sub
-
-'Public Sub LoadExisting(ByVal MappedField As MappedField, ByVal Remote As Remote)
-'    Set This.MappedField = MappedField
-'    Dim RemoteField As RemoteField
-'    If Remote.Fields.TryGetRemoteFieldFromID(MappedField.FieldID, RemoteField) Then
-'        Set This.RemoteField = RemoteField
-'    End If
-'End Sub
 
 Public Sub MapTo(ByVal RemoteField As RemoteField)
     Set This.RemoteField = RemoteField
