@@ -33,3 +33,61 @@ Public Function RangeBox(ByVal InputRange As Range, ByVal Row As Long, ByVal Col
     Set RangeBox = InputRange.Cells.Item(1, 1).Offset(Row - 1, Column - 1).Resize(Rows, Columns)
 End Function
 
+' Partitions a Range based on the Values in the given Column.
+' Returns a 2-dimensional array with the following:
+'  Result(i, 1) is the Value in the Column used to partition
+'  Result(i, 2) is the first row this value appears
+'  Result(i, 3) is the last row this value appears
+'  Result(i, 4) is the Range of the partition
+Public Function PartitionRange(ByVal Range As Range, ByVal Column As Long) As Variant
+    If Range Is Nothing Then Exit Function
+    If Column < 1 Then Exit Function
+    If Column > Range.Columns.Count Then Exit Function
+    
+    ' handle this odd case
+    If Range.Rows.Count = 1 Then Exit Function
+    
+    Range.Sort Key1:=Range.Columns.Item(Column), Order1:=xlAscending, Header:=xlNo
+    
+    Dim vv As Variant
+    vv = Range.Columns.Item(Column).Value2
+    
+    ' Error 1004 if no errors found instead of returning Nothing
+    'If Range.Columns.Item(Column).SpecialCells(xlCellTypeConstants, xlErrors) Then
+    '    Stop
+    'End If
+    
+    Dim Partitions As Variant
+    ReDim Partitions(1 To Range.Rows.Count, 1 To 3)
+    
+    Partitions(1, 1) = vv(1, 1)
+    Partitions(1, 2) = 1
+    
+    Dim Cursor As Long
+    Cursor = 1
+    
+    Dim i As Long
+    For i = 2 To Range.Rows.Count
+        ' FIX Will crash if either is vbError (Error 2042)
+        If vv(i - 1, 1) <> vv(i, 1) Then
+            Partitions(Cursor, 3) = i - 1
+            Cursor = Cursor + 1
+            Partitions(Cursor, 1) = vv(i, 1)
+            Partitions(Cursor, 2) = i
+        End If
+    Next i
+    Partitions(Cursor, 3) = i - 1
+    
+    Dim Partitions2 As Variant
+    ReDim Partitions2(1 To Cursor, 1 To 4)
+    
+    For i = 1 To Cursor
+        Partitions2(i, 1) = Partitions(i, 1)
+        Partitions2(i, 2) = Partitions(i, 2)
+        Partitions2(i, 3) = Partitions(i, 3)
+        'Set Partitions2(i, 4) = Range.Range(Range.Rows(Partitions(i, 2)), Range.Rows(Partitions(i, 3)))
+        Set Partitions2(i, 4) = Range.Cells(Partitions(i, 2), 1).Resize(Partitions(i, 3) - Partitions(i, 2) + 1, Range.Columns.Count)
+    Next i
+    
+    PartitionRange = Partitions2
+End Function
