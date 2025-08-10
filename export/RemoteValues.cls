@@ -64,6 +64,8 @@ Private Sub LoadFromWorksheet()
         Set DataBodyRange = Application.Intersect(DataBodyRange, LatestHashRange.EntireRow)
     End If
     
+    If DataBodyRange Is Nothing Then Exit Sub
+    
     Dim WorksheetValues As Variant
     Log.Message "RemoteValues.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False), "RValues", Info_Level
     WorksheetValues = DataBodyRange.Value2
@@ -114,7 +116,8 @@ Public Sub Save()
     
     SetNumberFormats
     
-    RangeSetValueFromVariant This.Worksheet.Range("A2"), UpdatedValues
+    'RangeSetValueFromVariant This.Worksheet.Range("A2"), UpdatedValues
+    RangeSetValueFromVariant This.Worksheet.Cells(1, 1).End(xlDown).Offset(1, 0), UpdatedValues
     
     SortWorksheet
     
@@ -125,7 +128,20 @@ Private Sub ClearWorksheet()
     This.Worksheet.AutoFilterMode = False
     If This.Worksheet.UsedRange Is Nothing Then Exit Sub
     If This.Worksheet.UsedRange.Rows.Count = 1 Then Exit Sub
-    This.Worksheet.UsedRange.Offset(1).Delete
+    
+    This.Worksheet.UsedRange.AutoFilter Field:=5, Criteria1:="<>"
+    
+    Dim FilteredDataBodyRange As Range
+    
+    On Error Resume Next
+    Set FilteredDataBodyRange = GetWorksheetDatabodyRange(This.Worksheet).SpecialCells(xlCellTypeVisible)
+    On Error GoTo 0
+    
+    If Not FilteredDataBodyRange Is Nothing Then
+        FilteredDataBodyRange.EntireRow.Delete
+    End If
+    
+    This.Worksheet.AutoFilterMode = False
 End Sub
 
 Private Sub SetNumberFormats()
@@ -274,8 +290,46 @@ Private Function CreateNewValue(ByVal KeyID As String, ByVal FieldID As String, 
         .Value = Value
         .Latest = KeyID & "x" & FieldID
         .CreationTime = Application.Evaluate("=NOW()")
+        .ModificationTime = .CreationTime
         .CommitID = CommitID
         .ID = Left$(HashSHA1(.Latest & .CreationTime), HASH_LEN)
     End With
     Set CreateNewValue = NewRemoteValue
+End Function
+
+Public Function GetAllValues(ByVal KeyID As String, ByVal FieldID As String) As Variant
+    This.Worksheet.UsedRange.Sort Header:=xlYes, _
+        Key1:=This.Worksheet.Columns.Item(2), _
+        Key2:=This.Worksheet.Columns.Item(3), _
+        Key3:=This.Worksheet.Columns.Item(7), Order3:=xlDescending
+        
+    Dim KeyPartitions As Variant
+    KeyPartitions = PartitionRange(GetWorksheetDatabodyRange(This.Worksheet), 2)
+    
+    Dim KeyIndex As Long
+    KeyIndex = ArraySearch.BinarySearch2(KeyPartitions, KeyID)
+    If KeyIndex < 1 Then Exit Function
+    
+    Dim FieldPartitions As Variant
+    FieldPartitions = PartitionRange(KeyPartitions(KeyIndex, 4), 3)
+    
+    Dim FieldIndex As Long
+    FieldIndex = ArraySearch.BinarySearch2(FieldPartitions, FieldID)
+    If FieldIndex < 1 Then Exit Function
+    
+    Dim Values As Variant
+    Values = FieldPartitions(FieldIndex, 4).Value2
+    
+    Dim Values2 As Variant
+    ReDim Values2(1 To UBound(Values, 1))
+    
+    Dim i As Long
+    For i = 1 To UBound(Values, 1)
+        Dim NewRemoteValue As RemoteValue
+        Set NewRemoteValue = New RemoteValue
+        NewRemoteValue.LoadFromArray Values, i
+        Set Values2(i) = NewRemoteValue
+    Next i
+    
+    GetAllValues = Values2
 End Function

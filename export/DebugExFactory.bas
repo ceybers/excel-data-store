@@ -1,4 +1,5 @@
 Attribute VB_Name = "DebugExFactory"
+'@IgnoreModule HungarianNotation
 '@Folder("Version4.Factories")
 Option Explicit
 
