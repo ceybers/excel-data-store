@@ -13,6 +13,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
 '@IgnoreModule HungarianNotation, MemberNotOnInterface
 '@Folder "Version4.Resources"
 Option Explicit
