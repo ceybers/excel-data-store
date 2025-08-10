@@ -10,6 +10,8 @@
 - Key management, including soft-deletion/deprecation.
 
 ## Fields
+- [ ] Data Types for Fields 
+  - String, Integer, Float, Currency, Date, Boolean
 - Remote Field Manager UI (read/write)
 - Rename existing Fields. 
 - Delete existing Fields 
@@ -18,6 +20,9 @@
 
 ## Values
 - GUI to browse Cell (KeyxField) history. i.e., Timeline of changes.
+  - [x] Single Value read-only history
+  - [ ] Roll back to previous value
+  - [ ] Multiple Key(s) and Field(s) modeless dialog
 
 ## Commits
 - Pull by specific Commit
