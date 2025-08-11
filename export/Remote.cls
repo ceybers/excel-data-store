@@ -28,6 +28,10 @@ Private Type TState
 End Type
 Private This As TState
 
+Public Property Get IsValid() As Boolean
+    IsValid = Not This.Workbook Is Nothing
+End Property
+
 Public Property Get Keys() As RemoteKeys
     Log.Message "Remote.Keys Property Get", "Remote", verbose_Level
     Set Keys = This.RemoteKeys
@@ -85,6 +89,7 @@ Public Sub Load(ByVal Workbook As Workbook)
 End Sub
 
 Public Sub Reload()
+'    Stop
     With This
         Set .RemoteKeys = New RemoteKeys
         .RemoteKeys.Load This.Workbook.Worksheets.Item(WS_KEYS_NAME)
@@ -121,5 +126,14 @@ Public Sub Rebuild()
     MsgBox MSG_REMOTE_REBUILD_KEYS, vbInformation + vbOKOnly, APP_TITLE
     RebuildRemoteTable This.Workbook.Worksheets.Item(WS_FIELDS_NAME), Array("FieldID", "Path", "Name", "Caption", "CreationTime", "ModificationTime", "DeletionTime")
     MsgBox MSG_REMOTE_REBUILD_FIELDS, vbInformation + vbOKOnly, APP_TITLE
+End Sub
+
+Public Sub SaveWorkbook()
+    This.Workbook.Save
+End Sub
+
+Public Sub CloseWorkbook()
+    This.Workbook.Close
+    Set This.Workbook = Nothing
 End Sub
 

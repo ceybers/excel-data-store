@@ -16,6 +16,10 @@ Private Type TMappedTable
 End Type
 Private This As TMappedTable
 
+Public Property Get IsProtected() As Boolean
+    IsProtected = ListObjectHelpers.TestIfProtected(This.ListObject)
+End Property
+
 Public Property Get ListObject() As ListObject
     Set ListObject = This.ListObject
 End Property
@@ -64,7 +68,11 @@ Public Sub SelectKeys(ByVal Partial As Boolean)
     
     Dim Cell As Range
     For Each Cell In SelectedKeys.Cells
-        This.TableMap.KeyMap.Add Cell.Value2, Cell.Row - This.ListObject.Range.Row
+        If VarType(Cell.Value2) = vbError Then
+            This.TableMap.KeyMap.Add vbNullString, Cell.Row - This.ListObject.Range.Row
+        Else
+            This.TableMap.KeyMap.Add Cell.Value2, Cell.Row - This.ListObject.Range.Row
+        End If
     Next Cell
 End Sub
 
@@ -114,10 +122,12 @@ Public Function GetExistingValuesFromTable(ByVal KeyIDs As Variant, ByVal FieldI
         
         Dim k As Long
         For k = 1 To UBound(KeyIDs)
-            Dim KeyIndex As Long
-            KeyIndex = GetRowIndexFromKeyID(KeyIDs(k))
-            
-            Result(k, f) = vv(KeyIndex, 1)
+            If KeyIDs(k) <> vbNullString Then
+                Dim KeyIndex As Long
+                KeyIndex = GetRowIndexFromKeyID(KeyIDs(k))
+                
+                Result(k, f) = vv(KeyIndex, 1)
+            End If
         Next k
     Next f
     
@@ -135,11 +145,13 @@ Public Sub HighlightChanges(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, 
         
         Dim k As Long
         For k = 1 To UBound(KeyIDs)
-            Dim KeyIndex As Long
-            KeyIndex = GetRowIndexFromKeyID(KeyIDs(k))
-            
-            If ChangeMask(k, f) = 1 Then
-                Changes.Add ListColumn.DataBodyRange.Cells.Item(KeyIndex, 1)
+            If KeyIDs(k) <> vbNullString Then
+                Dim KeyIndex As Long
+                KeyIndex = GetRowIndexFromKeyID(KeyIDs(k))
+                
+                If ChangeMask(k, f) = 1 Then
+                    Changes.Add ListColumn.DataBodyRange.Cells.Item(KeyIndex, 1)
+                End If
             End If
         Next k
     Next f

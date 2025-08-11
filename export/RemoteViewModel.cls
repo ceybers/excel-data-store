@@ -14,8 +14,13 @@ Private Type TState
     Remote As Remote
     SelectedRemoteField As RemoteField
     SelectedKeyPath As String
+    DoClose As Boolean
 End Type
 Private This As TState
+
+Public Property Get DoClose() As Boolean
+    DoClose = This.DoClose
+End Property
 
 Public Property Get KeyPaths() As Collection
     Set KeyPaths = This.Remote.Keys.Paths
@@ -62,6 +67,11 @@ Public Sub ExportKeys()
     MsgBox "NYI"
 End Sub
 
-Public Sub Rebuild()
+Public Sub DoRebuild()
     This.Remote.Rebuild
+End Sub
+
+Public Sub DoSave()
+    This.Remote.SaveWorkbook
+    This.DoClose = True
 End Sub

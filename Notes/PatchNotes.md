@@ -1,4 +1,12 @@
 # Patch Notes
+## v0.6.4-beta (2025/08/11)
+- [x] Check if Worksheet is Protected and exit gracefully.
+- [x] Check if Workbook is opened in Protected Viewing and exit gracefully.
+- [x] Blank cells in Key column will be ignored instead of throwing errors.
+- [x] Error cells (#N/A) in Key column will be ignored instead of throwing errors.
+- [x] Error cells (#N/A) in Value cells will be treated as variant type vbEmpty.
+- [x] Remote UI now has buttons to Save or Save & Close the Repo worksheet.  
+ 
 ## v0.6.3-beta (2025/08/10)
 - [x] New View History UI for a single selected Value (Key x Field)
 

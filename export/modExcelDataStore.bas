@@ -94,6 +94,11 @@ Public Sub PullAll()
         Exit Sub
     End If
     
+    If MappedTable.IsProtected Then
+        MsgBox MSG_IS_PROTECTED, vbExclamation + vbOKOnly, APP_TITLE
+        Exit Sub
+    End If
+    
     Log.Message "RemoteFactory.GetRemote.Reload", "PullAll"
     RemoteFactory.GetRemote.Reload
 
@@ -117,6 +122,11 @@ Public Sub PullPartial()
     Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=True, Resolve:=True)
     If MappedTable Is Nothing Then
         MsgBox MSG_PULL_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
+        Exit Sub
+    End If
+    
+    If MappedTable.IsProtected Then
+        MsgBox MSG_IS_PROTECTED, vbExclamation + vbOKOnly, APP_TITLE
         Exit Sub
     End If
     
@@ -195,7 +205,6 @@ Public Sub HighlightMappedFields()
     MappedTable.HighlightMappedFields
 End Sub
 
-
 Private Sub DoHighlight(ByVal PartialSelection As Boolean)
     Log.StartLogging
     Log.Message "DoHighlight()"
@@ -204,6 +213,11 @@ Private Sub DoHighlight(ByVal PartialSelection As Boolean)
     Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=PartialSelection, Resolve:=True)
     If MappedTable Is Nothing Then
         MsgBox MSG_PULL_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
+        Exit Sub
+    End If
+    
+    If MappedTable.IsProtected Then
+        MsgBox MSG_IS_PROTECTED, vbExclamation + vbOKOnly, APP_TITLE
         Exit Sub
     End If
     
@@ -233,6 +247,11 @@ Public Sub Push()
         Exit Sub
     End If
     
+    If MappedTable.IsProtected Then
+        MsgBox MSG_IS_PROTECTED, vbExclamation + vbOKOnly, APP_TITLE
+        Exit Sub
+    End If
+    
     Log.Message "RemoteFactory.GetRemote.Reload", "Push"
     RemoteFactory.GetRemote.Reload
     
@@ -255,6 +274,11 @@ Public Sub PushPartial()
     Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=True, Resolve:=True)
     If MappedTable Is Nothing Then
         MsgBox MSG_PUSH_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
+        Exit Sub
+    End If
+    
+    If MappedTable.IsProtected Then
+        MsgBox MSG_IS_PROTECTED, vbExclamation + vbOKOnly, APP_TITLE
         Exit Sub
     End If
     
@@ -291,6 +315,7 @@ Public Sub DataStoreUI()
     Log.Message "Entering UserForm...", "DataStoreUI", UI_Level
     If RemoteView.ShowDialog(ViewModel) Then
         Log.Message "...exited UserForm", "DataStoreUI", UI_Level
+        If ViewModel.DoClose Then RemoteFactory.GetRemote.CloseWorkbook
         Exit Sub
     Else
         Log.Message "...exited UserForm", "DataStoreUI", UI_Level
