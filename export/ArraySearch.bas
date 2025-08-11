@@ -4,7 +4,7 @@ Attribute VB_Name = "ArraySearch"
 Option Explicit
 ' Source: https://en.wikipedia.org/wiki/Binary_search_algorithm#Procedure
 
-' Searches for SearchItem in the sorted array ArrayToSearch.
+' Searches for SearchItem in the sorted array ArrayToSearch of shape (1 to n)
 ' Returns the index if SearchItem is found.
 ' Returns -1 if it is not in the list.
 Public Function BinarySearch(ByRef ArrayToSearch As Variant, ByVal SearchItem As Variant) As Long
@@ -34,7 +34,9 @@ Public Function BinarySearch(ByRef ArrayToSearch As Variant, ByVal SearchItem As
     BinarySearch = -1
 End Function
 
-' Searchs in a array of shape (1 to n, 1 to m), only testing (i, 1)
+' Searches for SearchItem in the sorted array ArrayToSearch of shape (1 to n, 1 to m)
+' Returns the index if SearchItem is found in the first dimension (1 to n)
+' Returns -1 if it is not in the list.
 Public Function BinarySearch2(ByRef ArrayToSearch As Variant, ByVal SearchItem As Variant) As Long
     Debug.Assert IsArray(ArrayToSearch)
     
