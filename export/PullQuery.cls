@@ -85,7 +85,9 @@ Private Sub UpdateFromRemote(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant,
     ReDim KeyIndexes(1 To UBound(KeyIDs))
     Dim i As Long
     For i = 1 To UBound(KeyIDs)
-        KeyIndexes(i) = This.MappedTable.GetRowIndexFromKeyID(KeyIDs(i))
+        If KeyIDs(i) <> vbNullString Then
+            KeyIndexes(i) = This.MappedTable.GetRowIndexFromKeyID(KeyIDs(i))
+        End If
     Next i
     
     Log.Message "PullQuery.UpdateFromRemote Looping through Fields", "PullQuery", Info_Level
@@ -99,7 +101,9 @@ Private Sub UpdateFromRemote(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant,
         
         Dim k As Long
         For k = 1 To UBound(KeyIndexes)
-            vv(KeyIndexes(k), 1) = NewValues(k, f)
+            If IsEmpty(KeyIndexes(k)) = False Then
+                vv(KeyIndexes(k), 1) = NewValues(k, f)
+            End If
         Next k
         
         Log.Message "PullQuery.UpdateFromRemote writing to " & ListColumn.DataBodyRange.Address(False, False), "PullQuery", Info_Level
