@@ -34,11 +34,13 @@ Public Function RangeBox(ByVal InputRange As Range, ByVal Row As Long, ByVal Col
 End Function
 
 ' Partitions a Range based on the Values in the given Column.
+' CAUTION: Function will Sort rows in the Worksheet.
 ' Returns a 2-dimensional array with the following:
 '  Result(i, 1) is the Value in the Column used to partition
 '  Result(i, 2) is the first row this value appears
 '  Result(i, 3) is the last row this value appears
 '  Result(i, 4) is the Range of the partition
+'  Error values in the Partitioning Column will be replaced with Empty.
 Public Function PartitionRange(ByVal Range As Range, ByVal Column As Long) As Variant
     If Range Is Nothing Then Exit Function
     If Column < 1 Then Exit Function
@@ -52,10 +54,12 @@ Public Function PartitionRange(ByVal Range As Range, ByVal Column As Long) As Va
     Dim vv As Variant
     vv = Range.Columns.Item(Column).Value2
     
-    ' Error 1004 if no errors found instead of returning Nothing
-    'If Range.Columns.Item(Column).SpecialCells(xlCellTypeConstants, xlErrors) Then
-    '    Stop
-    'End If
+    Dim i As Long
+    For i = 1 To UBound(vv, 1)
+        If VarType(vv(i, 1)) = vbError Then
+            vv(i, 1) = Empty
+        End If
+    Next i
     
     Dim Partitions As Variant
     ReDim Partitions(1 To Range.Rows.Count, 1 To 3)
@@ -66,9 +70,7 @@ Public Function PartitionRange(ByVal Range As Range, ByVal Column As Long) As Va
     Dim Cursor As Long
     Cursor = 1
     
-    Dim i As Long
     For i = 2 To Range.Rows.Count
-        ' FIX Will crash if either is vbError (Error 2042)
         If vv(i - 1, 1) <> vv(i, 1) Then
             Partitions(Cursor, 3) = i - 1
             Cursor = Cursor + 1
