@@ -291,6 +291,7 @@ Public Sub DataStoreUI()
     Log.Message "Entering UserForm...", "DataStoreUI", UI_Level
     If RemoteView.ShowDialog(ViewModel) Then
         Log.Message "...exited UserForm", "DataStoreUI", UI_Level
+        If ViewModel.DoClose Then RemoteFactory.GetRemote.CloseWorkbook
         Exit Sub
     Else
         Log.Message "...exited UserForm", "DataStoreUI", UI_Level

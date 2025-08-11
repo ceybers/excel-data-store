@@ -9,5 +9,9 @@ Public Function GetRemote() As Remote
         DataStore.Load
     End If
     
+    If DataStore.Remote.IsValid = False Then
+        DataStore.Load
+    End If
+    
     Set GetRemote = DataStore.Remote
 End Function

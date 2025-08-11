@@ -13,8 +13,6 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-
-
 '@IgnoreModule ArgumentWithIncompatibleObjectType, HungarianNotation
 '@Folder "RemoteDataStore.Views"
 Option Explicit
@@ -43,8 +41,18 @@ Private Sub cmdKeysExport_Click()
 End Sub
 
 Private Sub cmdRebuildIDs_Click()
-    This.ViewModel.Rebuild
+    This.ViewModel.DoRebuild
     Me.cmdRebuildIDs.Enabled = False
+End Sub
+
+Private Sub cmdSave_Click()
+    This.ViewModel.DoSave
+    Me.cmdSave.Enabled = False
+End Sub
+
+Private Sub cmdSaveClose_Click()
+    This.ViewModel.DoSave
+    Me.Hide
 End Sub
 
 Private Function IView_ShowDialog(ByVal ViewModel As Object) As Boolean
