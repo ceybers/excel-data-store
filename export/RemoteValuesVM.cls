@@ -28,6 +28,8 @@ Private Sub Class_Initialize()
 End Sub
 
 Public Sub Load(ByVal Values As Variant, ByVal Remote As Remote)
+    If IsEmpty(Values) Then Exit Sub
+    
     Dim i As Long
     For i = 1 To UBound(Values)
         Dim NewRemoteValueVM As RemoteValueVM
