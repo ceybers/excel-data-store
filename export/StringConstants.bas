@@ -3,7 +3,7 @@ Attribute VB_Name = "StringConstants"
 Option Explicit
 
 Public Const APP_TITLE As String = "Excel Data Store Tool"
-Public Const APP_VERSION As String = "Version 0.6.3-beta"
+Public Const APP_VERSION As String = "Version 0.6.4-beta"
 Public Const APP_COPYRIGHT As String = "2025 Craig Eybers" & vbCrLf & "All rights reserved."
 
 Public Const ASCII_US As Long = 164 '31
@@ -16,6 +16,7 @@ Public Const MSG_DATASTORE_WB_INVALID As String = "Data Store workbook is not a 
 Public Const MSG_MAP_NO_TABLE As String = "Please select a table first before running the Map command."
 Public Const MSG_PULL_NO_TABLE As String = "Please select a table first before running the Pull command."
 Public Const MSG_PUSH_NO_TABLE As String = "Please select a table first before running the Push command."
+Public Const MSG_IS_PROTECTED As String = "Worksheet is Protected. Unprotect it and try again."
 
 Public Const MSG_REMOTE_REBUILD_KEYS As String = "Remote Keys Table rebuild OK!"
 Public Const MSG_REMOTE_REBUILD_FIELDS As String = "Remote Fields Table rebuild OK!"

@@ -42,7 +42,7 @@
 
 ## Unsorted
 - Remote could keep a watermark to cache naive Pulls.
-- Check if Working(LO) is protected (or opened in read only mode) to prevent errors.
+- [x] ~~Check if Working(LO) is protected (or opened in read only mode) to prevent errors.~~
 
 # Notes
 - Surrogate key in Values is SHA1[0,8] of Latest (KeyIDxFieldID) and CreationTime.

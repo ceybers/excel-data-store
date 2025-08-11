@@ -16,3 +16,17 @@ Attribute TryGetWorkbook.VB_Description = "Tries to return the Workbook with the
         End If
     Next Workbook
 End Function
+
+'@Description "Returns True if the given Workbook is opened in Protected View"
+Public Function IsWorkbookProtectedView(ByVal WorkbookName As String) As Boolean
+Attribute IsWorkbookProtectedView.VB_Description = "Returns True if the given Workbook is opened in Protected View"
+    If WorkbookName = vbNullString Then Exit Function
+    
+    Dim ProtectedViewWindow As ProtectedViewWindow
+    For Each ProtectedViewWindow In Application.ProtectedViewWindows
+        If ProtectedViewWindow.Workbook.Name = WorkbookName Then
+            IsWorkbookProtectedView = True
+            Exit Function
+        End If
+    Next ProtectedViewWindow
+End Function

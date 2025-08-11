@@ -29,3 +29,19 @@ Attribute TryGetListObjectFromCollection.VB_Description = "Tries to return the L
         End If
     Next ListObject
 End Function
+
+'@Description "Returns True if any of the cells in ListObject Range are Locked and the Worksheet is Protected, or if the Workbook is opened in Protected Viewing mode."
+Public Function TestIfProtected(ByVal ListObject As ListObject) As Boolean
+Attribute TestIfProtected.VB_Description = "Returns True if any of the cells in ListObject Range are Locked and the Worksheet is Protected, or if the Workbook is opened in Protected Viewing mode."
+    Dim Worksheet As Worksheet
+    Set Worksheet = ListObject.Parent
+    
+    Dim Workbook As Workbook
+    Set Workbook = Worksheet.Parent
+    
+    If ListObject.Range.Locked And Worksheet.ProtectContents Then
+        TestIfProtected = True
+    ElseIf WorkbookHelpers.IsWorkbookProtectedView(Workbook.Name) Then
+        TestIfProtected = True
+    End If
+End Function

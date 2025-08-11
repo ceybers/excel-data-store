@@ -16,6 +16,10 @@ Private Type TMappedTable
 End Type
 Private This As TMappedTable
 
+Public Property Get IsProtected() As Boolean
+    IsProtected = ListObjectHelpers.TestIfProtected(This.ListObject)
+End Property
+
 Public Property Get ListObject() As ListObject
     Set ListObject = This.ListObject
 End Property
