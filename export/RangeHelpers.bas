@@ -103,3 +103,20 @@ Attribute TryGetSelectionRange.VB_Description = "Returns the Selection object if
     Set OutRange = Selection
     TryGetSelectionRange = True
 End Function
+
+'@Description "Tries to return the Intersection of two ranges by reference, testing both ranges before, and handling errors if they do not intersect."
+Public Function TryIntersectRanges(ByVal Range1 As Range, ByVal Range2 As Range, ByRef OutRange As Range) As Boolean
+Attribute TryIntersectRanges.VB_Description = "Tries to return the Intersection of two ranges by reference, testing both ranges before, and handling errors if they do not intersect."
+    If Range1 Is Nothing Then Exit Function
+    If Range2 Is Nothing Then Exit Function
+    
+    Dim Result As Range
+    On Error Resume Next
+    Set Result = Application.Intersect(Range1, Range2)
+    On Error GoTo 0
+    
+    If Result Is Nothing Then Exit Function
+    
+    Set OutRange = Result
+    TryIntersectRanges = True
+End Function
