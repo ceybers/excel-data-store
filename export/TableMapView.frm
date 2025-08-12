@@ -29,6 +29,7 @@ Private This As TState
 Private Sub cmdCancel_Click()
     OnCancel
 End Sub
+
 Private Sub cmdAutoMap_Click()
     If vbYes = MsgBox(MSG_AUTOMAP, vbQuestion + vbYesNo + vbDefaultButton2, APP_TITLE) Then
         This.ViewModel.DoAutoMap
@@ -150,14 +151,14 @@ End Sub
 Private Sub InitializeControls()
     Me.txtTableName = This.ViewModel.Name
     
-    LoadKeyPathsToComboBox This.ViewModel.KeyPaths, Me.cboKeyPaths
-    
     InitLocalFieldsListView Me.lvMappedFields
     LoadLocalFieldsToListView This.ViewModel.LocalFields, Me.lvMappedFields
     
     InitRemoteFieldsTreeView Me.tvRemoteFields
     LoadRemotePathsToTreeView This.ViewModel.RemoteFields, Me.tvRemoteFields
     LoadRemoteFieldsToTreeView This.ViewModel.RemoteFields, Me.tvRemoteFields
+    
+    LoadKeyPathsToComboBox This.ViewModel.KeyPaths, Me.cboKeyPaths
     
     UpdateControls
 End Sub

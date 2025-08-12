@@ -109,15 +109,15 @@ Public Sub SaveTo(ByVal TableMap As TableMap)
 End Sub
 
 Public Sub LoadFrom(ByVal TableMap As TableMap, ByVal Remote As Remote)
-    Dim KeyColumn As LocalFieldVM
-    If TryGetByName(TableMap.KeyMap.KeyColumnName, KeyColumn) Then
-        KeyColumn.IsKey = True
-    End If
-    
     Dim i As Long
     For i = 1 To TableMap.FieldMap.Count
         LoadMappedField TableMap.FieldMap.Item(i), Remote
     Next i
+    
+    Dim KeyColumn As LocalFieldVM
+    If TryGetByName(TableMap.KeyMap.KeyColumnName, KeyColumn) Then
+        KeyColumn.IsKey = True
+    End If
 End Sub
 
 Private Sub LoadMappedField(ByVal MappedField As MappedField, ByVal Remote As Remote)
