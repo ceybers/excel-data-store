@@ -61,7 +61,7 @@ Private Sub LoadFromWorksheet()
     Set LatestHashRange = This.Worksheet.Columns.Item(COL_LATEST_HASH).SpecialCells(xlCellTypeConstants)
     If Not LatestHashRange Is Nothing Then
         Log.Message "RemoteValues.LoadFromWorksheet taking intersect of " & DataBodyRange.Address(False, False) & " and " & LatestHashRange.Address(False, False), "RValues", Info_Level
-        Set DataBodyRange = Application.Intersect(DataBodyRange, LatestHashRange.EntireRow)
+        If Not TryIntersectRanges(DataBodyRange, LatestHashRange.EntireRow, DataBodyRange) Then Exit Sub
     End If
     
     If DataBodyRange Is Nothing Then Exit Sub

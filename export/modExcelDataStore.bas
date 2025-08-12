@@ -54,7 +54,6 @@ Public Sub TableMapMatchesUI()
     End If
 End Sub
 
-
 Public Sub TableMapUIWithMappedTable2(ByVal MappedTable As MappedTable)
     Log.StartLogging
     Log.Message "TableMapUI", "TableMapUI"
@@ -147,6 +146,15 @@ Public Sub TimelineSingle()
     Log.StartLogging
     Log.Message "@EntryPoint TlineSingle"
     
+    Dim SelectedRange As Range
+    If Not TryGetSelectionRange(SelectedRange) Then
+        Log.StopLogging
+        Exit Sub
+    ElseIf SelectedRange.Cells.Count <> 1 Then
+        Log.StopLogging
+        Exit Sub
+    End If
+    
     Log.Message "MappedTableFactory.CreateMappedTable", "TlineSingle"
     Dim MappedTable As MappedTable
     ' DEBUG PartialSelection(single selection!)
@@ -167,6 +175,7 @@ Public Sub TimelineSingle()
         Dim VM As ValueTimelineVM
         Set VM = New ValueTimelineVM
         VM.Load .Results, RemoteFactory.GetRemote
+        VM.NumberFormat = SelectedRange.NumberFormatLocal
     End With
     
     Dim View As IView
@@ -193,8 +202,10 @@ End Sub
 
 '@EntryPoint
 Public Sub HighlightRemove()
-    If Selection.ListObject Is Nothing Then Exit Sub
-    RangeHighlighter.RemoveHighlights Selection.ListObject
+    Dim ListObject As ListObject
+    If TryGetActiveSheetListObject(ListObject) Then
+        RangeHighlighter.RemoveHighlights ListObject
+    End If
 End Sub
 
 '@EntryPoint
@@ -219,6 +230,10 @@ Private Sub DoHighlight(ByVal PartialSelection As Boolean)
     If MappedTable.IsProtected Then
         MsgBox MSG_IS_PROTECTED, vbExclamation + vbOKOnly, APP_TITLE
         Exit Sub
+    End If
+    
+    If Not RemoteFactory.GetRemote.IsValid Then
+        'remotefactory.GetRemote.
     End If
     
     Log.Message "RemoteFactory.GetRemote.Reload", "PullHighlightOnly"
@@ -302,8 +317,8 @@ Public Sub DataStoreUI()
     Log.Message "RemoteFactory.GetRemote.Reload", "DataStoreUI"
     RemoteFactory.GetRemote.Reload
     
-    Log.Message "RemoteFactory.GetRemote.Show", "DataStoreUI"
-    RemoteFactory.GetRemote.Show
+    'Log.Message "RemoteFactory.GetRemote.Show", "DataStoreUI"
+    'RemoteFactory.GetRemote.Show
     
     Dim ViewModel As RemoteViewModel
     Set ViewModel = New RemoteViewModel

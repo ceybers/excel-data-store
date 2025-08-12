@@ -40,7 +40,7 @@ Public Property Get Matches() As TableMapMatches
 End Property
 
 Public Sub Load()
-    If TryGetListObject(This.ListObject) = False Then Exit Sub
+    If Not TryGetSelectedListObject(This.ListObject) Then Exit Sub
     
     Set This.Matches = New TableMapMatches
     With This.Matches
@@ -58,17 +58,6 @@ Public Property Get IsValid() As Boolean
     If This.Matches.Count = 0 Then Exit Property
     IsValid = True
 End Property
-
-Private Function TryGetListObject(ByRef OutListObject As ListObject) As Boolean
-    If Not TypeOf Selection Is Range Then Exit Function
-    If Not Selection.ListObject Is Nothing Then
-        Set OutListObject = Selection.ListObject
-        TryGetListObject = True
-    ElseIf Selection.Parent.ListObjects.Count = 1 Then
-        Set OutListObject = Selection.Parent.ListObjects.Item(1)
-        TryGetListObject = True
-    End If
-End Function
 
 Public Sub SelectTableMapByIndex(ByVal Index As Long)
     Debug.Assert Not This.Matches Is Nothing

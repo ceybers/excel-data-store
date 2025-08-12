@@ -59,7 +59,9 @@ Public Sub SelectKeys(ByVal Partial As Boolean)
     
     Dim SelectedKeys As Range
     If Partial Then
-        Set SelectedKeys = Intersect(Selection.EntireRow, KeyListColumn.DataBodyRange)
+        Dim SelectedRange As Range
+        If Not TryGetSelectionRange(SelectedRange) Then Exit Sub
+        If Not TryIntersectRanges(SelectedRange.EntireRow, KeyListColumn.DataBodyRange, SelectedKeys) Then Exit Sub
     Else
         Set SelectedKeys = KeyListColumn.DataBodyRange
     End If
@@ -85,7 +87,7 @@ Public Sub SelectFields(ByVal Partial As Boolean)
     
     Dim SelectedHeaders As Range
     If Partial Then
-        Set SelectedHeaders = Intersect(Selection.EntireColumn, This.ListObject.HeaderRowRange)
+        If Not TryIntersectRanges(Selection.EntireColumn, This.ListObject.HeaderRowRange, SelectedHeaders) Then Exit Sub
     Else
         Set SelectedHeaders = This.ListObject.HeaderRowRange
     End If

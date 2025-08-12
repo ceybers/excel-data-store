@@ -26,17 +26,17 @@ Public Property Get IsKey() As Boolean
     IsKey = This.IsKey
 End Property
 
-Public Property Get IsMapped() As Boolean
-    If This.RemoteField Is Nothing Then Exit Property
-    If This.RemoteField.ID = "#UNMAPPED" Then Exit Property
-    IsMapped = True
-End Property
-
 Public Property Let IsKey(ByVal RHS As Boolean)
     This.IsKey = RHS
     If RHS = True Then
         Set This.RemoteField = Nothing
     End If
+End Property
+
+Public Property Get IsMapped() As Boolean
+    If This.RemoteField Is Nothing Then Exit Property
+    If This.RemoteField.ID = "#UNMAPPED" Then Exit Property
+    IsMapped = True
 End Property
 
 Public Property Get Name() As String

@@ -84,7 +84,7 @@ Private Sub LoadValuesToListView(ByVal RemoteValues As RemoteValuesVM, ByVal Lis
     Dim i As Long
     For i = 1 To RemoteValues.Count
         Dim ListItem As ListItem
-        Set ListItem = ListView.ListItems.Add(Text:=RemoteValues.Item(i).Value)
+        Set ListItem = ListView.ListItems.Add(Text:=Format$(RemoteValues.Item(i).Value, This.ViewModel.NumberFormat))
         ListItem.ListSubItems.Add Text:=RemoteValues.Item(i).Timestamp
         ListItem.ListSubItems.Add Text:=RemoteValues.Item(i).Commit
     Next i

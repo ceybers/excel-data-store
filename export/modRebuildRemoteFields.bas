@@ -21,7 +21,7 @@ Public Sub RebuildRemoteTable(ByVal Worksheet As Worksheet, ByVal ColumnHeadings
 End Sub
 
 Private Sub RebuildHeaders(ByVal Worksheet As Worksheet, ByVal ColumnHeadings As Variant)
-    Worksheet.Cells(1, 1).Resize(1, UBound(ColumnHeadings) + 1).Value2 = ColumnHeadings
+    RangeSetValueFromVariant Worksheet.Cells(1, 1).Resize(1, UBound(ColumnHeadings) + 1), ArrayTransform.ArrayToRow(ColumnHeadings)
     
     Worksheet.UsedRange.Sort Header:=xlYes, Key1:=Worksheet.Columns.Item(COL_KEY), Order1:=xlDescending
 End Sub
@@ -69,7 +69,7 @@ Private Sub RebuildIDs(ByVal Worksheet As Worksheet)
         vv(i, COL_ID) = HashSHA1(vv(i, COL_PATH) & "\" & vv(i, COL_KEY))
     Next i
     
-    Range.Value2 = vv
+    RangeSetValueFromVariant Range, vv
     
     Worksheet.UsedRange.Sort Header:=xlYes, Key1:=Worksheet.Columns.Item(COL_ID), Order1:=xlAscending
 End Sub

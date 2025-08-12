@@ -40,12 +40,15 @@ End Property
 Public Sub Run()
     'If This.MappedTable.TableMap.KeyMap.Count <> 1 Then Exit Sub
     'If This.MappedTable.TableMap.FieldMap.Count <> 1 Then Exit Sub
+    
     Dim k As Variant
     k = This.MappedTable.TableMap.KeyMap.GetKeyIDs
+    If IsEmpty(k) Then Exit Sub
     If UBound(k) <> 1 Then Exit Sub
     
     Dim f As Variant
     f = This.MappedTable.TableMap.FieldMap.GetFieldIDs
+    If IsEmpty(f) Then Exit Sub
     If UBound(f) <> 1 Then Exit Sub
     
     This.Results = This.Remote.Values.GetAllValues(k(1), f(1))

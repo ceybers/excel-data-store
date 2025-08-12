@@ -127,7 +127,7 @@ Private Sub SetNumberFormats()
 End Sub
 
 Private Sub SortWorksheet()
-    This.Worksheet.UsedRange.Sort Key1:=This.Worksheet.Columns.Item(1), Header:=xlYes
+    This.Worksheet.UsedRange.Sort Key1:=This.Worksheet.Columns.Item(3), Header:=xlYes
 End Sub
 
 Public Function GetIDsFromQuery(ByVal KeyPath As String, ByVal Keys As Variant) As Variant

@@ -67,6 +67,7 @@ End Sub
 
 Public Sub SelectKeyPathByKey(ByVal Key As String)
     If This.LocalFields.Selected Is Nothing Then Exit Sub
+    If This.LocalFields.Selected.IsMapped Then Exit Sub
     
     This.KeyPaths.SelectByKey Key
     This.LocalFields.Selected.IsKey = This.KeyPaths.IsMapped
