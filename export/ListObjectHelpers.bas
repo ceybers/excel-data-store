@@ -58,3 +58,16 @@ Attribute TryGetSelectedListObject.VB_Description = "Tries to return the ListObj
     Set OutListObject = Range.ListObject
     TryGetSelectedListObject = True
 End Function
+
+'@Description "Tries to return the ListObject in the active worksheet if there is exactly one present."
+Public Function TryGetActiveSheetListObject(ByRef OutListObject As ListObject) As Boolean
+Attribute TryGetActiveSheetListObject.VB_Description = "Tries to return the ListObject in the active worksheet if there is exactly one present."
+    If Application.ActiveSheet Is Nothing Then Exit Function
+    If Not TypeOf Application.ActiveSheet Is Worksheet Then Exit Function
+    Dim Worksheet As Worksheet
+    Set Worksheet = Application.ActiveSheet
+    If Worksheet.ListObjects.Count <> 1 Then Exit Function
+    
+    Set OutListObject = Worksheet.ListObjects.Item(1)
+    TryGetActiveSheetListObject = True
+End Function
