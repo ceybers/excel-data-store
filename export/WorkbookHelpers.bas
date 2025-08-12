@@ -30,3 +30,15 @@ Attribute IsWorkbookProtectedView.VB_Description = "Returns True if the given Wo
         End If
     Next ProtectedViewWindow
 End Function
+
+'@Description "Returns True if a Workbook is still open. Returns False if the workbook is closed but the reference is still present."
+Public Function IsWorkbookOpen(ByVal Workbook As Workbook) As Boolean
+    If Workbook Is Nothing Then Exit Function
+    Dim TestWorkbook As String
+    On Error Resume Next
+    TestWorkbook = Workbook.Name
+    On Error GoTo 0
+    If TestWorkbook = vbNullString Then Exit Function
+    
+    IsWorkbookOpen = True
+End Function

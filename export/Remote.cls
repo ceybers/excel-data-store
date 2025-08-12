@@ -29,6 +29,7 @@ End Type
 Private This As TState
 
 Public Property Get IsValid() As Boolean
+    If Not IsWorkbookOpen(This.Workbook) Then Exit Property
     IsValid = Not This.Workbook Is Nothing
 End Property
 
@@ -89,7 +90,6 @@ Public Sub Load(ByVal Workbook As Workbook)
 End Sub
 
 Public Sub Reload()
-'    Stop
     With This
         Set .RemoteKeys = New RemoteKeys
         .RemoteKeys.Load This.Workbook.Worksheets.Item(WS_KEYS_NAME)

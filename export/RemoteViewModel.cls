@@ -75,3 +75,7 @@ Public Sub DoSave()
     This.Remote.SaveWorkbook
     This.DoClose = True
 End Sub
+
+Public Sub DoShow()
+    This.Remote.Show
+End Sub

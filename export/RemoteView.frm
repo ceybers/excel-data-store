@@ -55,6 +55,11 @@ Private Sub cmdSaveClose_Click()
     Me.Hide
 End Sub
 
+Private Sub cmdShow_Click()
+    This.ViewModel.DoShow
+    Me.cmdShow.Enabled = False
+End Sub
+
 Private Function IView_ShowDialog(ByVal ViewModel As Object) As Boolean
     Set This.ViewModel = ViewModel
     This.IsCancelled = False

@@ -223,6 +223,10 @@ Private Sub DoHighlight(ByVal PartialSelection As Boolean)
         Exit Sub
     End If
     
+    If Not RemoteFactory.GetRemote.IsValid Then
+        'remotefactory.GetRemote.
+    End If
+    
     Log.Message "RemoteFactory.GetRemote.Reload", "PullHighlightOnly"
     RemoteFactory.GetRemote.Reload
     
@@ -304,8 +308,8 @@ Public Sub DataStoreUI()
     Log.Message "RemoteFactory.GetRemote.Reload", "DataStoreUI"
     RemoteFactory.GetRemote.Reload
     
-    Log.Message "RemoteFactory.GetRemote.Show", "DataStoreUI"
-    RemoteFactory.GetRemote.Show
+    'Log.Message "RemoteFactory.GetRemote.Show", "DataStoreUI"
+    'RemoteFactory.GetRemote.Show
     
     Dim ViewModel As RemoteViewModel
     Set ViewModel = New RemoteViewModel
