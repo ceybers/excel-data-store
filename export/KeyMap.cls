@@ -75,6 +75,8 @@ Private Sub Class_Initialize()
 End Sub
 
 Public Sub ResolveIDs(ByVal Remote As Remote)
+    If Count = 0 Then Exit Sub
+    
     Log.Message "KeyMap ResolveIDs", "KeyMap"
     Dim Keys As Variant
     ReDim Keys(1 To Count)

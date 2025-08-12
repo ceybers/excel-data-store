@@ -5,7 +5,7 @@ Option Explicit
 Public Function CreateMappedTable(ByVal PartialSelection As Boolean, ByVal Resolve As Boolean) As MappedTable
     Log.Message "CreateMappedTable()", "MapTablFct"
     Dim ListObject As ListObject
-    If TryGetListObject(ListObject) = False Then
+    If Not TryGetSelectedListObject(ListObject) Then
         Exit Function
     End If
     
@@ -30,15 +30,4 @@ Public Function CreateMappedTable(ByVal PartialSelection As Boolean, ByVal Resol
     End With
     
     Set CreateMappedTable = MappedTable
-End Function
-
-Private Function TryGetListObject(ByRef OutListObject As ListObject) As Boolean
-    If Not TypeOf Selection Is Range Then Exit Function
-    If Not Selection.ListObject Is Nothing Then
-        Set OutListObject = Selection.ListObject
-        TryGetListObject = True
-    ElseIf Selection.Parent.ListObjects.Count = 1 Then
-        Set OutListObject = Selection.Parent.ListObjects.Item(1)
-        TryGetListObject = True
-    End If
 End Function

@@ -193,8 +193,10 @@ End Sub
 
 '@EntryPoint
 Public Sub HighlightRemove()
-    If Selection.ListObject Is Nothing Then Exit Sub
-    RangeHighlighter.RemoveHighlights Selection.ListObject
+    Dim ListObject As ListObject
+    If TryGetActiveSheetListObject(ListObject) Then
+        RangeHighlighter.RemoveHighlights ListObject
+    End If
 End Sub
 
 '@EntryPoint
