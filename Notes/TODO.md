@@ -21,6 +21,7 @@
 ## Values
 - GUI to browse Cell (KeyxField) history. i.e., Timeline of changes.
   - [x] Single Value read-only history
+  - [x] Formating using the NumberFormat of selected cell. 
   - [ ] Roll back to previous value
   - [ ] Multiple Key(s) and Field(s) modeless dialog
 

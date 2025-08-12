@@ -1,4 +1,13 @@
 # Patch Notes
+## v0.6.5-beta (2025/08/12)
+- [x] Better error handling if Selection is not a Range of cells.
+- [x] Better error handling if we cannot automatically pick the ListObject.
+- [x] Fixed bug where first column in a table was always shown as they Key column, even if the actual key column was at index > 1.
+- [x] Fixed bug where RemoteKeys did not sort correctly and could not find KeyIDs. 
+- [x] Better error handling if Remote Repo workbook is closed.
+- [x] Remote UI now has Show button to reveal the Repo workbook which opens hidden by default.
+- [x] View History (Timeline) now uses the selected cell's Number Formatting to display dates and numbers correctly.   
+  
 ## v0.6.4-beta (2025/08/11)
 - [x] Check if Worksheet is Protected and exit gracefully.
 - [x] Check if Workbook is opened in Protected Viewing and exit gracefully.

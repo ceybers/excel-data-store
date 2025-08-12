@@ -54,7 +54,6 @@ Public Sub TableMapMatchesUI()
     End If
 End Sub
 
-
 Public Sub TableMapUIWithMappedTable2(ByVal MappedTable As MappedTable)
     Log.StartLogging
     Log.Message "TableMapUI", "TableMapUI"
@@ -147,6 +146,15 @@ Public Sub TimelineSingle()
     Log.StartLogging
     Log.Message "@EntryPoint TlineSingle"
     
+    Dim SelectedRange As Range
+    If Not TryGetSelectionRange(SelectedRange) Then
+        Log.StopLogging
+        Exit Sub
+    ElseIf SelectedRange.Cells.Count <> 1 Then
+        Log.StopLogging
+        Exit Sub
+    End If
+    
     Log.Message "MappedTableFactory.CreateMappedTable", "TlineSingle"
     Dim MappedTable As MappedTable
     ' DEBUG PartialSelection(single selection!)
@@ -167,6 +175,7 @@ Public Sub TimelineSingle()
         Dim VM As ValueTimelineVM
         Set VM = New ValueTimelineVM
         VM.Load .Results, RemoteFactory.GetRemote
+        VM.NumberFormat = SelectedRange.NumberFormatLocal
     End With
     
     Dim View As IView
