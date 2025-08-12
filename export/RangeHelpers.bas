@@ -93,3 +93,13 @@ Public Function PartitionRange(ByVal Range As Range, ByVal Column As Long) As Va
     
     PartitionRange = Partitions2
 End Function
+
+'@Description "Returns the Selection object if it is a valid Range."
+Public Function TryGetSelectionRange(ByRef OutRange As Range) As Boolean
+Attribute TryGetSelectionRange.VB_Description = "Returns the Selection object if it is a valid Range."
+    If Selection Is Nothing Then Exit Function
+    If Not TypeOf Selection Is Range Then Exit Function
+    
+    Set OutRange = Selection
+    TryGetSelectionRange = True
+End Function
