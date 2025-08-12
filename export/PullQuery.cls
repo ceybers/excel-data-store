@@ -107,6 +107,6 @@ Private Sub UpdateFromRemote(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant,
         Next k
         
         Log.Message "PullQuery.UpdateFromRemote writing to " & ListColumn.DataBodyRange.Address(False, False), "PullQuery", Info_Level
-        ListColumn.DataBodyRange.Value2 = vv
+        RangeSetValueFromVariant ListColumn.DataBodyRange, vv
     Next f
 End Sub

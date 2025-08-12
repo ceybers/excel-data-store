@@ -16,6 +16,8 @@ End Function
 Public Sub RangeSetValueFromVariant(ByVal InputRange As Range, ByVal InputVariant As Variant)
     Debug.Assert Not InputRange Is Nothing
     Debug.Assert ArrayCheck.IsTwoDimensionalOneBasedArray(InputVariant)
+    
+    Log.Message "RangeSetValueFromVariant writing to = " & InputRange.Address(False, False) & " with Variant(" & UBound(InputVariant, 1) & " to " & UBound(InputVariant, 2) & ")"
     InputRange.Cells.Item(1, 1).Resize(UBound(InputVariant, 1), UBound(InputVariant, 2)).Value2 = InputVariant
 End Sub
 
