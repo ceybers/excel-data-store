@@ -89,8 +89,7 @@ Public Function PartitionRange(ByVal Range As Range, ByVal Column As Long) As Va
         Partitions2(i, 1) = Partitions(i, 1)
         Partitions2(i, 2) = Partitions(i, 2)
         Partitions2(i, 3) = Partitions(i, 3)
-        'Set Partitions2(i, 4) = Range.Range(Range.Rows(Partitions(i, 2)), Range.Rows(Partitions(i, 3)))
-        Set Partitions2(i, 4) = Range.Cells(Partitions(i, 2), 1).Resize(Partitions(i, 3) - Partitions(i, 2) + 1, Range.Columns.Count)
+        Set Partitions2(i, 4) = Range.Cells.Item(Partitions(i, 2), 1).Resize(Partitions(i, 3) - Partitions(i, 2) + 1, Range.Columns.Count)
     Next i
     
     PartitionRange = Partitions2

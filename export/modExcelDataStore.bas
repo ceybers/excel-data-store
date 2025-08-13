@@ -232,10 +232,6 @@ Private Sub DoHighlight(ByVal PartialSelection As Boolean)
         Exit Sub
     End If
     
-    If Not RemoteFactory.GetRemote.IsValid Then
-        'remotefactory.GetRemote.
-    End If
-    
     Log.Message "RemoteFactory.GetRemote.Reload", "PullHighlightOnly"
     RemoteFactory.GetRemote.Reload
     
