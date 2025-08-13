@@ -133,6 +133,8 @@ Public Function GetExistingValuesFromTable(ByVal KeyIDs As Variant, ByVal FieldI
         Next k
     Next f
     
+    ReplaceErrorCells Result
+    
     GetExistingValuesFromTable = Result
 End Function
 
