@@ -1,4 +1,8 @@
 # Patch Notes
+## v0.6.6-beta (2025/08/13)
+- [x] Fixed bug with first column incorrectly showing Key column, but properly this time.
+- [x] Cells with errors in them will now be treated as empty when pulling/pushing/comparing.
+
 ## v0.6.5-beta (2025/08/12)
 - [x] Better error handling if Selection is not a Range of cells.
 - [x] Better error handling if we cannot automatically pick the ListObject.
