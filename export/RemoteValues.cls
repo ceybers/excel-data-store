@@ -116,8 +116,11 @@ Public Sub Save()
     
     SetNumberFormats
     
-    'RangeSetValueFromVariant This.Worksheet.Range("A2"), UpdatedValues
-    RangeSetValueFromVariant This.Worksheet.Cells(1, 1).End(xlDown).Offset(1, 0), UpdatedValues
+    If This.Worksheet.UsedRange.Rows.Count = 1 Then
+        RangeSetValueFromVariant This.Worksheet.Cells.Item(2, 1), UpdatedValues
+    Else
+        RangeSetValueFromVariant This.Worksheet.Cells.Item(1, 1).End(xlDown).Offset(1, 0), UpdatedValues
+    End If
     
     SortWorksheet
     

@@ -64,11 +64,6 @@ Public Sub Deserialize(ByVal SerializedString As String)
     KeyPath = SplitString(1)
 End Sub
 
-Public Sub DEBUGPrint()
-    Debug.Print "KeyColumnName = "; KeyColumnName
-    Debug.Print "KeyPath = "; KeyPath
-End Sub
-
 Private Sub Class_Initialize()
     Set This.Items = New Collection
     Set This.KeyIDs = New Collection

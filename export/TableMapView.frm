@@ -23,6 +23,7 @@ Implements IView
 Private Type TState
     ViewModel As TableMapVM
     IsCancelled As Boolean
+    IsLoaded As Boolean
 End Type
 Private This As TState
 
@@ -50,6 +51,8 @@ Private Sub cmdSaveMap_Click()
 End Sub
 
 Private Sub cboKeyPaths_Change()
+    If Not This.IsLoaded Then Exit Sub
+    
     This.ViewModel.SelectKeyPathByKey Me.cboKeyPaths.Value
     UpdateControls
 End Sub
@@ -138,6 +141,7 @@ Private Function IView_ShowDialog(ByVal ViewModel As Object) As Boolean
     InitializeControls
     UpdateControls
     
+    This.IsLoaded = True
     Me.Show
     
     IView_ShowDialog = Not This.IsCancelled
@@ -323,5 +327,3 @@ Private Sub UpdateControls()
     Me.cmdReset.Enabled = This.ViewModel.LocalFields.CanReset
     Me.cmdSaveMap.Enabled = This.ViewModel.IsValid
 End Sub
-
-

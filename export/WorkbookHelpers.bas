@@ -33,6 +33,7 @@ End Function
 
 '@Description "Returns True if a Workbook is still open. Returns False if the workbook is closed but the reference is still present."
 Public Function IsWorkbookOpen(ByVal Workbook As Workbook) As Boolean
+Attribute IsWorkbookOpen.VB_Description = "Returns True if a Workbook is still open. Returns False if the workbook is closed but the reference is still present."
     If Workbook Is Nothing Then Exit Function
     Dim TestWorkbook As String
     On Error Resume Next

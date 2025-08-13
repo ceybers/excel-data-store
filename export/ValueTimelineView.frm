@@ -91,5 +91,5 @@ Private Sub LoadValuesToListView(ByVal RemoteValues As RemoteValuesVM, ByVal Lis
 End Sub
 
 Private Sub UpdateControls()
-    ' Nothing yet
+    Exit Sub
 End Sub

@@ -28,7 +28,7 @@ Public Property Get NumberFormat() As String
     NumberFormat = This.NumberFormat
 End Property
 
-Public Property Let NumberFormat(RHS As String)
+Public Property Let NumberFormat(ByVal RHS As String)
     If RHS = "General" Then
         This.NumberFormat = "@"
     Else
