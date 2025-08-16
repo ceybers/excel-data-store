@@ -120,13 +120,13 @@ End Function
 
 Private Function TryResolveByListObjectName() As Boolean
     Dim Workbook As Workbook
-    If Not TryGetWorkbookByName(This.WorkbookName, Workbook) Then Exit Function
+    If Not TryGetWorkbook(This.WorkbookName, Workbook) Then Exit Function
     
     Dim Worksheet As Worksheet
-    If Not TryGetWorksheetByName(Workbook, This.WorksheetName, Worksheet) Then Exit Function
+    If Not WorksheetHelpers.TryGetWorksheet(Workbook, This.WorksheetName, Worksheet) Then Exit Function
     
     Dim ListObject As ListObject
-    If Not TryGetListObjectByName(Worksheet, This.ListObjectName, ListObject) Then Exit Function
+    If Not TryGetListObject(Worksheet, This.ListObjectName, ListObject) Then Exit Function
     
     Set This.ListObject = ListObject
     TryResolveByListObjectName = True
@@ -134,10 +134,10 @@ End Function
 
 Private Function TryResolveByWorksheetName() As Boolean
     Dim Workbook As Workbook
-    If Not TryGetWorkbookByName(This.WorkbookName, Workbook) Then Exit Function
+    If Not TryGetWorkbook(This.WorkbookName, Workbook) Then Exit Function
     
     Dim Worksheet As Worksheet
-    If Not TryGetWorksheetByName(Workbook, This.WorksheetName, Worksheet) Then Exit Function
+    If Not WorksheetHelpers.TryGetWorksheet(Workbook, This.WorksheetName, Worksheet) Then Exit Function
         
     If Worksheet.ListObjects.Count <> 1 Then Exit Function
     
@@ -150,7 +150,7 @@ Private Function TryResolveByWorkbookName() As Boolean
     Set ListObjects = New Collection
     
     Dim Workbook As Workbook
-    If Not TryGetWorkbookByName(This.WorkbookName, Workbook) Then Exit Function
+    If Not TryGetWorkbook(This.WorkbookName, Workbook) Then Exit Function
     
     Dim Worksheet As Worksheet
     For Each Worksheet In Workbook.Worksheets
@@ -164,48 +164,4 @@ Private Function TryResolveByWorkbookName() As Boolean
         Set This.ListObject = ListObjects.Item(1)
         TryResolveByWorkbookName = True
     End If
-End Function
-
-' TODO Copy this to Public Repo Common Helpers
-Private Function TryGetWorkbookByName(ByVal WorkbookName As String, ByRef OutWorkbook As Workbook) As Boolean
-    If WorkbookName = vbNullString Then Exit Function
-    
-    Dim Workbook As Workbook
-    For Each Workbook In Application.Workbooks
-        If Workbook.Name = WorkbookName Then
-            Set OutWorkbook = Workbook
-            TryGetWorkbookByName = True
-            Exit Function
-        End If
-    Next Workbook
-End Function
-
-' TODO Copy this to Public Repo Common Helpers
-Private Function TryGetWorksheetByName(ByVal Workbook As Workbook, ByVal WorksheetName As String, ByRef OutWorksheet As Worksheet) As Boolean
-    If Workbook Is Nothing Then Exit Function
-    If WorksheetName = vbNullString Then Exit Function
-    
-    Dim Worksheet As Worksheet
-    For Each Worksheet In Workbook.Worksheets
-        If Worksheet.Name = WorksheetName Then
-            Set OutWorksheet = Worksheet
-            TryGetWorksheetByName = True
-            Exit Function
-        End If
-    Next Worksheet
-End Function
-
-' TODO Copy this to Public Repo Common Helpers
-Private Function TryGetListObjectByName(ByVal Worksheet As Worksheet, ByVal ListObjectName As String, ByRef OutListObject As ListObject) As Boolean
-    If Worksheet Is Nothing Then Exit Function
-    If ListObjectName = vbNullString Then Exit Function
-    
-    Dim ListObject As ListObject
-    For Each ListObject In Worksheet.ListObjects
-        If ListObject.Name = ListObjectName Then
-            Set OutListObject = ListObject
-            TryGetListObjectByName = True
-            Exit Function
-        End If
-    Next ListObject
 End Function

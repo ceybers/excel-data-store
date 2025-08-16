@@ -71,3 +71,20 @@ Attribute TryGetActiveSheetListObject.VB_Description = "Tries to return the List
     Set OutListObject = Worksheet.ListObjects.Item(1)
     TryGetActiveSheetListObject = True
 End Function
+
+'@Description "Tries to return the ListObject with the given Name in the given Worksheet if it exists."
+Public Function TryGetListObject(ByVal Worksheet As Worksheet, ByVal ListObjectName As String, _
+    ByRef OutListObject As ListObject) As Boolean
+Attribute TryGetListObject.VB_Description = "Tries to return the ListObject with the given Name in the given Worksheet if it exists."
+    If Worksheet Is Nothing Then Exit Function
+    If ListObjectName = vbNullString Then Exit Function
+    
+    Dim ListObject As ListObject
+    For Each ListObject In Worksheet.ListObjects
+        If ListObject.Name = ListObjectName Then
+            Set OutListObject = ListObject
+            TryGetListObject = True
+            Exit Function
+        End If
+    Next ListObject
+End Function

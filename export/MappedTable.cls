@@ -55,7 +55,7 @@ End Sub
 
 Public Sub SelectKeys(ByVal Partial As Boolean)
     Dim KeyListColumn As ListColumn
-    If Not TryGetListColumn(This.TableMap.KeyMap.KeyColumnName, KeyListColumn) Then Exit Sub
+    If Not TryGetListColumn(This.TableMap.KeyMap.KeyColumnName, This.ListObject, KeyListColumn) Then Exit Sub
     
     Dim SelectedKeys As Range
     If Partial Then
