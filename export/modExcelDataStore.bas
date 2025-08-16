@@ -19,8 +19,7 @@ Public Sub TableMapUI()
     VM.GetBestMappedTable
     Log.StopLogging
         
-    'TableMapUIWithMappedTable VM.MappedTable
-    TableMapUIWithMappedTable2 VM.MappedTable
+    TableMapUIWithMappedTable VM.MappedTable
 End Sub
 
 '@EntryPoint
@@ -45,7 +44,7 @@ Public Sub TableMapMatchesUI()
         VM.Save
         Log.StopLogging
         
-        TableMapUIWithMappedTable2 VM.MappedTable
+        TableMapUIWithMappedTable VM.MappedTable
         Exit Sub
     Else
         Log.Message "...exited UserForm", "TableMapUI", UI_Level
@@ -54,7 +53,7 @@ Public Sub TableMapMatchesUI()
     End If
 End Sub
 
-Public Sub TableMapUIWithMappedTable2(ByVal MappedTable As MappedTable)
+Public Sub TableMapUIWithMappedTable(ByVal MappedTable As MappedTable)
     Log.StartLogging
     Log.Message "TableMapUI", "TableMapUI"
     
@@ -88,6 +87,7 @@ Public Sub PullAll()
     Log.Message "MappedTableFactory.CreateMappedTable"
     Dim MappedTable As MappedTable
     Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=False, Resolve:=True)
+    
     If MappedTable Is Nothing Then
         MsgBox MSG_PULL_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
         Exit Sub
@@ -98,9 +98,6 @@ Public Sub PullAll()
         Exit Sub
     End If
     
-    Log.Message "RemoteFactory.GetRemote.Reload", "PullAll"
-    RemoteFactory.GetRemote.Reload
-
     Log.Message "New PullQuery"
     With New PullQuery
         Set .MappedTable = MappedTable
@@ -119,6 +116,7 @@ Public Sub PullPartial()
     ' TODO Only run if Selection covers a ListObject. Don't resolve the single and only ListObject on the selection's worksheet.
     Dim MappedTable As MappedTable
     Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=True, Resolve:=True)
+    
     If MappedTable Is Nothing Then
         MsgBox MSG_PULL_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
         Exit Sub
@@ -132,7 +130,71 @@ Public Sub PullPartial()
     Log.Message "RemoteFactory.GetRemote.Reload", "PullPartial"
     RemoteFactory.GetRemote.Reload
     
+    Log.Message "New PullQuery"
     With New PullQuery
+        Set .MappedTable = MappedTable
+        Set .Remote = RemoteFactory.GetRemote
+        .Run
+    End With
+    
+    Log.StopLogging
+End Sub
+
+'@EntryPoint
+Public Sub Push()
+    Log.StartLogging
+    Log.Message "@EntryPoint PushAll"
+    
+    Log.Message "MappedTableFactory.CreateMappedTable"
+    Dim MappedTable As MappedTable
+    Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=False, Resolve:=True)
+    
+    If MappedTable Is Nothing Then
+        MsgBox MSG_PUSH_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
+        Exit Sub
+    End If
+    
+    If MappedTable.IsProtected Then
+        MsgBox MSG_IS_PROTECTED, vbExclamation + vbOKOnly, APP_TITLE
+        Exit Sub
+    End If
+    
+    Log.Message "RemoteFactory.GetRemote.Reload", "Push"
+    RemoteFactory.GetRemote.Reload
+    
+    Log.Message "New PushQuery"
+    With New PushQuery
+        Set .MappedTable = MappedTable
+        Set .Remote = RemoteFactory.GetRemote
+        .Run
+    End With
+    
+    Log.StopLogging
+End Sub
+
+'@EntryPoint
+Public Sub PushPartial()
+    Log.StartLogging
+    Log.Message "@EntryPoint PushPartial"
+    
+    Dim MappedTable As MappedTable
+    Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=True, Resolve:=True)
+    
+    If MappedTable Is Nothing Then
+        MsgBox MSG_PUSH_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
+        Exit Sub
+    End If
+    
+    If MappedTable.IsProtected Then
+        MsgBox MSG_IS_PROTECTED, vbExclamation + vbOKOnly, APP_TITLE
+        Exit Sub
+    End If
+    
+    Log.Message "RemoteFactory.GetRemote.Reload", "PushPartial"
+    RemoteFactory.GetRemote.Reload
+    
+    Log.Message "New PushQuery"
+    With New PushQuery
         Set .MappedTable = MappedTable
         Set .Remote = RemoteFactory.GetRemote
         .Run
@@ -159,6 +221,7 @@ Public Sub TimelineSingle()
     Dim MappedTable As MappedTable
     ' DEBUG PartialSelection(single selection!)
     Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=True, Resolve:=True)
+    
     If MappedTable Is Nothing Then
         MsgBox MSG_PULL_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
         Exit Sub
@@ -213,6 +276,7 @@ Public Sub HighlightMappedFields()
     Dim MappedTable As MappedTable
     Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=True, Resolve:=True)
     If MappedTable Is Nothing Then Exit Sub
+    
     MappedTable.HighlightMappedFields
 End Sub
 
@@ -222,6 +286,7 @@ Private Sub DoHighlight(ByVal PartialSelection As Boolean)
     
     Dim MappedTable As MappedTable
     Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=PartialSelection, Resolve:=True)
+    
     If MappedTable Is Nothing Then
         MsgBox MSG_PULL_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
         Exit Sub
@@ -236,67 +301,6 @@ Private Sub DoHighlight(ByVal PartialSelection As Boolean)
     RemoteFactory.GetRemote.Reload
     
     With New PullDryRunQuery
-        Set .MappedTable = MappedTable
-        Set .Remote = RemoteFactory.GetRemote
-        .Run
-    End With
-    
-    Log.StopLogging
-End Sub
-
-
-'@EntryPoint
-Public Sub Push()
-    Log.StartLogging
-    Log.Message "@EntryPoint PushAll"
-    
-    Log.Message "MappedTableFactory.CreateMappedTable"
-    Dim MappedTable As MappedTable
-    Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=False, Resolve:=True)
-    If MappedTable Is Nothing Then
-        MsgBox MSG_PUSH_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
-    
-    If MappedTable.IsProtected Then
-        MsgBox MSG_IS_PROTECTED, vbExclamation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
-    
-    Log.Message "RemoteFactory.GetRemote.Reload", "Push"
-    RemoteFactory.GetRemote.Reload
-    
-    Log.Message "New PushQuery"
-    With New PushQuery
-        Set .MappedTable = MappedTable
-        Set .Remote = RemoteFactory.GetRemote
-        .Run
-    End With
-    
-    Log.StopLogging
-End Sub
-
-'@EntryPoint
-Public Sub PushPartial()
-    Log.StartLogging
-    Log.Message "@EntryPoint PushPartial"
-    
-    Dim MappedTable As MappedTable
-    Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=True, Resolve:=True)
-    If MappedTable Is Nothing Then
-        MsgBox MSG_PUSH_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
-    
-    If MappedTable.IsProtected Then
-        MsgBox MSG_IS_PROTECTED, vbExclamation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
-    
-    Log.Message "RemoteFactory.GetRemote.Reload", "PushPartial"
-    RemoteFactory.GetRemote.Reload
-    
-    With New PushQuery
         Set .MappedTable = MappedTable
         Set .Remote = RemoteFactory.GetRemote
         .Run

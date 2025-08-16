@@ -9,25 +9,25 @@ Public Function CreateMappedTable(ByVal PartialSelection As Boolean, ByVal Resol
         Exit Function
     End If
     
-    Dim TableMapMatches As TableMapMatches
-    Set TableMapMatches = New TableMapMatches
-    With TableMapMatches
+    Dim MappedTable As MappedTable
+    With New TableMapMatches
         .Load
         .Evaluate ListObject
-    End With
-    
-    Dim MappedTable As MappedTable
-    Set MappedTable = TableMapMatches.GetBestMappedTable
-    
-    With MappedTable
-        If Resolve And MappedTable.TableMap.IsMapped Then
-            Log.Message " Resolve & IsMapped", "MapTablFct"
-            .SelectKeys Partial:=PartialSelection
-            .ResolveKeyIDs RemoteFactory.GetRemote
-        
-            .SelectFields Partial:=PartialSelection
-        End If
+        Set MappedTable = .GetBestMappedTable
     End With
     
     Set CreateMappedTable = MappedTable
+    
+    If Resolve = False Then Exit Function
+    
+    If MappedTable.TableMap.IsMapped = False Then Exit Function
+    
+    With MappedTable
+        Log.Message " SelectKeys", "MapTablFct"
+        .SelectKeys Partial:=PartialSelection
+        Log.Message " ResolveKeyIDs", "MapTablFct"
+        .ResolveKeyIDs RemoteFactory.GetRemote
+        Log.Message " SelectFields", "MapTablFct"
+        .SelectFields Partial:=PartialSelection
+    End With
 End Function

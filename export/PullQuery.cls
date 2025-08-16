@@ -53,17 +53,19 @@ Public Sub Run()
     Dim ExistingValues As Variant
     ExistingValues = This.MappedTable.GetExistingValuesFromTable(KeyIDs, FieldIDs)
     
-    Dim ChangedValues As Variant
-    ChangedValues = This.Remote.Values.GetChangeMask(KeyIDs, FieldIDs, ExistingValues)
-    
-    This.MappedTable.HighlightChanges KeyIDs, FieldIDs, ChangedValues, hcBeforePull
-    
     Dim ChangeCount As Long
     ChangeCount = This.Remote.Values.GetChangeCount(KeyIDs, FieldIDs, ExistingValues)
     
     If ChangeCount = 0 Then
         MsgBox MSG_PULL_NOCHANGES, vbInformation + vbOKOnly, APP_TITLE
-    ElseIf vbNo = MsgBox(Replace$(MSG_PULL_CONFIRM, "{0}", ChangeCount), vbQuestion + vbYesNo + vbDefaultButton2, APP_TITLE) Then
+        Exit Sub
+    End If
+    
+    Dim ChangedValues As Variant
+    ChangedValues = This.Remote.Values.GetChangeMask(KeyIDs, FieldIDs, ExistingValues)
+    This.MappedTable.HighlightChanges KeyIDs, FieldIDs, ChangedValues, hcBeforePull
+    
+    If vbNo = MsgBox(Replace$(MSG_PULL_CONFIRM, "{0}", ChangeCount), vbQuestion + vbYesNo + vbDefaultButton2, APP_TITLE) Then
         Exit Sub
     End If
     
@@ -73,6 +75,7 @@ Public Sub Run()
     Dim NewValues As Variant
     Log.Message "PullQuery.Run GetValues", "PullQuery", Info_Level
     NewValues = This.Remote.Values.GetValues(KeyIDs, FieldIDs)
+    
     Log.Message "PullQuery.Run UpdateFromRemote", "PullQuery", Info_Level
     UpdateFromRemote KeyIDs, FieldIDs, NewValues
     
@@ -81,6 +84,7 @@ End Sub
 
 Private Sub UpdateFromRemote(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, ByVal NewValues As Variant)
     Log.Message "PullQuery.UpdateFromRemote creating KeyIndexes", "PullQuery", Info_Level
+    
     Dim KeyIndexes As Variant
     ReDim KeyIndexes(1 To UBound(KeyIDs))
     Dim i As Long
@@ -106,7 +110,6 @@ Private Sub UpdateFromRemote(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant,
             End If
         Next k
         
-        Log.Message "PullQuery.UpdateFromRemote writing to " & ListColumn.DataBodyRange.Address(False, False), "PullQuery", Info_Level
         RangeSetValueFromVariant ListColumn.DataBodyRange, vv
     Next f
 End Sub
