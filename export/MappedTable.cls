@@ -55,7 +55,7 @@ End Sub
 
 Public Sub SelectKeys(ByVal Partial As Boolean)
     Dim KeyListColumn As ListColumn
-    Set KeyListColumn = This.ListObject.ListColumns.Item(This.TableMap.KeyMap.KeyColumnName)
+    If Not TryGetListColumn(This.TableMap.KeyMap.KeyColumnName, KeyListColumn) Then Exit Sub
     
     Dim SelectedKeys As Range
     If Partial Then
@@ -66,14 +66,12 @@ Public Sub SelectKeys(ByVal Partial As Boolean)
         Set SelectedKeys = KeyListColumn.DataBodyRange
     End If
     
-    'TableMap.KeyMap.Clear
-    
     Dim Cell As Range
     For Each Cell In SelectedKeys.Cells
         If VarType(Cell.Value2) = vbError Then
-            This.TableMap.KeyMap.Add vbNullString, Cell.Row - This.ListObject.Range.Row
+            This.TableMap.KeyMap.Add KeyValue:=vbNullString, RowIndex:=Cell.Row - This.ListObject.Range.Row
         Else
-            This.TableMap.KeyMap.Add Cell.Value2, Cell.Row - This.ListObject.Range.Row
+            This.TableMap.KeyMap.Add KeyValue:=Cell.Value2, RowIndex:=Cell.Row - This.ListObject.Range.Row
         End If
     Next Cell
 End Sub
@@ -91,7 +89,6 @@ Public Sub SelectFields(ByVal Partial As Boolean)
     Else
         Set SelectedHeaders = This.ListObject.HeaderRowRange
     End If
-    If SelectedHeaders Is Nothing Then Exit Sub
     
     Dim Cell As Range
     For Each Cell In SelectedHeaders.Cells
@@ -168,12 +165,7 @@ Public Sub HighlightChanges(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, 
     End If
     
     Dim ChangeRange As Range
-    Set ChangeRange = Changes.Item(1)
-
-    Dim i As Long
-    For i = 2 To Changes.Count
-        Set ChangeRange = Application.Union(ChangeRange, Changes.Item(i))
-    Next i
+    Set ChangeRange = CollectionToRangeUnion(Changes)
     
     HighlightRange ChangeRange, HighlightColor
 End Sub
@@ -202,11 +194,7 @@ Public Sub HighlightMappedFields()
     If MappedListColumns.Count = 0 Then Exit Sub
     
     Dim HighlightRange As Range
-    Set HighlightRange = MappedListColumns.Item(1)
-
-    For i = 2 To MappedListColumns.Count
-        Set HighlightRange = Application.Union(HighlightRange, MappedListColumns.Item(i))
-    Next i
+    Set HighlightRange = CollectionToRangeUnion(MappedListColumns)
     
     RangeHighlighter.HighlightRange HighlightRange, hcHeaders
 End Sub
