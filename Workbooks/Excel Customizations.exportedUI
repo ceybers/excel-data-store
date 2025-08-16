@@ -43,8 +43,11 @@
 <mso:group id="mso_c1.B26744B" label="History" autoScale="true">
 <mso:button idQ="x1:excel-data-store.xlam_TimelineSingle_0_B26ACE0" label="View History" imageMso="FunctionsDateTimeInsertGallery" onAction="C:\Users\User\Repos\Public\excel-data-store\Workbooks\excel-data-store.xlsm!TimelineSingle" visible="true"/>
 </mso:group>
-<mso:group id="mso_c1.F55461" label="Remote" autoScale="true">
-<mso:button idQ="x1:excel-data-store.xlam_DataStoreUI_0_F58370" label="Manage Remote" imageMso="GroupPrintPreviewData" onAction="C:\Users\User\Repos\Public\excel-data-store\Workbooks\excel-data-store.xlsm!DataStoreUI" visible="true"/>
+<mso:group id="mso_c1.F55461" label="Remote" autoScale="false">
+<mso:button size="large" idQ="x1:excel-data-store.xlam_DataStoreUI_0_F58370" label="Manage Remote" imageMso="GroupPrintPreviewData" onAction="C:\Users\User\Repos\Public\excel-data-store\Workbooks\excel-data-store.xlsm!DataStoreUI" visible="true"/>
+<mso:button size="normal" idQ="x1:excel-data-store.xlam_DataStoreOpen_0_609A741" label="Open" imageMso="FileOpen" onAction="C:\Users\User\Repos\Public\excel-data-store\Workbooks\excel-data-store.xlsm!DataStoreOpen" visible="true"/>
+<mso:button size="normal" idQ="x1:excel-data-store.xlam_DataStoreSave_1_609A741" label="Save" imageMso="FileSave" onAction="C:\Users\User\Repos\Public\excel-data-store\Workbooks\excel-data-store.xlsm!DataStoreSave" visible="true"/>
+<mso:button size="normal" idQ="x1:excel-data-store.xlam_DataStoreClose_2_609A741" label="Close" imageMso="FileClose" onAction="C:\Users\User\Repos\Public\excel-data-store\Workbooks\excel-data-store.xlsm!DataStoreClose" visible="true"/>
 </mso:group>
 </mso:tab>
 

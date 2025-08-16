@@ -313,9 +313,6 @@ Public Sub DataStoreUI()
     Log.Message "RemoteFactory.GetRemote.Reload", "DataStoreUI"
     RemoteFactory.GetRemote.Reload
     
-    'Log.Message "RemoteFactory.GetRemote.Show", "DataStoreUI"
-    'RemoteFactory.GetRemote.Show
-    
     Dim ViewModel As RemoteViewModel
     Set ViewModel = New RemoteViewModel
     Log.Message "ViewModel.Load RemoteFactory.GetRemote", "DataStoreUI"
@@ -333,4 +330,22 @@ Public Sub DataStoreUI()
         Exit Sub
     End If
     Log.StopLogging
+End Sub
+
+'@EntryPoint
+Public Sub DataStoreOpen()
+    Dim Remote As Remote
+    Set Remote = RemoteFactory.GetRemote
+    Remote.Reload
+End Sub
+
+'@EntryPoint
+Public Sub DataStoreSave()
+    RemoteFactory.GetRemote.SaveWorkbook
+End Sub
+
+'@EntryPoint
+Public Sub DataStoreClose()
+    RemoteFactory.GetRemote.SaveWorkbook
+    RemoteFactory.GetRemote.CloseWorkbook
 End Sub
