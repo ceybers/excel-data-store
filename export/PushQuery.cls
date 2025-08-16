@@ -71,6 +71,8 @@ Public Sub Run()
     Dim ValuesToPush As Variant
     ValuesToPush = UpdateToRemote(KeyIDs, FieldIDs)
     
+    ArrayClean.ReplaceErrorCells ValuesToPush
+    
     This.Remote.Values.UpsertValues KeyIDs, FieldIDs, ValuesToPush, Commit.CommitID
 End Sub
 
