@@ -79,15 +79,16 @@ Public Sub Deserialize(ByVal SerializedString As String)
     KeyPath = SplitString(1)
 End Sub
 
-
 Public Sub ResolveIDs(ByVal Remote As Remote)
+    Log.Message "ResolveIDs()", "KeyMap"
+    
     If Count = 0 Then Exit Sub
     
-    Log.Message "KeyMap ResolveIDs", "KeyMap"
+    Log.Message " KeyMap ResolveIDs", "KeyMap"
     Dim Keys As Variant
-    ReDim Keys(1 To Count)
+    ReDim Keys(1 To Count) As String
     
-    Set This.KeyIDs = New Collection
+    CollectionClear This.KeyIDs
     
     Dim i As Long
     For i = 1 To Count
@@ -95,8 +96,10 @@ Public Sub ResolveIDs(ByVal Remote As Remote)
     Next i
     
     Dim KeyIDs As Variant
+    Log.Message " Remote.Keys.GetIDsFromQuery", "KeyMap"
     KeyIDs = Remote.Keys.GetIDsFromQuery(KeyPath, Keys)
     
+    Log.Message " For i; This.KeyIDs.Add", "KeyMap"
     For i = 1 To Count
         This.Items.Item(i).KeyID = KeyIDs(i)
         If KeyIDs(i) <> vbNullString Then
@@ -106,6 +109,8 @@ Public Sub ResolveIDs(ByVal Remote As Remote)
             On Error GoTo 0
         End If
     Next i
+    
+    Log.Message "ResolveIDs() End", "KeyMap"
 End Sub
 
 Public Function GetRowFromKeyID(ByVal KeyID As String) As Long
@@ -116,7 +121,7 @@ Public Function GetKeyIDs() As Variant
     If Count = 0 Then Exit Function
     
     Dim Result As Variant
-    ReDim Result(1 To Count)
+    ReDim Result(1 To Count) As String
     
     Dim i As Long
     For i = 1 To Count

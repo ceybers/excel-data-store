@@ -34,12 +34,12 @@ Public Property Set Remote(ByVal RHS As Remote)
 End Property
 
 Public Sub Run()
+    Log.Message "PullDryQuery.Run()", "DryQuery", Info_Level
+    
+    Log.Message "This.Remote.Reload", "DryQuery", Info_Level
     This.Remote.Reload
     
-    RemoveHighlights This.MappedTable.ListObject
-    
-    Log.Message "This.Remote.Reload", "PullDryRunQuery", Info_Level
-    This.Remote.Reload
+    RangeHighlighter.RemoveHighlights This.MappedTable.ListObject
     
     Dim KeyIDs As Variant
     KeyIDs = This.MappedTable.GetKeyIDs

@@ -210,6 +210,7 @@ Private Sub DoHighlight(ByVal PartialSelection As Boolean)
     If GuardMappedTableNoListObject(MappedTable) Then Exit Sub
     If GuardMappedTableProtected(MappedTable) Then Exit Sub
     
+    Log.Message "MappedTable.SelectKeysAndFields", "DoHL"
     MappedTable.SelectKeysAndFields PartialSelection:=PartialSelection
     
     Log.Message "New PullDryRunQuery", "DoHL"
@@ -225,10 +226,10 @@ End Sub
 '@EntryPoint
 Public Sub HighlightRemove()
     Dim ListObject As ListObject
-    If TryGetActiveSheetListObject(ListObject) Then
-        If TestIfProtected(ListObject) Then Exit Sub
-        RangeHighlighter.RemoveHighlights ListObject
-    End If
+    If Not TryGetActiveSheetListObject(ListObject) Then Exit Sub
+    If TestIfProtected(ListObject) Then Exit Sub
+    
+    RangeHighlighter.RemoveHighlights ListObject
 End Sub
 
 '@EntryPoint

@@ -34,12 +34,12 @@ Public Property Set Remote(ByVal RHS As Remote)
 End Property
 
 Public Sub Run()
+    Log.Message "PushQuery.Run()", "PushQuery", Info_Level
+    
+    Log.Message "This.Remote.Reload", "PushQuery", Info_Level
     This.Remote.Reload
     
     RangeHighlighter.RemoveHighlights This.MappedTable.ListObject
-    
-    Log.Message "This.Remote.ReLoad", "PushQuery", Info_Level
-    This.Remote.Reload
     
     Dim KeyIDs As Variant
     KeyIDs = This.MappedTable.GetKeyIDs
