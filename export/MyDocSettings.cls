@@ -85,13 +85,10 @@ Private Function ISettings_GetSetting(ByVal SettingName As String) As String
     If Not IsKeyValid(SettingName) Then Exit Function
     If Not This.Settings.Exists(SettingName) Then Exit Function
     ISettings_GetSetting = This.Settings.Item(SettingName)
-    If DO_DEBUG Then Debug.Print "ISettings_GetSetting("; SettingName; ") = "; ISettings_GetSetting
 End Function
 
 Private Sub ISettings_SetSetting(ByVal SettingName As String, ByVal Value As String)
     If Not IsKeyValid(SettingName) Then Exit Sub
-    
-    If DO_DEBUG Then Debug.Print "ISettings_SetSetting("; SettingName; ") = "; Value
     
     This.Settings.Item(SettingName) = Value
     
@@ -183,8 +180,6 @@ Public Function Create(ByVal UUID As String, ByVal Filename As String) As ISetti
 End Function
 
 Public Sub Load()
-    If DO_DEBUG Then Debug.Print "MyDocSettings.Load()"
-    
     CheckIfFileExists
     LoadFromFile
     If Not IsMySettings Then Exit Sub

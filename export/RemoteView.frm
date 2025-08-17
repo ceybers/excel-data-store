@@ -19,9 +19,6 @@ Option Explicit
 
 Implements IView
 
-Private Const FIELD_ID_ADDNEW As String = "#ADDNEW"
-Private Const FIELD_ID_UNMAPPED As String = "#UNMAPPED"
-        
 Private Type TState
     ViewModel As RemoteViewModel
     IsCancelled As Boolean
@@ -133,12 +130,9 @@ Private Sub LoadRemoteKeysToListView(ByVal RemoteKeys As RemoteKeys, ByVal ListV
     
     With ListView.ColumnHeaders
         .Clear
-        .Add Text:="ID"
-        .Add Text:="Name"
-        .Add Text:="Created At"
-        .Item(1).Width = 52 '(.Width / 5)
-        .Item(2).Width = 86 '(.Width - 92) / 2
-        .Item(3).Width = 92
+        .Add Text:="ID", Width:=52 '(.Width / 5)
+        .Add Text:="Name", Width:=86 '(.Width - 92) / 2
+        .Add Text:="Created At", Width:=92
     End With
     
     Dim i As Long
@@ -166,14 +160,10 @@ Private Sub LoadRemoteFieldsToListView(ByVal RemoteFields As RemoteFields, ByVal
     
     With ListView.ColumnHeaders
         .Clear
-        .Add Text:="ID"
-        .Add Text:="Path"
-        .Add Text:="Name"
-        .Add Text:="Caption"
-        .Item(1).Width = 48 '(.Width / 4) - 8
-        .Item(2).Width = 48 '(.Width / 4) - 8
-        .Item(3).Width = 48 '(.Width / 4) - 8
-        .Item(4).Width = 48 '(.Width / 4) - 8
+        .Add Text:="ID", Width:=48   '(.Width / 4) - 8
+        .Add Text:="Path", Width:=48   '(.Width / 4) - 8
+        .Add Text:="Name", Width:=48   '(.Width / 4) - 8
+        .Add Text:="Caption", Width:=48   '(.Width / 4) - 8
     End With
     
     Dim i As Long

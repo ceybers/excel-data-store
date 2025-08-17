@@ -3,49 +3,51 @@ Attribute VB_Name = "modExcelDataStore"
 '@Folder("Version4")
 Option Explicit
 
-'@EntryPoint
+'@EntryPoint Map > Map Table
 Public Sub TableMapUI()
     Log.StartLogging
     Log.Message "TableMapMatcherUI", "TMapMatchUI"
     
+    Dim ListObject As ListObject
+    TryGetSelectedListObject ListObject
+    If GuardNoSelectedListObject(ListObject) Then Exit Sub
+    
     Dim VM As TableMapMatcherVM
     Set VM = New TableMapMatcherVM
-    VM.Load
-    If VM.IsValid = False Then
-        MsgBox MSG_MAP_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
+    With VM
+        .Load ListObject
+        .GetBestMappedTable
+    End With
     
-    VM.GetBestMappedTable
     Log.StopLogging
         
-    'TableMapUIWithMappedTable VM.MappedTable
-    TableMapUIWithMappedTable2 VM.MappedTable
+    TableMapUIWithMappedTable VM.MappedTable
 End Sub
 
-'@EntryPoint
+'@EntryPoint Map > View Maps
 Public Sub TableMapMatchesUI()
     Log.StartLogging
     Log.Message "TableMapMatcherUI", "TMapMatchUI"
     
+    Dim ListObject As ListObject
+    TryGetSelectedListObject ListObject
+    If GuardNoSelectedListObject(ListObject) Then Exit Sub
+    
     Dim VM As TableMapMatcherVM
     Set VM = New TableMapMatcherVM
-    VM.Load
-    If VM.IsValid = False Then
-        MsgBox MSG_MAP_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
+    VM.Load ListObject
     
     Log.Message "Entering UserForm...", "TableMapUI", UI_Level
     Dim View As IView
     Set View = New TableMapMatcher
     If View.ShowDialog(VM) Then
         Log.Message "...exited UserForm", "TableMapUI", UI_Level
+        
         Log.Message "ViewModel.Save", "TableMapUI"
         VM.Save
         Log.StopLogging
         
-        TableMapUIWithMappedTable2 VM.MappedTable
+        TableMapUIWithMappedTable VM.MappedTable
         Exit Sub
     Else
         Log.Message "...exited UserForm", "TableMapUI", UI_Level
@@ -54,7 +56,7 @@ Public Sub TableMapMatchesUI()
     End If
 End Sub
 
-Public Sub TableMapUIWithMappedTable2(ByVal MappedTable As MappedTable)
+Private Sub TableMapUIWithMappedTable(ByVal MappedTable As MappedTable)
     Log.StartLogging
     Log.Message "TableMapUI", "TableMapUI"
     
@@ -80,58 +82,31 @@ Public Sub TableMapUIWithMappedTable2(ByVal MappedTable As MappedTable)
     End If
 End Sub
 
-'@EntryPoint
+'@EntryPoint Pull > Pull
 Public Sub PullAll()
-    Log.StartLogging
-    Log.Message "@EntryPoint PullAll"
-    
-    Log.Message "MappedTableFactory.CreateMappedTable"
-    Dim MappedTable As MappedTable
-    Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=False, Resolve:=True)
-    If MappedTable Is Nothing Then
-        MsgBox MSG_PULL_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
-    
-    If MappedTable.IsProtected Then
-        MsgBox MSG_IS_PROTECTED, vbExclamation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
-    
-    Log.Message "RemoteFactory.GetRemote.Reload", "PullAll"
-    RemoteFactory.GetRemote.Reload
-
-    Log.Message "New PullQuery"
-    With New PullQuery
-        Set .MappedTable = MappedTable
-        Set .Remote = RemoteFactory.GetRemote
-        .Run
-    End With
-    
-    Log.StopLogging
+    DoPull PartialSelection:=False
 End Sub
 
-'@EntryPoint
+'@EntryPoint Pull > Pull Selected
 Public Sub PullPartial()
+    DoPull PartialSelection:=True
+End Sub
+
+Private Sub DoPull(ByVal PartialSelection As Boolean)
     Log.StartLogging
-    Log.Message "@EntryPoint PullPartial"
+    Log.Message "@EntryPoint DoPull", "DoPull"
     
-    ' TODO Only run if Selection covers a ListObject. Don't resolve the single and only ListObject on the selection's worksheet.
+    Log.Message "MappedTableFactory.TryCreateBestMappedTable", "DoPull"
     Dim MappedTable As MappedTable
-    Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=True, Resolve:=True)
-    If MappedTable Is Nothing Then
-        MsgBox MSG_PULL_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
+    MappedTableFactory.TryCreateBestMappedTable RemoteFactory.GetRemote, MappedTable
     
-    If MappedTable.IsProtected Then
-        MsgBox MSG_IS_PROTECTED, vbExclamation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
+    If GuardMappedTableNoListObject(MappedTable) Then Exit Sub
+    If GuardMappedTableProtected(MappedTable) Then Exit Sub
     
-    Log.Message "RemoteFactory.GetRemote.Reload", "PullPartial"
-    RemoteFactory.GetRemote.Reload
+    Log.Message "MappedTable.SelectKeysAndFields", "DoPull"
+    MappedTable.SelectKeysAndFields PartialSelection:=PartialSelection
     
+    Log.Message "New PullQuery", "DoPull"
     With New PullQuery
         Set .MappedTable = MappedTable
         Set .Remote = RemoteFactory.GetRemote
@@ -141,100 +116,65 @@ Public Sub PullPartial()
     Log.StopLogging
 End Sub
 
-'@EntryPoint
-Public Sub TimelineSingle()
+'@EntryPoint Push > Push
+Public Sub Push()
+    DoPush PartialSelection:=False
+End Sub
+
+'@EntryPoint Push > Push Selected
+Public Sub PushPartial()
+    DoPush PartialSelection:=True
+End Sub
+
+Private Sub DoPush(ByVal PartialSelection As Boolean)
     Log.StartLogging
-    Log.Message "@EntryPoint TlineSingle"
+    Log.Message "@EntryPoint DoPush", "DoPush"
     
-    Dim SelectedRange As Range
-    If Not TryGetSelectionRange(SelectedRange) Then
-        Log.StopLogging
-        Exit Sub
-    ElseIf SelectedRange.Cells.Count <> 1 Then
-        Log.StopLogging
-        Exit Sub
-    End If
-    
-    Log.Message "MappedTableFactory.CreateMappedTable", "TlineSingle"
+    Log.Message "MappedTableFactory.TryCreateBestMappedTable", "DoPush"
     Dim MappedTable As MappedTable
-    ' DEBUG PartialSelection(single selection!)
-    Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=True, Resolve:=True)
-    If MappedTable Is Nothing Then
-        MsgBox MSG_PULL_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
+    MappedTableFactory.TryCreateBestMappedTable RemoteFactory.GetRemote, MappedTable
+        
+    If GuardMappedTableNoListObject(MappedTable) Then Exit Sub
+    If GuardMappedTableProtected(MappedTable) Then Exit Sub
     
-    Log.Message "RemoteFactory.GetRemote.Reload", "TlineSingle"
-    RemoteFactory.GetRemote.Reload
+    Log.Message "MappedTable.SelectKeysAndFields", "DoPush"
+    MappedTable.SelectKeysAndFields PartialSelection:=PartialSelection
     
-    With New ValueTimelineQuery
+    Log.Message "New PushQuery", "DoPush"
+    With New PushQuery
         Set .MappedTable = MappedTable
         Set .Remote = RemoteFactory.GetRemote
         .Run
-        
-        Dim VM As ValueTimelineVM
-        Set VM = New ValueTimelineVM
-        VM.Load .Results, RemoteFactory.GetRemote
-        VM.NumberFormat = SelectedRange.NumberFormatLocal
     End With
     
-    Dim View As IView
-    Set View = New ValueTimelineView
-    If View.ShowDialog(VM) Then
-        Exit Sub
-    Else
-        Exit Sub
-    End If
-
     Log.StopLogging
-    Exit Sub
 End Sub
 
-'@EntryPoint
+'@EntryPoint Compare > Highlight Changes
 Public Sub HighlightAll()
     DoHighlight PartialSelection:=False
 End Sub
 
-'@EntryPoint
+'@EntryPoint Compare > Select Only
 Public Sub HighlightSelection()
     DoHighlight PartialSelection:=True
 End Sub
 
-'@EntryPoint
-Public Sub HighlightRemove()
-    Dim ListObject As ListObject
-    If TryGetActiveSheetListObject(ListObject) Then
-        RangeHighlighter.RemoveHighlights ListObject
-    End If
-End Sub
-
-'@EntryPoint
-Public Sub HighlightMappedFields()
-    Dim MappedTable As MappedTable
-    Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=True, Resolve:=True)
-    If MappedTable Is Nothing Then Exit Sub
-    MappedTable.HighlightMappedFields
-End Sub
-
 Private Sub DoHighlight(ByVal PartialSelection As Boolean)
     Log.StartLogging
-    Log.Message "DoHighlight()"
+    Log.Message "DoHighlight()", "DoHL"
     
+    Log.Message "MappedTableFactory.TryCreateBestMappedTable", "DoHL"
     Dim MappedTable As MappedTable
-    Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=PartialSelection, Resolve:=True)
-    If MappedTable Is Nothing Then
-        MsgBox MSG_PULL_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
+    MappedTableFactory.TryCreateBestMappedTable RemoteFactory.GetRemote, MappedTable
     
-    If MappedTable.IsProtected Then
-        MsgBox MSG_IS_PROTECTED, vbExclamation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
+    If GuardMappedTableNoListObject(MappedTable) Then Exit Sub
+    If GuardMappedTableProtected(MappedTable) Then Exit Sub
     
-    Log.Message "RemoteFactory.GetRemote.Reload", "PullHighlightOnly"
-    RemoteFactory.GetRemote.Reload
+    Log.Message "MappedTable.SelectKeysAndFields", "DoHL"
+    MappedTable.SelectKeysAndFields PartialSelection:=PartialSelection
     
+    Log.Message "New PullDryRunQuery", "DoHL"
     With New PullDryRunQuery
         Set .MappedTable = MappedTable
         Set .Remote = RemoteFactory.GetRemote
@@ -244,77 +184,82 @@ Private Sub DoHighlight(ByVal PartialSelection As Boolean)
     Log.StopLogging
 End Sub
 
-
-'@EntryPoint
-Public Sub Push()
+'@EntryPoint Compare > Mapped
+Public Sub HighlightMappedFields()
     Log.StartLogging
-    Log.Message "@EntryPoint PushAll"
+    Log.Message "@EntryPoint HighlightMappedFields", "HLMapped"
     
-    Log.Message "MappedTableFactory.CreateMappedTable"
+    Log.Message "MappedTableFactory.TryCreateBestMappedTable", "HLMapped"
     Dim MappedTable As MappedTable
-    Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=False, Resolve:=True)
-    If MappedTable Is Nothing Then
-        MsgBox MSG_PUSH_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
+    MappedTableFactory.TryCreateBestMappedTable RemoteFactory.GetRemote, MappedTable
     
-    If MappedTable.IsProtected Then
-        MsgBox MSG_IS_PROTECTED, vbExclamation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
+    If GuardMappedTableNoListObject(MappedTable) Then Exit Sub
+    If GuardMappedTableProtected(MappedTable) Then Exit Sub
     
-    Log.Message "RemoteFactory.GetRemote.Reload", "Push"
-    RemoteFactory.GetRemote.Reload
-    
-    Log.Message "New PushQuery"
-    With New PushQuery
-        Set .MappedTable = MappedTable
-        Set .Remote = RemoteFactory.GetRemote
-        .Run
-    End With
+    Log.Message "MappedTable.HighlightMappedFields", "HLMapped"
+    MappedTable.HighlightMappedFields
     
     Log.StopLogging
 End Sub
 
-'@EntryPoint
-Public Sub PushPartial()
+'@EntryPoint Compare > Clear
+Public Sub HighlightRemove()
+    Dim ListObject As ListObject
+    If Not TryGetActiveSheetListObject(ListObject) Then Exit Sub
+    If TestIfProtected(ListObject) Then Exit Sub
+    
+    RangeHighlighter.RemoveHighlights ListObject
+End Sub
+
+'@EntryPoint History > View History
+Public Sub TimelineSingle()
     Log.StartLogging
-    Log.Message "@EntryPoint PushPartial"
+    Log.Message "@EntryPoint TLineSingle", "TimeLSngl"
     
+    If GuardSelectionSingleCell Then Exit Sub
+    
+    Log.Message "MappedTableFactory.CreateMappedTable", "TimeLSngl"
     Dim MappedTable As MappedTable
-    Set MappedTable = MappedTableFactory.CreateMappedTable(PartialSelection:=True, Resolve:=True)
-    If MappedTable Is Nothing Then
-        MsgBox MSG_PUSH_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
+    MappedTableFactory.TryCreateBestMappedTable RemoteFactory.GetRemote, MappedTable
     
-    If MappedTable.IsProtected Then
-        MsgBox MSG_IS_PROTECTED, vbExclamation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
+    If GuardMappedTableNoListObject(MappedTable) Then Exit Sub
     
-    Log.Message "RemoteFactory.GetRemote.Reload", "PushPartial"
-    RemoteFactory.GetRemote.Reload
+    MappedTable.SelectKeysAndFields PartialSelection:=True
     
-    With New PushQuery
+    Log.Message "New ValueTimelineQuery", "TimeLSngl"
+    With New ValueTimelineQuery
         Set .MappedTable = MappedTable
         Set .Remote = RemoteFactory.GetRemote
         .Run
+        
+        Dim VM As ValueTimelineVM
+        Set VM = New ValueTimelineVM
+        Log.Message "New ValueTimelineVM", "TimeLSngl"
+        VM.Load .Results, RemoteFactory.GetRemote
+        VM.NumberFormat = Selection.NumberFormatLocal
     End With
     
+    Dim View As IView
+    Set View = New ValueTimelineView
+    Log.Message "Entering UserForm...", "TimeLSngl"
+    If View.ShowDialog(VM) Then
+        Log.Message "...exited UserForm", "TimeLSngl"
+        Exit Sub
+    Else
+        Log.Message "...exited UserForm", "TimeLSngl"
+        Exit Sub
+    End If
+
     Log.StopLogging
 End Sub
 
-'@EntryPoint
+'@EntryPoint Remote > Manage Remote
 Public Sub DataStoreUI()
     Log.StartLogging
     Log.Message "@EntryPoint DataStoreUI", "DataStoreUI"
     
     Log.Message "RemoteFactory.GetRemote.Reload", "DataStoreUI"
     RemoteFactory.GetRemote.Reload
-    
-    'Log.Message "RemoteFactory.GetRemote.Show", "DataStoreUI"
-    'RemoteFactory.GetRemote.Show
     
     Dim ViewModel As RemoteViewModel
     Set ViewModel = New RemoteViewModel
@@ -333,4 +278,22 @@ Public Sub DataStoreUI()
         Exit Sub
     End If
     Log.StopLogging
+End Sub
+
+'@EntryPoint Remote > Open
+Public Sub DataStoreOpen()
+    Dim Remote As Remote
+    Set Remote = RemoteFactory.GetRemote
+    Remote.Reload
+End Sub
+
+'@EntryPoint Remote > Save
+Public Sub DataStoreSave()
+    RemoteFactory.GetRemote.SaveWorkbook
+End Sub
+
+'@EntryPoint Remote > Close
+Public Sub DataStoreClose()
+    RemoteFactory.GetRemote.SaveWorkbook
+    RemoteFactory.GetRemote.CloseWorkbook
 End Sub

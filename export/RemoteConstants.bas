@@ -7,3 +7,5 @@ Public Const NUMFMT_DATE As String = "yyyy/mm/dd hh:mm.00;;"
 
 Public Const FIELD_ID_ADDNEW As String = "#ADDNEW"
 Public Const FIELD_ID_UNMAPPED As String = "#UNMAPPED"
+
+Public Const HASH_LEN As Long = 40

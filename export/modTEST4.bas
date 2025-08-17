@@ -36,3 +36,16 @@ Private Function TESTListObject() As ListObject
     
     Set TESTListObject = ThisWorkbook.Worksheets.Item(1).ListObjects.Item(1)
 End Function
+
+Public Sub AAA()
+    ThisWorkbook.Worksheets.Item("Sheet1").Range("B3:C3,C9:C10,C5:D7,F11").Select
+    
+    Dim DataBodyRange As Range
+    Set DataBodyRange = ThisWorkbook.Worksheets.Item("Sheet1").Range("C2:C11")
+    
+    Dim vv2 As Variant
+    vv2 = GetStaggeredArrayValues(DataBodyRange, Selection)
+    
+    Stop
+End Sub
+

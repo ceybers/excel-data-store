@@ -50,6 +50,13 @@ Public Sub SelectField(ByVal ListColumnName As String)
     Next i
 End Sub
 
+Public Sub SelectAllFields()
+    Dim i As Long
+    For i = 1 To Count
+        This.Items.Item(i).Selected = True
+    Next i
+End Sub
+
 Public Sub UnselectAllFields()
     Dim i As Long
     For i = 1 To Count
@@ -72,9 +79,7 @@ Public Function Serialize() As String
 End Function
 
 Public Sub Deserialize(ByVal SerializedString As String)
-    Do While This.Items.Count > 0
-        This.Items.Remove This.Items.Count
-    Loop
+    CollectionClear This.Items
     
     Dim SplitString As Variant
     SplitString = Split(SerializedString, Chr$(ASCII_RS))
@@ -85,15 +90,6 @@ Public Sub Deserialize(ByVal SerializedString As String)
         Set MappedField = New MappedField
         MappedField.Deserialize SplitString(i)
         This.Items.Add Item:=MappedField, Key:=MappedField.FieldID
-    Next i
-End Sub
-
-Public Sub DEBUGPrint()
-    Dim i As Long
-    For i = 1 To Count
-        Dim MappedField As MappedField
-        Set MappedField = This.Items.Item(i)
-        Debug.Print MappedField.ListColumnName; " <--> "; MappedField.FieldID
     Next i
 End Sub
 
@@ -139,7 +135,5 @@ Public Function TryGetMappedFieldByName(ByVal Name As String, ByRef OutMappedFie
 End Function
 
 Public Sub Clear()
-    Do While This.Items.Count > 0
-        This.Items.Remove This.Items.Count
-    Loop
+    CollectionClear This.Items
 End Sub

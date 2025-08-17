@@ -12,7 +12,6 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Const ARRAY_WIDTH As Long = 9
-Private Const HASH_LEN As Long = 40
 Private Const COL_LATEST_HASH As Long = 5
 
 Private Type TState
@@ -49,9 +48,7 @@ End Sub
 Private Sub LoadFromWorksheet()
     SortWorksheet
     
-    Do While This.Item.Count > 0
-        This.Item.Remove This.Item.Count
-    Loop
+    CollectionClear This.Item
     
     Dim DataBodyRange As Range
     Set DataBodyRange = GetWorksheetDatabodyRange(This.Worksheet)
@@ -72,9 +69,6 @@ Private Sub LoadFromWorksheet()
     
     Dim i As Long
     For i = 1 To UBound(WorksheetValues, 1)
-        'If i Mod 100 = 0 Then
-        '    Log.Message "RemoteValues.LoadFromWorksheet " & i & " of " & UBound(WorksheetValues), "RemoteValues", Debug_level
-        'End If
         Dim NewRemoteValue As RemoteValue
         Set NewRemoteValue = New RemoteValue
         NewRemoteValue.LoadFromArray WorksheetValues, i
@@ -94,7 +88,8 @@ Private Sub LoadLatestHash()
 End Sub
 
 Private Sub SortWorksheet()
-    This.Worksheet.UsedRange.Sort Key1:=This.Worksheet.Columns.Item(COL_LATEST_HASH), Header:=xlYes
+    This.Worksheet.UsedRange.Sort Header:=xlYes, _
+        Key1:=This.Worksheet.Columns.Item(COL_LATEST_HASH)
 End Sub
 
 Public Sub Save()
@@ -159,7 +154,8 @@ Private Sub SetNumberFormats()
     End With
 End Sub
 
-Public Function GetChangeMask(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, ByVal Values As Variant) As Variant
+Public Function GetChangeMask(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, _
+    ByVal Values As Variant) As Variant
     Dim Result As Variant
     ReDim Result(1 To UBound(KeyIDs), 1 To UBound(FieldIDs))
 
@@ -169,13 +165,13 @@ Public Function GetChangeMask(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant
         Exit Function
     End If
     
-    Dim i As Long
-    For i = 1 To UBound(KeyIDs)
-        Dim j As Long
-        For j = 1 To UBound(FieldIDs)
-            Result(i, j) = IIf(Values(i, j) = GetValue(KeyIDs(i), FieldIDs(j)), 0, 1)
-        Next j
-    Next i
+    Dim KeyIndex As Long
+    For KeyIndex = 1 To UBound(KeyIDs)
+        Dim FieldIndex As Long
+        For FieldIndex = 1 To UBound(FieldIDs)
+            Result(KeyIndex, FieldIndex) = IIf(Values(KeyIndex, FieldIndex) = GetValue(KeyIDs(KeyIndex), FieldIDs(FieldIndex)), 0, 1)
+        Next FieldIndex
+    Next KeyIndex
     
     GetChangeMask = Result
 End Function
@@ -187,7 +183,6 @@ Public Function GetChangeCount(ByVal KeyIDs As Variant, ByVal FieldIDs As Varian
         GetChangeCount = UBound(KeyIDs) * UBound(FieldIDs)
         Exit Function
     End If
-    
     
     Dim i As Long
     For i = 1 To UBound(KeyIDs)
@@ -215,19 +210,55 @@ End Sub
 Public Function GetValues(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant) As Variant
     Dim Result As Variant
     ReDim Result(1 To UBound(KeyIDs), 1 To UBound(FieldIDs))
-    GetValues = Result
     
-    If IsEmpty(This.LatestHash) Then Exit Function
+    This.Worksheet.AutoFilterMode = False
+    This.Worksheet.UsedRange.AutoFilter Field:=5, Criteria1:="<>"
+    
+    Dim FilteredRange As Range
+    On Error Resume Next
+    Set FilteredRange = GetWorksheetDatabodyRange(This.Worksheet).SpecialCells(xlCellTypeVisible)
+    On Error GoTo 0
+    If FilteredRange Is Nothing Then Exit Function
+    
+    FilteredRange.Sort Header:=False, _
+        Key1:=This.Worksheet.Columns.Item(3), Order1:=xlAscending, _
+        Key1:=This.Worksheet.Columns.Item(2), Order1:=xlAscending
+    
+    Dim FieldPartitions As Variant
+    FieldPartitions = PartitionRange(FilteredRange, 3)
+    
+    Dim FieldIndex As Long
+    For FieldIndex = 1 To UBound(FieldIDs)
+        Dim FieldPartitionIndex As Long
+        FieldPartitionIndex = PartitionIndexOf(FieldPartitions, FieldIDs(FieldIndex))
+        If FieldPartitionIndex > -1 Then
+            Dim ThisKeyIDs As Variant
+            ThisKeyIDs = FieldPartitions(FieldPartitionIndex, 4).Columns.Item(2).Value2
+            Dim ThisValues As Variant
+            ThisValues = FieldPartitions(FieldPartitionIndex, 4).Columns.Item(4).Value2
+            Dim KeyIndex As Long
+            For KeyIndex = 1 To UBound(KeyIDs)
+                Dim SearchResult As Long
+                SearchResult = ArraySearch.BinarySearch2(ThisKeyIDs, KeyIDs(KeyIndex))
+                If SearchResult > -1 Then
+                    Result(KeyIndex, FieldIndex) = ThisValues(SearchResult, 1)
+                End If
+            Next KeyIndex
+        End If
+    Next FieldIndex
+    
+    GetValues = Result
+    Log.Message "GetValues() End", "RValues"
+End Function
 
+Private Function PartitionIndexOf(ByRef Partitions As Variant, ByVal Key As String) As Long
     Dim i As Long
-    For i = 1 To UBound(KeyIDs)
-        Dim j As Long
-        For j = 1 To UBound(FieldIDs)
-            Result(i, j) = GetValue(KeyIDs(i), FieldIDs(j))
-        Next j
+    For i = 1 To UBound(Partitions, 1)
+        If Partitions(i, 1) = Key Then
+            PartitionIndexOf = i
+            Exit Function
+        End If
     Next i
-    
-    GetValues = Result
 End Function
 
 Private Function GetValue(ByVal KeyID As String, ByVal FieldID As String) As Variant
@@ -241,12 +272,16 @@ Private Function GetValue(ByVal KeyID As String, ByVal FieldID As String) As Var
     GetValue = This.Item.Item(Index - 1).Value
 End Function
 
-Public Sub UpsertValues(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, ByVal Values As Variant, ByVal CommitID As String)
+Public Sub UpsertValuesWithMask(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, _
+    ByVal Values As Variant, ByVal ChangeMask As Variant, _
+    ByVal CommitID As String)
     Dim i As Long
     For i = 1 To UBound(KeyIDs)
         Dim j As Long
         For j = 1 To UBound(FieldIDs)
-            UpsertValue KeyIDs(i), FieldIDs(j), Values(i, j), CommitID
+            If ChangeMask(i, j) Then
+                UpsertValue KeyIDs(i), FieldIDs(j), Values(i, j), CommitID
+            End If
         Next j
     Next i
     
@@ -302,8 +337,8 @@ End Function
 
 Public Function GetAllValues(ByVal KeyID As String, ByVal FieldID As String) As Variant
     This.Worksheet.UsedRange.Sort Header:=xlYes, _
-        Key1:=This.Worksheet.Columns.Item(2), _
-        Key2:=This.Worksheet.Columns.Item(3), _
+        Key1:=This.Worksheet.Columns.Item(2), Order1:=xlAscending, _
+        Key2:=This.Worksheet.Columns.Item(3), Order2:=xlAscending, _
         Key3:=This.Worksheet.Columns.Item(7), Order3:=xlDescending
         
     Dim KeyPartitions As Variant

@@ -30,14 +30,14 @@ Public Property Get Item(ByVal Index As Long) As TableMapMatch
     Set Item = This.Matches.Item(Index)
 End Property
 
-Public Sub Load()
-    Log.Message "Load()", "TMapMatches"
+Public Sub Load(ByVal Remote As Remote)
+    Log.Message "Load()", "TMapMatchs"
     
     Dim Tables As RemoteTables
-    Set Tables = GetRemote.Tables
+    Set Tables = Remote.Tables
     
     Dim Maps As RemoteMaps
-    Set Maps = GetRemote.Maps
+    Set Maps = Remote.Maps
     
     Dim i As Long
     For i = 1 To Tables.Count
@@ -45,26 +45,33 @@ Public Sub Load()
         Set RemoteTable = Tables.Item(i)
         
         Dim RemoteMap As RemoteMap
-        Maps.TryGetByID RemoteTable.MapID, RemoteMap
-        
-        Dim NewTableMapMatch As TableMapMatch
-        Set NewTableMapMatch = New TableMapMatch
-        
-        NewTableMapMatch.Load RemoteTable, RemoteMap
-        
-        This.Matches.Add Item:=NewTableMapMatch, Key:=RemoteTable.ID
-        
-        Dim TableMap As TableMap
-        Set TableMap = New TableMap
-        With TableMap
-            .Deserialize RemoteMap.SerializedString
-            .TableID = RemoteTable.ID
-            .MapID = RemoteMap.ID
-        End With
-        This.TableMaps.Add Item:=TableMap
+        If Maps.TryGetByID(RemoteTable.MapID, RemoteMap) Then
+            AddTableMapMatch RemoteTable, RemoteMap
+            AddTableMap RemoteTable, RemoteMap
+        End If
     Next i
     
-    Log.Message "Load() end", "TMapMatches"
+    Log.Message "Load() end", "TMapMatchs"
+End Sub
+
+Private Sub AddTableMapMatch(ByVal RemoteTable As RemoteTable, ByVal RemoteMap As RemoteMap)
+    Dim NewTableMapMatch As TableMapMatch
+    Set NewTableMapMatch = New TableMapMatch
+    NewTableMapMatch.Load RemoteTable, RemoteMap
+    
+    This.Matches.Add Item:=NewTableMapMatch, Key:=RemoteTable.ID
+End Sub
+
+Private Sub AddTableMap(ByVal RemoteTable As RemoteTable, ByVal RemoteMap As RemoteMap)
+    Dim NewTableMap As TableMap
+    Set NewTableMap = New TableMap
+    With NewTableMap
+        .Deserialize RemoteMap.SerializedString
+        .TableID = RemoteTable.ID
+        .MapID = RemoteMap.ID
+    End With
+    
+    This.TableMaps.Add Item:=NewTableMap
 End Sub
 
 Public Sub Evaluate(ByVal ListObject As ListObject)

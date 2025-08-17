@@ -7,17 +7,20 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'@IgnoreModule ParameterCanBeByVal
 '@Folder "RemoteDataStore.Models.Plural"
 Option Explicit
 
 Private Const ARRAY_WIDTH As Long = 7
-Private Const HASH_LEN  As Long = 40
 
 Private Type TState
     Worksheet As Worksheet
     Item As Collection
     UniquePaths As Collection
     IsDirty As Boolean
+    
+    CurrentKeyPath As String
+    LookupKeyIDs As Variant
 End Type
 Private This As TState
 
@@ -65,17 +68,17 @@ Private Sub LoadFromWorksheet()
     Next i
 End Sub
 
-Private Sub GenerateUniquePaths() ' TODO What a round-about mess
+Private Sub GenerateUniquePaths()
+    CollectionClear This.UniquePaths
+    
     If Count = 0 Then Exit Sub
     
     Dim AllPaths As Variant
-    ReDim AllPaths(1 To Count)
+    ReDim AllPaths(1 To Count) As String
     
     Dim i As Long
     For i = 1 To Count
-        Dim ThisRemoteKey As RemoteKey
-        Set ThisRemoteKey = This.Item.Item(i)
-        AllPaths(i) = ThisRemoteKey.Path
+        AllPaths(i) = Item(i).Path
     Next
     
     Dim UniquePaths As Variant
@@ -127,15 +130,19 @@ Private Sub SetNumberFormats()
 End Sub
 
 Private Sub SortWorksheet()
+    ' Column 3 = Key
     This.Worksheet.UsedRange.Sort Key1:=This.Worksheet.Columns.Item(3), Header:=xlYes
 End Sub
 
 Public Function GetIDsFromQuery(ByVal KeyPath As String, ByVal Keys As Variant) As Variant
+    This.CurrentKeyPath = KeyPath
+    UpdateLookupKeyValues
+    
     Dim ResultCount As Long
     ResultCount = UBound(Keys, 1)
     
     Dim Result As Variant
-    ReDim Result(1 To ResultCount)
+    ReDim Result(1 To ResultCount) As String
     
     Dim i As Long
     For i = 1 To ResultCount
@@ -144,8 +151,52 @@ Public Function GetIDsFromQuery(ByVal KeyPath As String, ByVal Keys As Variant) 
     
     Save
     
+    This.CurrentKeyPath = vbNullString
     GetIDsFromQuery = Result
 End Function
+
+Private Sub UpdateLookupKeyValues()
+    ' Sort Path A-Z; Key A-Z
+    Log.Message "UpdateLookupKeyValues Sorting Path; Key", "RKeys"
+    This.Worksheet.UsedRange.Sort Header:=xlYes, _
+        Key1:=This.Worksheet.Columns.Item(2), _
+        Key1:=This.Worksheet.Columns.Item(3)
+        
+    Dim Partitions As Variant
+    Partitions = RangeHelpers.PartitionRange(GetWorksheetDatabodyRange(This.Worksheet), 2)
+    
+    Dim i As Long
+    For i = 1 To UBound(Partitions, 1)
+        If Partitions(i, 1) = This.CurrentKeyPath Then
+            DoUpdateLookupKeyValues Partitions, i
+            Exit Sub
+        End If
+    Next i
+End Sub
+
+Private Sub DoUpdateLookupKeyValues(ByRef Partitions As Variant, ByVal PartitionIndex As Long)
+    Log.Message "DoUpdateLookupKeyValues found: " & Partitions(PartitionIndex, 2) & " to " & Partitions(PartitionIndex, 3), "RKeys"
+    Dim Range As Range
+    Set Range = Partitions(PartitionIndex, 4)
+    
+    Dim Result As Variant
+    ReDim Result(1 To Range.Rows.Count, 1 To 2)
+    
+    Dim vvValues As Variant
+    vvValues = Range.Columns.Item(3).Value2
+    Dim vvID As Variant
+    vvID = Range.Columns.Item(1).Value2
+    
+    Dim i As Long
+    For i = 1 To UBound(vvValues)
+        Result(i, 1) = vvValues(i, 1)
+        Result(i, 2) = vvID(i, 1)
+    Next i
+    
+    ArraySort.QuickSort2 Result
+    
+    This.LookupKeyIDs = Result
+End Sub
 
 Private Function GetOrCreateKeyID(ByVal KeyPath As String, ByVal Key As String) As String
     If Key = vbNullString Then
@@ -153,28 +204,38 @@ Private Function GetOrCreateKeyID(ByVal KeyPath As String, ByVal Key As String) 
         Exit Function
     End If
     
-    Dim RemoteKey As RemoteKey
-    
-    If TryGetKey(KeyPath, Key, RemoteKey) Then
-        GetOrCreateKeyID = RemoteKey.ID
-    Else
-        Set RemoteKey = CreateNewKey(KeyPath, Key)
-        This.Item.Add Item:=RemoteKey
-        This.IsDirty = True
-        GetOrCreateKeyID = RemoteKey.ID
+    Dim KeyIDFast As String
+    KeyIDFast = TryGetKeyIDFast(Key)
+    If KeyIDFast <> vbNullString Then
+        GetOrCreateKeyID = KeyIDFast
+        Exit Function
     End If
+    
+    Dim RemoteKey As RemoteKey
+    Set RemoteKey = CreateNewKey(KeyPath, Key)
+    This.Item.Add Item:=RemoteKey
+    This.IsDirty = True
+    GetOrCreateKeyID = RemoteKey.ID
 End Function
 
-Private Function TryGetKey(ByVal KeyPath As String, ByVal Key As String, ByRef OutRemoteKey As RemoteKey) As Boolean
-    Dim ThisRemoteKey As RemoteKey
-    For Each ThisRemoteKey In This.Item
-        If ThisRemoteKey.Path = KeyPath And ThisRemoteKey.Key = Key Then
-            Set OutRemoteKey = ThisRemoteKey
-            TryGetKey = True
-            Exit Function
-        End If
-    Next ThisRemoteKey
+Private Function TryGetKeyIDFast(ByVal Key As String) As String
+    Dim Index As Long
+    Index = ArraySearch.BinarySearch2(This.LookupKeyIDs, Key)
+    If Index = -1 Then Exit Function
+    
+    TryGetKeyIDFast = This.LookupKeyIDs(Index, 2)
 End Function
+
+'Private Function TryGetKey(ByVal KeyPath As String, ByVal Key As String, ByRef OutRemoteKey As RemoteKey) As Boolean
+'    Dim ThisRemoteKey As RemoteKey
+'    For Each ThisRemoteKey In This.Item
+'        If ThisRemoteKey.Path = KeyPath And ThisRemoteKey.Key = Key Then
+'            Set OutRemoteKey = ThisRemoteKey
+'            TryGetKey = True
+'            Exit Function
+'        End If
+'    Next ThisRemoteKey
+'End Function
 
 Private Function CreateNewKey(ByVal KeyPath As String, ByVal Key As String) As RemoteKey
     Dim NewRemoteKey As RemoteKey
@@ -189,3 +250,4 @@ Private Function CreateNewKey(ByVal KeyPath As String, ByVal Key As String) As R
     
     Set CreateNewKey = NewRemoteKey
 End Function
+

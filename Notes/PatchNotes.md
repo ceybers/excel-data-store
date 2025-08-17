@@ -1,4 +1,9 @@
 # Patch Notes
+## v0.7.0-beta (2025/08/17)
+- [x] Faster Pull, Push and Compare queries.
+- [x] Better handling of Errors, Blanks, and Duplicates.
+- [x] Behind the scenes refactoring, housekeeping, and Rubberducking.
+ 
 ## v0.6.6-beta (2025/08/13)
 - [x] Fixed bug with first column incorrectly showing Key column, but properly this time.
 - [x] Cells with errors in them will now be treated as empty when pulling/pushing/comparing.

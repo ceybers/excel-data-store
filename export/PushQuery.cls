@@ -34,27 +34,41 @@ Public Property Set Remote(ByVal RHS As Remote)
 End Property
 
 Public Sub Run()
+    Log.Message "PushQuery.Run()", "PushQuery", Info_Level
+    
+    Log.Message "This.Remote.Reload", "PushQuery", Info_Level
     This.Remote.Reload
     
     RangeHighlighter.RemoveHighlights This.MappedTable.ListObject
     
     Dim KeyIDs As Variant
     KeyIDs = This.MappedTable.GetKeyIDs
+    If IsEmpty(KeyIDs) Then Exit Sub
     
     Dim FieldIDs As Variant
     FieldIDs = This.MappedTable.GetFieldIDs
     If IsEmpty(FieldIDs) Then Exit Sub
     
-    Dim ExistingValues As Variant
-    ExistingValues = This.MappedTable.GetExistingValuesFromTable(KeyIDs, FieldIDs)
+    Dim LocalValues As Variant
+    Log.Message "Run MappedTable.GetExistingValuesFromTable", "PushQuery", Info_Level
+    LocalValues = This.MappedTable.GetExistingValuesFromTable(KeyIDs, FieldIDs)
+    
+    Dim RemoteValues As Variant
+    Log.Message "PullQuery.Run GetValues", "PushQuery", Info_Level
+    RemoteValues = This.Remote.Values.GetValues(KeyIDs, FieldIDs)
+    
+    Dim ChangeMask As Variant
+    ChangeMask = GetChangeMask(LocalValues, RemoteValues)
     
     Dim ChangeCount As Long
-    ChangeCount = This.Remote.Values.GetChangeCount(KeyIDs, FieldIDs, ExistingValues)
+    ChangeCount = CountChanges(ChangeMask)
     
-    Dim ChangedValues As Variant
-    ChangedValues = This.Remote.Values.GetChangeMask(KeyIDs, FieldIDs, ExistingValues)
+    If ChangeCount = 0 Then
+        MsgBox MSG_PULL_NOCHANGES, vbInformation + vbOKOnly, APP_TITLE
+        Exit Sub
+    End If
     
-    This.MappedTable.HighlightChanges KeyIDs, FieldIDs, ChangedValues, hcBeforePush
+    This.MappedTable.HighlightChanges KeyIDs, FieldIDs, ChangeMask, hcBeforePush
     
     If ChangeCount = 0 Then
         MsgBox MSG_PUSH_NOCHANGES, vbInformation + vbOKOnly, APP_TITLE
@@ -63,43 +77,10 @@ Public Sub Run()
     End If
     
     RangeHighlighter.RemoveHighlights This.MappedTable.ListObject
-    This.MappedTable.HighlightChanges KeyIDs, FieldIDs, ChangedValues, hcAfterPush
+    This.MappedTable.HighlightChanges KeyIDs, FieldIDs, ChangeMask, hcAfterPush
     
     Dim Commit As RemoteCommit
     Set Commit = This.Remote.Commits.Add(This.MappedTable.TableID, This.MappedTable.MapID, This.MappedTable.Caption)
     
-    Dim ValuesToPush As Variant
-    ValuesToPush = UpdateToRemote(KeyIDs, FieldIDs)
-    
-    This.Remote.Values.UpsertValues KeyIDs, FieldIDs, ValuesToPush, Commit.CommitID
+    This.Remote.Values.UpsertValuesWithMask KeyIDs, FieldIDs, LocalValues, ChangeMask, Commit.CommitID
 End Sub
-
-Private Function UpdateToRemote(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant) As Variant
-    Log.Message "PushQuery.UpdateToRemote creating KeyIndexes", "PushQuery", Info_Level
-    Dim KeyIndexes As Variant
-    ReDim KeyIndexes(1 To UBound(KeyIDs))
-    Dim i As Long
-    For i = 1 To UBound(KeyIDs)
-        KeyIndexes(i) = This.MappedTable.GetRowIndexFromKeyID(KeyIDs(i))
-    Next i
-    
-    Log.Message "PushQuery.UpdateToRemote Looping through Fields", "PushQuery", Info_Level
-    Dim Result As Variant
-    ReDim Result(1 To UBound(KeyIDs), 1 To UBound(FieldIDs))
-    
-    Dim f As Long
-    For f = 1 To UBound(FieldIDs)
-        Dim ListColumn As ListColumn
-        Set ListColumn = This.MappedTable.GetListColumnFromFieldID(FieldIDs(f))
-        
-        Dim vv As Variant
-        vv = ListColumn.DataBodyRange.Value2
-        
-        Dim k As Long
-        For k = 1 To UBound(KeyIndexes)
-            Result(k, f) = vv(KeyIndexes(k), 1)
-        Next k
-    Next f
-    
-    UpdateToRemote = Result
-End Function

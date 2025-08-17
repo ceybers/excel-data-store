@@ -16,6 +16,7 @@ Public Const MSG_DATASTORE_WB_INVALID As String = "Data Store workbook is not a 
 Public Const MSG_MAP_NO_TABLE As String = "Please select a table first before running the Map command."
 Public Const MSG_PULL_NO_TABLE As String = "Please select a table first before running the Pull command."
 Public Const MSG_PUSH_NO_TABLE As String = "Please select a table first before running the Push command."
+Public Const MSG_NO_TABLE As String = "Data Store could not find a table to work with."
 Public Const MSG_IS_PROTECTED As String = "Worksheet is Protected. Unprotect it and try again."
 
 Public Const MSG_REMOTE_REBUILD_KEYS As String = "Remote Keys Table rebuild OK!"
@@ -32,12 +33,23 @@ Public Const NODE_PREFIX_PATH As String = "Path:"
 Public Const NODE_KEY_UNMAPPED As String = "#UNMAPPED"
 Public Const NODE_KEY_ROOT As String = "#ROOT"
 
+Public Const NO_KEYPATH_SET As String = "(No Key Path set)"
+
 Public Const TV_CAP_UNMAPPED As String = "(Unmapped)"
 Public Const TV_CAP_ROOT As String = "Fields"
 
 Public Const LV_COL_LCN As String = "Column Name"
 Public Const LV_COL_MAP As String = "Mapped To"
 Public Const LV_CAP_UNMAPPED As String = "(Key Column)"
+
+Public Const LV_COL_CAP As String = "Caption"
+Public Const LV_COL_SCORE As String = "Score"
+Public Const LV_COL_TIME As String = "Timestamp"
+Public Const LV_COL_ITEM As String = "Item"
+Public Const LV_COL_VAL As String = "Value"
+Public Const LV_COL_MATCH As String = "Match?"
+Public Const LV_COL_MATCHY As String = "OK"
+Public Const LV_COL_MATCHN As String = "No Match"
 
 Public Const IMG_BLANK As String = "imgBlank"
 Public Const IMG_MAPPED As String = "imgMapped"
@@ -46,3 +58,6 @@ Public Const IMG_FIELDS As String = "imgFields"
 Public Const IMG_FIELD As String = "imgField"
 Public Const IMG_FOLDEROPEN As String = "imgFolderOpen"
 Public Const IMG_FOLDERCLSD As String = "imgFolderClosed"
+
+Public Const FMT_TIMESTAMP As String = "yyyy/mm/dd hh:MM:ss"
+

@@ -14,8 +14,11 @@ Public Sub RebuildRemoteTable(ByVal Worksheet As Worksheet, ByVal ColumnHeadings
     
     RemoveExtraRows Worksheet
     
-    Worksheet.UsedRange.RemoveDuplicates Columns:=Array(COL_PATH, COL_KEY), Header:=xlYes
-    Worksheet.UsedRange.Sort Header:=xlYes, Key1:=Worksheet.Columns.Item(COL_KEY), Order1:=xlDescending
+    Worksheet.UsedRange.RemoveDuplicates Header:=xlYes, _
+        Columns:=Array(COL_PATH, COL_KEY)
+        
+    Worksheet.UsedRange.Sort Header:=xlYes, _
+        Key1:=Worksheet.Columns.Item(COL_KEY), Order1:=xlDescending
 
     RebuildIDs Worksheet
 End Sub
@@ -23,7 +26,8 @@ End Sub
 Private Sub RebuildHeaders(ByVal Worksheet As Worksheet, ByVal ColumnHeadings As Variant)
     RangeSetValueFromVariant Worksheet.Cells(1, 1).Resize(1, UBound(ColumnHeadings) + 1), ArrayTransform.ArrayToRow(ColumnHeadings)
     
-    Worksheet.UsedRange.Sort Header:=xlYes, Key1:=Worksheet.Columns.Item(COL_KEY), Order1:=xlDescending
+    Worksheet.UsedRange.Sort Header:=xlYes, _
+        Key1:=Worksheet.Columns.Item(COL_KEY), Order1:=xlDescending
 End Sub
 
 Private Sub RemoveExtraColumns(ByVal Worksheet As Worksheet, ByVal ColumnCount As Long)

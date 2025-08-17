@@ -34,22 +34,31 @@ Public Property Set Remote(ByVal RHS As Remote)
 End Property
 
 Public Sub Run()
+    Log.Message "PullDryQuery.Run()", "DryQuery", Info_Level
+    
+    Log.Message "This.Remote.Reload", "DryQuery", Info_Level
     This.Remote.Reload
     
-    RemoveHighlights This.MappedTable.ListObject
+    RangeHighlighter.RemoveHighlights This.MappedTable.ListObject
     
     Dim KeyIDs As Variant
     KeyIDs = This.MappedTable.GetKeyIDs
+    If IsEmpty(KeyIDs) Then Exit Sub
     
     Dim FieldIDs As Variant
     FieldIDs = This.MappedTable.GetFieldIDs
     If IsEmpty(FieldIDs) Then Exit Sub
     
-    Dim ExistingValues As Variant
-    ExistingValues = This.MappedTable.GetExistingValuesFromTable(KeyIDs, FieldIDs)
+    Dim LocalValues As Variant
+    Log.Message "Run MappedTable.GetExistingValuesFromTable", "PullQuery", Info_Level
+    LocalValues = This.MappedTable.GetExistingValuesFromTable(KeyIDs, FieldIDs)
     
-    Dim ChangedValues As Variant
-    ChangedValues = This.Remote.Values.GetChangeMask(KeyIDs, FieldIDs, ExistingValues)
+    Dim RemoteValues As Variant
+    Log.Message "PullQuery.Run GetValues", "PullQuery", Info_Level
+    RemoteValues = This.Remote.Values.GetValues(KeyIDs, FieldIDs)
     
-    This.MappedTable.HighlightChanges KeyIDs, FieldIDs, ChangedValues, hcCompareOnly
+    Dim ChangeMask As Variant
+    ChangeMask = GetChangeMask(LocalValues, RemoteValues)
+    
+    This.MappedTable.HighlightChanges KeyIDs, FieldIDs, ChangeMask, hcCompareOnly
 End Sub

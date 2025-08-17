@@ -121,3 +121,40 @@ Attribute TryIntersectRanges.VB_Description = "Tries to return the Intersection 
     Set OutRange = Result
     TryIntersectRanges = True
 End Function
+
+'@Description "Returns the .Value2 of a staggered or non-contiguous Range that consists of multiple Areas."
+' The output Variant is of the same shape as the BaseRange. Cells that are not in the SelectedRange will be Empty variants.
+Public Function GetStaggeredArrayValues(ByVal BaseRange As Range, ByVal SelectedRange As Range) As Variant
+Attribute GetStaggeredArrayValues.VB_Description = "Returns the .Value2 of a staggered or non-contiguous Range that consists of multiple Areas."
+    If BaseRange Is Nothing Then Exit Function
+    If BaseRange.Cells.Count <= 1 Then Exit Function
+    If SelectedRange Is Nothing Then Exit Function
+    
+    Dim WorkingRange As Range
+    If Not TryIntersectRanges(BaseRange, SelectedRange, WorkingRange) Then Exit Function
+    
+    Dim WorksheetOffset As Long
+    WorksheetOffset = BaseRange.Cells.Item(1, 1).Row - 1
+    
+    Dim BaseRangeValues As Variant
+    BaseRangeValues = BaseRange.Value2
+    
+    Dim Result As Variant
+    ReDim Result(1 To UBound(BaseRangeValues, 1), 1 To 1)
+
+    Dim AreaIndex As Long
+    For AreaIndex = 1 To WorkingRange.Areas.Count
+        Dim Area As Range
+        Set Area = WorkingRange.Areas.Item(AreaIndex)
+        Dim RowIndex As Long
+        For RowIndex = 1 To Area.Rows.Count
+            Dim ThisRowIndex As Long
+            ThisRowIndex = Area.Rows.Item(RowIndex).Row - WorksheetOffset
+            Result(ThisRowIndex, 1) = BaseRangeValues(ThisRowIndex, 1)
+        Next RowIndex
+    Next AreaIndex
+    
+    ArrayClean.ReplaceErrorCells2 Result
+    
+    GetStaggeredArrayValues = Result
+End Function

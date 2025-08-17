@@ -53,50 +53,65 @@ Public Sub Load(ByVal ListObject As ListObject, ByVal TableMap As TableMap)
     Set This.TableMap = TableMap
 End Sub
 
-Public Sub SelectKeys(ByVal Partial As Boolean)
+Public Sub SelectKeysAndFields(ByVal PartialSelection As Boolean)
+    Log.Message "SelectKeys", "MappedTbl"
+    SelectKeys PartialSelection
+    Log.Message "ResolveKeyIDs", "MappedTbl"
+    ResolveKeyIDs RemoteFactory.GetRemote
+    Log.Message "SelectFields", "MappedTbl"
+    SelectFields PartialSelection
+End Sub
+
+Private Sub SelectKeys(ByVal Partial As Boolean)
     Dim KeyListColumn As ListColumn
-    Set KeyListColumn = This.ListObject.ListColumns.Item(This.TableMap.KeyMap.KeyColumnName)
+    If Not TryGetListColumn(This.TableMap.KeyMap.KeyColumnName, This.ListObject, KeyListColumn) Then
+        Exit Sub
+    End If
     
-    Dim SelectedKeys As Range
+    Dim BaseRange As Range
+    Set BaseRange = KeyListColumn.DataBodyRange
+    
+    Dim KeyValues As Variant
+    
     If Partial Then
         Dim SelectedRange As Range
         If Not TryGetSelectionRange(SelectedRange) Then Exit Sub
-        If Not TryIntersectRanges(SelectedRange.EntireRow, KeyListColumn.DataBodyRange, SelectedKeys) Then Exit Sub
+        Dim SelectedKeys As Range
+        If Not TryIntersectRanges(SelectedRange.EntireRow, BaseRange, SelectedKeys) Then Exit Sub
+        KeyValues = RangeHelpers.GetStaggeredArrayValues(BaseRange, SelectedKeys)
     Else
-        Set SelectedKeys = KeyListColumn.DataBodyRange
+        KeyValues = BaseRange.Value2
     End If
     
-    'TableMap.KeyMap.Clear
+    ArrayClean.ReplaceErrorCells2 KeyValues
     
-    Dim Cell As Range
-    For Each Cell In SelectedKeys.Cells
-        If VarType(Cell.Value2) = vbError Then
-            This.TableMap.KeyMap.Add vbNullString, Cell.Row - This.ListObject.Range.Row
-        Else
-            This.TableMap.KeyMap.Add Cell.Value2, Cell.Row - This.ListObject.Range.Row
-        End If
-    Next Cell
+    This.TableMap.KeyMap.AddMany Values:=KeyValues, RowOffset:=This.ListObject.Range.Row - 1
 End Sub
 
-Public Sub ResolveKeyIDs(ByVal Remote As Remote)
+Private Sub ResolveKeyIDs(ByVal Remote As Remote)
     This.TableMap.KeyMap.ResolveIDs Remote
 End Sub
 
-Public Sub SelectFields(ByVal Partial As Boolean)
+Private Sub SelectFields(ByVal Partial As Boolean)
     This.TableMap.FieldMap.UnselectAllFields
     
-    Dim SelectedHeaders As Range
-    If Partial Then
-        If Not TryIntersectRanges(Selection.EntireColumn, This.ListObject.HeaderRowRange, SelectedHeaders) Then Exit Sub
-    Else
-        Set SelectedHeaders = This.ListObject.HeaderRowRange
+    If Partial = False Then
+        This.TableMap.FieldMap.SelectAllFields
+        Exit Sub
     End If
-    If SelectedHeaders Is Nothing Then Exit Sub
     
-    Dim Cell As Range
-    For Each Cell In SelectedHeaders.Cells
-        This.TableMap.FieldMap.SelectField Cell.Value2
-    Next Cell
+    Dim SelectedHeaders As Range
+    Set SelectedHeaders = This.ListObject.HeaderRowRange
+    
+    If TryIntersectRanges(Selection.EntireColumn, _
+        This.ListObject.HeaderRowRange, _
+        SelectedHeaders) Then
+        
+        Dim Cell As Range
+        For Each Cell In SelectedHeaders.Cells
+            This.TableMap.FieldMap.SelectField Cell.Value2
+        Next Cell
+    End If
 End Sub
 
 Public Function GetListColumnFromFieldID(ByVal FieldID As String) As ListColumn
@@ -114,26 +129,29 @@ Public Function GetExistingValuesFromTable(ByVal KeyIDs As Variant, ByVal FieldI
     Dim Result As Variant
     ReDim Result(1 To UBound(KeyIDs), 1 To UBound(FieldIDs))
     
-    Dim f As Long
-    For f = 1 To UBound(FieldIDs)
+    Dim FieldIndex As Long
+    For FieldIndex = 1 To UBound(FieldIDs)
         Dim ListColumn As ListColumn
-        Set ListColumn = GetListColumnFromFieldID(FieldIDs(f))
+        Set ListColumn = GetListColumnFromFieldID(FieldIDs(FieldIndex))
         
         Dim vv As Variant
         vv = ListColumn.DataBodyRange.Value2
         
-        Dim k As Long
-        For k = 1 To UBound(KeyIDs)
-            If KeyIDs(k) <> vbNullString Then
-                Dim KeyIndex As Long
-                KeyIndex = GetRowIndexFromKeyID(KeyIDs(k))
+        Dim KeyIndex As Long
+        For KeyIndex = 1 To UBound(KeyIDs)
+            If KeyIDs(KeyIndex) <> vbNullString Then
+                Dim KeyRowIndex As Long
+                KeyRowIndex = GetRowIndexFromKeyID(KeyIDs(KeyIndex))
                 
-                Result(k, f) = vv(KeyIndex, 1)
+                Result(KeyIndex, FieldIndex) = vv(KeyRowIndex, 1)
+                If VarType(Result(KeyIndex, FieldIndex)) = vbError Then
+                    Result(KeyIndex, FieldIndex) = Empty
+                End If
             End If
-        Next k
-    Next f
+        Next KeyIndex
+    Next FieldIndex
     
-    ReplaceErrorCells Result
+    ArrayClean.ReplaceErrorCells2 Result
     
     GetExistingValuesFromTable = Result
 End Function
@@ -142,23 +160,23 @@ Public Sub HighlightChanges(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, 
     Dim Changes As Collection
     Set Changes = New Collection
     
-    Dim f As Long
-    For f = 1 To UBound(FieldIDs)
+    Dim FieldIndex As Long
+    For FieldIndex = 1 To UBound(FieldIDs)
         Dim ListColumn As ListColumn
-        Set ListColumn = GetListColumnFromFieldID(FieldIDs(f))
+        Set ListColumn = GetListColumnFromFieldID(FieldIDs(FieldIndex))
         
-        Dim k As Long
-        For k = 1 To UBound(KeyIDs)
-            If KeyIDs(k) <> vbNullString Then
-                Dim KeyIndex As Long
-                KeyIndex = GetRowIndexFromKeyID(KeyIDs(k))
+        Dim KeyIndex As Long
+        For KeyIndex = 1 To UBound(KeyIDs)
+            If KeyIDs(KeyIndex) <> vbNullString Then
+                Dim KeyRowIndex As Long
+                KeyRowIndex = GetRowIndexFromKeyID(KeyIDs(KeyIndex))
                 
-                If ChangeMask(k, f) = 1 Then
-                    Changes.Add ListColumn.DataBodyRange.Cells.Item(KeyIndex, 1)
+                If ChangeMask(KeyIndex, FieldIndex) = True Then
+                    Changes.Add ListColumn.DataBodyRange.Cells.Item(KeyRowIndex, 1)
                 End If
             End If
-        Next k
-    Next f
+        Next KeyIndex
+    Next FieldIndex
     
     If Changes.Count = 0 Then Exit Sub
 
@@ -168,12 +186,7 @@ Public Sub HighlightChanges(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, 
     End If
     
     Dim ChangeRange As Range
-    Set ChangeRange = Changes.Item(1)
-
-    Dim i As Long
-    For i = 2 To Changes.Count
-        Set ChangeRange = Application.Union(ChangeRange, Changes.Item(i))
-    Next i
+    Set ChangeRange = CollectionToRangeUnion(Changes)
     
     HighlightRange ChangeRange, HighlightColor
 End Sub
@@ -202,11 +215,8 @@ Public Sub HighlightMappedFields()
     If MappedListColumns.Count = 0 Then Exit Sub
     
     Dim HighlightRange As Range
-    Set HighlightRange = MappedListColumns.Item(1)
-
-    For i = 2 To MappedListColumns.Count
-        Set HighlightRange = Application.Union(HighlightRange, MappedListColumns.Item(i))
-    Next i
+    Set HighlightRange = CollectionToRangeUnion(MappedListColumns)
     
     RangeHighlighter.HighlightRange HighlightRange, hcHeaders
 End Sub
+

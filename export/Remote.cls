@@ -90,6 +90,7 @@ Public Sub Load(ByVal Workbook As Workbook)
 End Sub
 
 Public Sub Reload()
+    Log.Message "Remote.Reload()", "Remote", Debug_level
     With This
         Set .RemoteKeys = New RemoteKeys
         .RemoteKeys.Load This.Workbook.Worksheets.Item(WS_KEYS_NAME)
@@ -107,14 +108,13 @@ Public Sub Reload()
         Set .RemoteMaps = New RemoteMaps
         .RemoteMaps.Load This.Workbook.Worksheets.Item(WS_MAPS_NAME)
         
-        'If Not .RemoteTables Is Nothing Then
-            Set .RemoteTables = New RemoteTables
-            .RemoteTables.Load This.Workbook.Worksheets.Item(WS_TABLES_NAME)
-        'End If
+        Set .RemoteTables = New RemoteTables
+        .RemoteTables.Load This.Workbook.Worksheets.Item(WS_TABLES_NAME)
         
         Set .RemoteCommits = New RemoteCommits
         .RemoteCommits.Load This.Workbook.Worksheets.Item(WS_COMMITS_NAME)
     End With
+    Log.Message "Remote.Reload() End", "Remote", Debug_level
 End Sub
 
 Public Sub Show()
@@ -122,9 +122,12 @@ Public Sub Show()
 End Sub
 
 Public Sub Rebuild()
-    RebuildRemoteTable This.Workbook.Worksheets.Item(WS_KEYS_NAME), Array("KeyID", "Path", "Key", "Caption", "CreationTime", "ModificationTime", "DeletionTime")
+    RebuildRemoteTable This.Workbook.Worksheets.Item(WS_KEYS_NAME), _
+        Array("KeyID", "Path", "Key", "Caption", "CreationTime", "ModificationTime", "DeletionTime")
     MsgBox MSG_REMOTE_REBUILD_KEYS, vbInformation + vbOKOnly, APP_TITLE
-    RebuildRemoteTable This.Workbook.Worksheets.Item(WS_FIELDS_NAME), Array("FieldID", "Path", "Name", "Caption", "CreationTime", "ModificationTime", "DeletionTime")
+    
+    RebuildRemoteTable This.Workbook.Worksheets.Item(WS_FIELDS_NAME), _
+        Array("FieldID", "Path", "Name", "Caption", "CreationTime", "ModificationTime", "DeletionTime")
     MsgBox MSG_REMOTE_REBUILD_FIELDS, vbInformation + vbOKOnly, APP_TITLE
 End Sub
 
@@ -136,4 +139,3 @@ Public Sub CloseWorkbook()
     This.Workbook.Close
     Set This.Workbook = Nothing
 End Sub
-

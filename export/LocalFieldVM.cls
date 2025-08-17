@@ -12,7 +12,6 @@ Option Explicit
 
 Private Type TMappedFieldVM
     ListColumn As ListColumn
-    'MappedField As MappedField
     RemoteField As RemoteField
     IsKey As Boolean
 End Type
@@ -35,7 +34,7 @@ End Property
 
 Public Property Get IsMapped() As Boolean
     If This.RemoteField Is Nothing Then Exit Property
-    If This.RemoteField.ID = "#UNMAPPED" Then Exit Property
+    If This.RemoteField.ID = FIELD_ID_UNMAPPED Then Exit Property
     IsMapped = True
 End Property
 

@@ -3,6 +3,8 @@ Attribute VB_Name = "PathHelpers"
 '@Folder "Version4.ViewModels"
 Option Explicit
 
+Private Const CHR_SEPARATOR As String = "\"
+
 Public Function CreatePathTreeItems(ByVal InputArray As Variant) As Variant
     Debug.Assert IsArray(InputArray)
     Debug.Assert LBound(InputArray) = 1
@@ -42,7 +44,7 @@ End Function
 
 Private Function RecursePathParent(ByVal Path As String) As String
     Dim PreviousSeparator As Long
-    PreviousSeparator = InStrRev(Path, "\")
+    PreviousSeparator = InStrRev(Path, CHR_SEPARATOR)
     If PreviousSeparator = 0 Then
         RecursePathParent = vbNullString
     Else
@@ -55,5 +57,5 @@ Public Function PrefixNode(ByVal Key As String) As String
 End Function
 
 Public Function IsNodePath(ByVal Key As String) As Boolean
-    IsNodePath = (Left$(Key, 5) = NODE_PREFIX_PATH)
+    IsNodePath = (Left$(Key, Len(NODE_PREFIX_PATH)) = NODE_PREFIX_PATH)
 End Function

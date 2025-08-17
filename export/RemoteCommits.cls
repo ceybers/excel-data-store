@@ -12,7 +12,6 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Const ARRAY_WIDTH As Long = 6
-Private Const HASH_LEN  As Long = 40
 
 Private Type TState
     Worksheet As Worksheet
@@ -124,7 +123,7 @@ Private Function CreateNewCommit(ByVal TableID As String, ByVal MapID As String,
     With NewRemoteCommit
         .TableID = TableID
         .MapID = MapID
-        .Caption = Caption & " (" & Format$(Now(), "yyyy/mm/dd hh:MM:ss") & ")"
+        .Caption = Caption & " (" & Format$(Now(), FMT_TIMESTAMP) & ")"
         .Timestamp = Application.Evaluate("=NOW()")
         .CommitID = Left$(HashSHA1(TableID & Chr$(ASCII_US) & MapID & Chr$(ASCII_US) & .Timestamp), HASH_LEN)
     End With
