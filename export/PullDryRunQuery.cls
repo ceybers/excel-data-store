@@ -38,6 +38,9 @@ Public Sub Run()
     
     RemoveHighlights This.MappedTable.ListObject
     
+    Log.Message "This.Remote.Reload", "PullDryRunQuery", Info_Level
+    This.Remote.Reload
+    
     Dim KeyIDs As Variant
     KeyIDs = This.MappedTable.GetKeyIDs
     

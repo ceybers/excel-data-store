@@ -2,34 +2,23 @@ Attribute VB_Name = "MappedTableFactory"
 '@Folder "TableMapMatcher.Factories"
 Option Explicit
 
-Public Function CreateMappedTable(ByVal PartialSelection As Boolean, ByVal Resolve As Boolean) As MappedTable
+Public Function TryCreateBestMappedTable(ByVal Remote As Remote, ByRef OutMappedTable As MappedTable) As Boolean
     Log.Message "CreateMappedTable()", "MapTablFct"
-    Dim ListObject As ListObject
     
+    Dim ListObject As ListObject
     Log.Message " TryGetSelectedListObject()", "MapTablFct"
     If Not TryGetSelectedListObject(ListObject) Then
+        Log.Message " Could not find a ListObject", "MapTablFct"
         Exit Function
     End If
     
-    Dim MappedTable As MappedTable
     With New TableMapMatches
-        .Load RemoteFactory.GetRemote
+        Log.Message " TableMapMatches.Load", "MapTablFct"
+        .Load Remote
+        Log.Message " TableMapMatches.Evaluate", "MapTablFct"
         .Evaluate ListObject
-        Set MappedTable = .GetBestMappedTable
+        Set OutMappedTable = .GetBestMappedTable
     End With
     
-    Set CreateMappedTable = MappedTable
-    
-    If Resolve = False Then Exit Function
-    
-    If MappedTable.TableMap.IsMapped = False Then Exit Function
-    
-    With MappedTable
-        Log.Message " SelectKeys", "MapTablFct"
-        .SelectKeys Partial:=PartialSelection
-        Log.Message " ResolveKeyIDs", "MapTablFct"
-        .ResolveKeyIDs RemoteFactory.GetRemote
-        Log.Message " SelectFields", "MapTablFct"
-        .SelectFields Partial:=PartialSelection
-    End With
+    TryCreateBestMappedTable = True
 End Function

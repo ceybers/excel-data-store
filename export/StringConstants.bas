@@ -16,6 +16,7 @@ Public Const MSG_DATASTORE_WB_INVALID As String = "Data Store workbook is not a 
 Public Const MSG_MAP_NO_TABLE As String = "Please select a table first before running the Map command."
 Public Const MSG_PULL_NO_TABLE As String = "Please select a table first before running the Pull command."
 Public Const MSG_PUSH_NO_TABLE As String = "Please select a table first before running the Push command."
+Public Const MSG_NO_TABLE As String = "Data Store could not find a table to work with."
 Public Const MSG_IS_PROTECTED As String = "Worksheet is Protected. Unprotect it and try again."
 
 Public Const MSG_REMOTE_REBUILD_KEYS As String = "Remote Keys Table rebuild OK!"
