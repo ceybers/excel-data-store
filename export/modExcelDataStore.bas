@@ -3,43 +3,46 @@ Attribute VB_Name = "modExcelDataStore"
 '@Folder("Version4")
 Option Explicit
 
-'@EntryPoint
+'@EntryPoint Map > Map Table
 Public Sub TableMapUI()
     Log.StartLogging
     Log.Message "TableMapMatcherUI", "TMapMatchUI"
     
+    Dim ListObject As ListObject
+    TryGetSelectedListObject ListObject
+    If GuardNoSelectedListObject(ListObject) Then Exit Sub
+    
     Dim VM As TableMapMatcherVM
     Set VM = New TableMapMatcherVM
-    VM.Load
-    If VM.IsValid = False Then
-        MsgBox MSG_MAP_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
+    With VM
+        .Load ListObject
+        .GetBestMappedTable
+    End With
     
-    VM.GetBestMappedTable
     Log.StopLogging
         
     TableMapUIWithMappedTable VM.MappedTable
 End Sub
 
-'@EntryPoint
+'@EntryPoint Map > View Maps
 Public Sub TableMapMatchesUI()
     Log.StartLogging
     Log.Message "TableMapMatcherUI", "TMapMatchUI"
     
+    Dim ListObject As ListObject
+    TryGetSelectedListObject ListObject
+    If GuardNoSelectedListObject(ListObject) Then Exit Sub
+    
     Dim VM As TableMapMatcherVM
     Set VM = New TableMapMatcherVM
-    VM.Load
-    If VM.IsValid = False Then
-        MsgBox MSG_MAP_NO_TABLE, vbInformation + vbOKOnly, APP_TITLE
-        Exit Sub
-    End If
+    VM.Load ListObject
     
     Log.Message "Entering UserForm...", "TableMapUI", UI_Level
     Dim View As IView
     Set View = New TableMapMatcher
     If View.ShowDialog(VM) Then
         Log.Message "...exited UserForm", "TableMapUI", UI_Level
+        
         Log.Message "ViewModel.Save", "TableMapUI"
         VM.Save
         Log.StopLogging
@@ -79,12 +82,12 @@ Private Sub TableMapUIWithMappedTable(ByVal MappedTable As MappedTable)
     End If
 End Sub
 
-'@EntryPoint
+'@EntryPoint Pull > Pull
 Public Sub PullAll()
     DoPull PartialSelection:=False
 End Sub
 
-'@EntryPoint
+'@EntryPoint Pull > Pull Selected
 Public Sub PullPartial()
     DoPull PartialSelection:=True
 End Sub
@@ -113,12 +116,12 @@ Private Sub DoPull(ByVal PartialSelection As Boolean)
     Log.StopLogging
 End Sub
 
-'@EntryPoint
+'@EntryPoint Push > Push
 Public Sub Push()
     DoPush PartialSelection:=False
 End Sub
 
-'@EntryPoint
+'@EntryPoint Push > Push Selected
 Public Sub PushPartial()
     DoPush PartialSelection:=True
 End Sub
@@ -147,7 +150,68 @@ Private Sub DoPush(ByVal PartialSelection As Boolean)
     Log.StopLogging
 End Sub
 
-'@EntryPoint
+'@EntryPoint Compare > Highlight Changes
+Public Sub HighlightAll()
+    DoHighlight PartialSelection:=False
+End Sub
+
+'@EntryPoint Compare > Select Only
+Public Sub HighlightSelection()
+    DoHighlight PartialSelection:=True
+End Sub
+
+Private Sub DoHighlight(ByVal PartialSelection As Boolean)
+    Log.StartLogging
+    Log.Message "DoHighlight()", "DoHL"
+    
+    Log.Message "MappedTableFactory.TryCreateBestMappedTable", "DoHL"
+    Dim MappedTable As MappedTable
+    MappedTableFactory.TryCreateBestMappedTable RemoteFactory.GetRemote, MappedTable
+    
+    If GuardMappedTableNoListObject(MappedTable) Then Exit Sub
+    If GuardMappedTableProtected(MappedTable) Then Exit Sub
+    
+    Log.Message "MappedTable.SelectKeysAndFields", "DoHL"
+    MappedTable.SelectKeysAndFields PartialSelection:=PartialSelection
+    
+    Log.Message "New PullDryRunQuery", "DoHL"
+    With New PullDryRunQuery
+        Set .MappedTable = MappedTable
+        Set .Remote = RemoteFactory.GetRemote
+        .Run
+    End With
+    
+    Log.StopLogging
+End Sub
+
+'@EntryPoint Compare > Mapped
+Public Sub HighlightMappedFields()
+    Log.StartLogging
+    Log.Message "@EntryPoint HighlightMappedFields", "HLMapped"
+    
+    Log.Message "MappedTableFactory.TryCreateBestMappedTable", "HLMapped"
+    Dim MappedTable As MappedTable
+    MappedTableFactory.TryCreateBestMappedTable RemoteFactory.GetRemote, MappedTable
+    
+    If GuardMappedTableNoListObject(MappedTable) Then Exit Sub
+    If GuardMappedTableProtected(MappedTable) Then Exit Sub
+    
+    Log.Message "MappedTable.HighlightMappedFields", "HLMapped"
+    MappedTable.HighlightMappedFields
+    
+    Log.StopLogging
+End Sub
+
+'@EntryPoint Compare > Clear
+Public Sub HighlightRemove()
+    Dim ListObject As ListObject
+    If Not TryGetActiveSheetListObject(ListObject) Then Exit Sub
+    If TestIfProtected(ListObject) Then Exit Sub
+    
+    RangeHighlighter.RemoveHighlights ListObject
+End Sub
+
+'@EntryPoint History > View History
 Public Sub TimelineSingle()
     Log.StartLogging
     Log.Message "@EntryPoint TLineSingle", "TimeLSngl"
@@ -189,68 +253,7 @@ Public Sub TimelineSingle()
     Log.StopLogging
 End Sub
 
-'@EntryPoint
-Public Sub HighlightAll()
-    DoHighlight PartialSelection:=False
-End Sub
-
-'@EntryPoint
-Public Sub HighlightSelection()
-    DoHighlight PartialSelection:=True
-End Sub
-
-Private Sub DoHighlight(ByVal PartialSelection As Boolean)
-    Log.StartLogging
-    Log.Message "DoHighlight()", "DoHL"
-    
-    Log.Message "MappedTableFactory.TryCreateBestMappedTable", "DoHL"
-    Dim MappedTable As MappedTable
-    MappedTableFactory.TryCreateBestMappedTable RemoteFactory.GetRemote, MappedTable
-    
-    If GuardMappedTableNoListObject(MappedTable) Then Exit Sub
-    If GuardMappedTableProtected(MappedTable) Then Exit Sub
-    
-    Log.Message "MappedTable.SelectKeysAndFields", "DoHL"
-    MappedTable.SelectKeysAndFields PartialSelection:=PartialSelection
-    
-    Log.Message "New PullDryRunQuery", "DoHL"
-    With New PullDryRunQuery
-        Set .MappedTable = MappedTable
-        Set .Remote = RemoteFactory.GetRemote
-        .Run
-    End With
-    
-    Log.StopLogging
-End Sub
-
-'@EntryPoint
-Public Sub HighlightRemove()
-    Dim ListObject As ListObject
-    If Not TryGetActiveSheetListObject(ListObject) Then Exit Sub
-    If TestIfProtected(ListObject) Then Exit Sub
-    
-    RangeHighlighter.RemoveHighlights ListObject
-End Sub
-
-'@EntryPoint
-Public Sub HighlightMappedFields()
-    Log.StartLogging
-    Log.Message "@EntryPoint HighlightMappedFields", "HLMapped"
-    
-    Log.Message "MappedTableFactory.TryCreateBestMappedTable", "HLMapped"
-    Dim MappedTable As MappedTable
-    MappedTableFactory.TryCreateBestMappedTable RemoteFactory.GetRemote, MappedTable
-    
-    If GuardMappedTableNoListObject(MappedTable) Then Exit Sub
-    If GuardMappedTableProtected(MappedTable) Then Exit Sub
-    
-    Log.Message "MappedTable.HighlightMappedFields", "HLMapped"
-    MappedTable.HighlightMappedFields
-    
-    Log.StopLogging
-End Sub
-
-'@EntryPoint
+'@EntryPoint Remote > Manage Remote
 Public Sub DataStoreUI()
     Log.StartLogging
     Log.Message "@EntryPoint DataStoreUI", "DataStoreUI"
@@ -277,49 +280,20 @@ Public Sub DataStoreUI()
     Log.StopLogging
 End Sub
 
-'@EntryPoint
+'@EntryPoint Remote > Open
 Public Sub DataStoreOpen()
     Dim Remote As Remote
     Set Remote = RemoteFactory.GetRemote
     Remote.Reload
 End Sub
 
-'@EntryPoint
+'@EntryPoint Remote > Save
 Public Sub DataStoreSave()
     RemoteFactory.GetRemote.SaveWorkbook
 End Sub
 
-'@EntryPoint
+'@EntryPoint Remote > Close
 Public Sub DataStoreClose()
     RemoteFactory.GetRemote.SaveWorkbook
     RemoteFactory.GetRemote.CloseWorkbook
 End Sub
-
-Private Function GuardSelectionSingleCell() As Boolean
-    Dim SelectedRange As Range
-    If Not TryGetSelectionRange(SelectedRange) Then
-        GuardSelectionSingleCell = True
-        Log.StopLogging
-        Exit Function
-    ElseIf SelectedRange.Cells.Count <> 1 Then
-        GuardSelectionSingleCell = True
-        Log.StopLogging
-        Exit Function
-    End If
-End Function
-
-Private Function GuardMappedTableNoListObject(ByVal MappedTable As MappedTable) As Boolean
-    If Not MappedTable Is Nothing Then Exit Function
-    
-    MsgBox MSG_NO_TABLE, vbExclamation + vbOKOnly, APP_TITLE
-    Log.StopLogging
-    GuardMappedTableNoListObject = True
-End Function
-
-Private Function GuardMappedTableProtected(ByVal MappedTable As MappedTable) As Boolean
-    If MappedTable.IsProtected = False Then Exit Function
-    
-    MsgBox MSG_IS_PROTECTED, vbExclamation + vbOKOnly, APP_TITLE
-    Log.StopLogging
-    GuardMappedTableProtected = True
-End Function
