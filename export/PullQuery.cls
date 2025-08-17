@@ -44,40 +44,43 @@ Public Sub Run()
     Dim KeyIDs As Variant
     Log.Message "This.MappedTable.GetKeyIDs", "PullQuery", Info_Level
     KeyIDs = This.MappedTable.GetKeyIDs
+    If IsEmpty(KeyIDs) Then Exit Sub
     
     Dim FieldIDs As Variant
-    Log.Message "PullQuery.Run GetFields", "PullQuery", Info_Level
+    Log.Message "Run GetFields", "PullQuery", Info_Level
     FieldIDs = This.MappedTable.GetFieldIDs
     If IsEmpty(FieldIDs) Then Exit Sub
     
-    Dim ExistingValues As Variant
-    ExistingValues = This.MappedTable.GetExistingValuesFromTable(KeyIDs, FieldIDs)
+    Dim LocalValues As Variant
+    Log.Message "Run MappedTable.GetExistingValuesFromTable", "PullQuery", Info_Level
+    LocalValues = This.MappedTable.GetExistingValuesFromTable(KeyIDs, FieldIDs)
+    
+    Dim RemoteValues As Variant
+    Log.Message "PullQuery.Run GetValues", "PullQuery", Info_Level
+    RemoteValues = This.Remote.Values.GetValues(KeyIDs, FieldIDs)
+    
+    Dim ChangeMask As Variant
+    ChangeMask = GetChangeMask(LocalValues, RemoteValues)
     
     Dim ChangeCount As Long
-    ChangeCount = This.Remote.Values.GetChangeCount(KeyIDs, FieldIDs, ExistingValues)
+    ChangeCount = CountChanges(ChangeMask)
     
     If ChangeCount = 0 Then
         MsgBox MSG_PULL_NOCHANGES, vbInformation + vbOKOnly, APP_TITLE
         Exit Sub
     End If
     
-    Dim ChangedValues As Variant
-    ChangedValues = This.Remote.Values.GetChangeMask(KeyIDs, FieldIDs, ExistingValues)
-    This.MappedTable.HighlightChanges KeyIDs, FieldIDs, ChangedValues, hcBeforePull
+    This.MappedTable.HighlightChanges KeyIDs, FieldIDs, ChangeMask, hcBeforePull
     
     If vbNo = MsgBox(Replace$(MSG_PULL_CONFIRM, "{0}", ChangeCount), vbQuestion + vbYesNo + vbDefaultButton2, APP_TITLE) Then
         Exit Sub
     End If
     
     RangeHighlighter.RemoveHighlights This.MappedTable.ListObject
-    This.MappedTable.HighlightChanges KeyIDs, FieldIDs, ChangedValues, hcAfterPull
-    
-    Dim NewValues As Variant
-    Log.Message "PullQuery.Run GetValues", "PullQuery", Info_Level
-    NewValues = This.Remote.Values.GetValues(KeyIDs, FieldIDs)
+    This.MappedTable.HighlightChanges KeyIDs, FieldIDs, ChangeMask, hcAfterPull
     
     Log.Message "PullQuery.Run UpdateFromRemote", "PullQuery", Info_Level
-    UpdateFromRemote KeyIDs, FieldIDs, NewValues
+    UpdateFromRemote KeyIDs, FieldIDs, RemoteValues
     
     Log.Message "PullQuery.Run() End", "PullQuery", Info_Level
 End Sub
@@ -86,7 +89,8 @@ Private Sub UpdateFromRemote(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant,
     Log.Message "PullQuery.UpdateFromRemote creating KeyIndexes", "PullQuery", Info_Level
     
     Dim KeyIndexes As Variant
-    ReDim KeyIndexes(1 To UBound(KeyIDs))
+    ReDim KeyIndexes(1 To UBound(KeyIDs)) As String
+    
     Dim i As Long
     For i = 1 To UBound(KeyIDs)
         If KeyIDs(i) <> vbNullString Then
