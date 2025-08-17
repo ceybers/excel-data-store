@@ -18,6 +18,8 @@ Private Type TTableMapMatch
     ListObject As ListObject
     Score As Long
     Results As Variant
+    FieldCount As Long
+    MatchCount As Long
 End Type
 Private This As TTableMapMatch
 
@@ -50,18 +52,20 @@ End Sub
 
 Public Sub Evaluate(ByVal ListObject As ListObject)
     Set This.ListObject = ListObject
+    This.FieldCount = This.TableMap.FieldMap.Count
+    UpdateResults
+    UpdateScore
+End Sub
+
+Private Sub UpdateResults()
+    Dim Worksheet As Worksheet
+    Set Worksheet = This.ListObject.Parent
     
     Dim Workbook As Workbook
-    Set Workbook = ListObject.Parent.Parent
-    
-    Dim Worksheet As Worksheet
-    Set Worksheet = ListObject.Parent
-    
-    Dim FieldCount As Long
-    FieldCount = This.TableMap.FieldMap.Count
+    Set Workbook = Worksheet.Parent
     
     Dim Results As Variant
-    ReDim Results(1 To 7 + FieldCount, 1 To 3)
+    ReDim Results(1 To 7 + This.FieldCount, 1 To 3)
     
     Results(1, 1) = "FullName"
     Results(1, 2) = This.SerializedTable.WorkbookFullName
@@ -81,58 +85,54 @@ Public Sub Evaluate(ByVal ListObject As ListObject)
     
     Results(5, 1) = "Table"
     Results(5, 2) = This.SerializedTable.ListObjectName
-    Results(5, 3) = This.SerializedTable.ListObjectName = ListObject.Name
+    Results(5, 3) = This.SerializedTable.ListObjectName = This.ListObject.Name
     
     Results(6, 1) = "Key"
     Results(6, 2) = This.TableMap.KeyMap.KeyColumnName
-    Results(6, 3) = ListColumnExists(This.TableMap.KeyMap.KeyColumnName)
+    Results(6, 3) = ListColumnExists(This.TableMap.KeyMap.KeyColumnName, This.ListObject)
     
     Results(7, 1) = "Fields: "
     
-    Dim MatchCount As Long
+    This.MatchCount = 0
+    
     Dim i As Long
-    For i = 1 To FieldCount
+    For i = 1 To This.FieldCount
         Results(7 + i, 1) = "Field #" & i
         Results(7 + i, 2) = This.TableMap.FieldMap.Item(i).ListColumnName
         
         Dim FieldMatch As Boolean
-        FieldMatch = ListColumnExists(Results(7 + i, 2))
+        FieldMatch = ListColumnExists(Results(7 + i, 2), This.ListObject)
         
         Results(7 + i, 3) = FieldMatch
-        If FieldMatch Then MatchCount = MatchCount + 1
+        If FieldMatch Then This.MatchCount = This.MatchCount + 1
     Next i
     
-    If FieldCount = 0 Then
+    If This.FieldCount = 0 Then
         Results(7, 3) = "No Fields"
-    ElseIf MatchCount = FieldCount Then
-        Results(7, 3) = "All (" & MatchCount & " of " & FieldCount & ")"
-    ElseIf MatchCount > 0 Then
-        Results(7, 3) = "Some (" & MatchCount & " of " & FieldCount & ")"
+    ElseIf This.MatchCount = This.FieldCount Then
+        Results(7, 3) = "All (" & This.MatchCount & " of " & This.FieldCount & ")"
+    ElseIf This.MatchCount > 0 Then
+        Results(7, 3) = "Some (" & This.MatchCount & " of " & This.FieldCount & ")"
     Else
-        Results(7, 3) = "None (" & MatchCount & " of " & FieldCount & ")"
+        Results(7, 3) = "None (" & This.MatchCount & " of " & This.FieldCount & ")"
     End If
     
     This.Results = Results
-    
+End Sub
+
+Private Sub UpdateScore()
     Dim Score As Long
     Score = 0
-    Score = IIf(Results(1, 3), Score + 1000, 0)
-    Score = IIf(Results(3, 3), Score + 500, 0)
-    Score = IIf(Results(2, 3), Score + 250, 0)
-    Score = IIf(Results(4, 3), Score + 500, 0)
-    Score = IIf(Results(5, 3), Score + 500, 0)
-    If FieldCount > 0 Then
-        Score = Score + (MatchCount / FieldCount * 1000)
+    Score = IIf(This.Results(1, 3), Score + 1000, 0)
+    Score = IIf(This.Results(3, 3), Score + 500, 0)
+    Score = IIf(This.Results(2, 3), Score + 250, 0)
+    Score = IIf(This.Results(4, 3), Score + 500, 0)
+    Score = IIf(This.Results(5, 3), Score + 500, 0)
+    
+    If This.FieldCount > 0 Then
+        Score = Score + ((This.MatchCount / This.FieldCount) * 1000)
     End If
-    Score = IIf(Results(6, 3), Score, 0)
+    Score = IIf(This.Results(6, 3), Score, 0)
     
     This.Score = Score
 End Sub
-
-Private Function ListColumnExists(ByVal ListColumnName As String) As Boolean
-    Dim ListColumn As ListColumn
-    If TryGetListColumn(ListColumnName, This.ListObject, ListColumn) Then
-        ListColumnExists = True
-        Exit Function
-    End If
-End Function

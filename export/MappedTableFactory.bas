@@ -5,13 +5,15 @@ Option Explicit
 Public Function CreateMappedTable(ByVal PartialSelection As Boolean, ByVal Resolve As Boolean) As MappedTable
     Log.Message "CreateMappedTable()", "MapTablFct"
     Dim ListObject As ListObject
+    
+    Log.Message " TryGetSelectedListObject()", "MapTablFct"
     If Not TryGetSelectedListObject(ListObject) Then
         Exit Function
     End If
     
     Dim MappedTable As MappedTable
     With New TableMapMatches
-        .Load
+        .Load RemoteFactory.GetRemote
         .Evaluate ListObject
         Set MappedTable = .GetBestMappedTable
     End With

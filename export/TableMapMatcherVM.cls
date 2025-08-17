@@ -44,7 +44,7 @@ Public Sub Load()
     
     Set This.Matches = New TableMapMatches
     With This.Matches
-        .Load
+        .Load RemoteFactory.GetRemote
         .Evaluate This.ListObject
     End With
     
