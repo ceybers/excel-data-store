@@ -12,8 +12,6 @@ Option Explicit
 
 Private Type TRemoteFieldVM
     RemoteField As RemoteField
-    'Selected As Boolean
-    'Bold As Boolean
 End Type
 Private This As TRemoteFieldVM
 

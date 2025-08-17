@@ -7,11 +7,11 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'@IgnoreModule ParameterCanBeByVal
 '@Folder "RemoteDataStore.Models.Plural"
 Option Explicit
 
 Private Const ARRAY_WIDTH As Long = 7
-Private Const HASH_LEN  As Long = 40
 
 Private Type TState
     Worksheet As Worksheet
@@ -74,7 +74,7 @@ Private Sub GenerateUniquePaths()
     If Count = 0 Then Exit Sub
     
     Dim AllPaths As Variant
-    ReDim AllPaths(1 To Count)
+    ReDim AllPaths(1 To Count) As String
     
     Dim i As Long
     For i = 1 To Count
@@ -226,16 +226,16 @@ Private Function TryGetKeyIDFast(ByVal Key As String) As String
     TryGetKeyIDFast = This.LookupKeyIDs(Index, 2)
 End Function
 
-Private Function TryGetKey(ByVal KeyPath As String, ByVal Key As String, ByRef OutRemoteKey As RemoteKey) As Boolean
-    Dim ThisRemoteKey As RemoteKey
-    For Each ThisRemoteKey In This.Item
-        If ThisRemoteKey.Path = KeyPath And ThisRemoteKey.Key = Key Then
-            Set OutRemoteKey = ThisRemoteKey
-            TryGetKey = True
-            Exit Function
-        End If
-    Next ThisRemoteKey
-End Function
+'Private Function TryGetKey(ByVal KeyPath As String, ByVal Key As String, ByRef OutRemoteKey As RemoteKey) As Boolean
+'    Dim ThisRemoteKey As RemoteKey
+'    For Each ThisRemoteKey In This.Item
+'        If ThisRemoteKey.Path = KeyPath And ThisRemoteKey.Key = Key Then
+'            Set OutRemoteKey = ThisRemoteKey
+'            TryGetKey = True
+'            Exit Function
+'        End If
+'    Next ThisRemoteKey
+'End Function
 
 Private Function CreateNewKey(ByVal KeyPath As String, ByVal Key As String) As RemoteKey
     Dim NewRemoteKey As RemoteKey
@@ -250,3 +250,4 @@ Private Function CreateNewKey(ByVal KeyPath As String, ByVal Key As String) As R
     
     Set CreateNewKey = NewRemoteKey
 End Function
+

@@ -94,4 +94,3 @@ Private Sub DoQuickSort2(ByRef ArrayToSort As Variant, _
     If (ArrayLowerBound < HighIndex) Then DoQuickSort2 ArrayToSort, ArrayLowerBound, HighIndex
     If (LowIndex < ArrayUpperBound) Then DoQuickSort2 ArrayToSort, LowIndex, ArrayUpperBound
 End Sub
-

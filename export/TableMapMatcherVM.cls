@@ -39,8 +39,8 @@ Public Property Get Matches() As TableMapMatches
     Set Matches = This.Matches
 End Property
 
-Public Sub Load()
-    If Not TryGetSelectedListObject(This.ListObject) Then Exit Sub
+Public Sub Load(ByVal ListObject As ListObject)
+    Set This.ListObject = ListObject
     
     Set This.Matches = New TableMapMatches
     With This.Matches

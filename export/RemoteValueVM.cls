@@ -21,9 +21,9 @@ Public Property Get Value() As String
 End Property
 
 Public Property Get Timestamp() As String
-    Timestamp = Format$(This.RemoteValue.CreationTime, "yyyy/mm/dd hh:MM:ss")
+    Timestamp = Format$(This.RemoteValue.CreationTime, FMT_TIMESTAMP)
     If This.RemoteValue.ModificationTime = 0 Then Exit Property
-    Timestamp = Format$(This.RemoteValue.ModificationTime, "yyyy/mm/dd hh:MM:ss")
+    Timestamp = Format$(This.RemoteValue.ModificationTime, FMT_TIMESTAMP)
 End Property
 
 Public Property Get Commit() As String

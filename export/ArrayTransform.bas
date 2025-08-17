@@ -41,6 +41,8 @@ End Function
 ' Useful for preparing an array to be placed into the .Value2 of a Range that is 1-column wide.
 '    (1 to m) to (1 to m, 1 to 1)
 Public Function ArrayToColumn(ByVal InputArray As Variant) As Variant
+    Debug.Assert ArrayCheck.IsOneDimensionalOneBasedArray(InputArray)
+    
     Dim Lower As Long
     Lower = LBound(InputArray)
     
@@ -62,6 +64,8 @@ End Function
 ' Useful for preparing an array to be placed into the .Value2 of a Range that is 1-row tall.
 '    (1 to m) to (1 to 1, 1 to m)
 Public Function ArrayToRow(ByVal InputArray As Variant) As Variant
+    Debug.Assert ArrayCheck.IsOneDimensionalOneBasedArray(InputArray)
+    
     Dim Lower As Long
     Lower = LBound(InputArray)
     
@@ -102,6 +106,8 @@ End Function
 ' Transforms a 1-dimensional one-based array into a zero-based array.
 '    (1 to n) to (0 to n-1)
 Public Function OneBasedToZero(ByVal InputArray As Variant) As Variant
+    Debug.Assert ArrayCheck.IsOneDimensionalOneBasedArray(InputArray)
+    
     Dim Lower As Long
     Lower = LBound(InputArray)
     
@@ -151,13 +157,15 @@ Public Function ForceTwoDimensional(ByVal InputVariant As Variant) As Variant
     ForceTwoDimensional = Result
 End Function
 
-' Returns a collection containing the items in a 1-dimensional array. Key is not set.
+' Returns a Collection containing the items in a 1-dimensional array. Key is not set.
 Public Function ToCollection(ByVal InputArray As Variant) As Collection
     Dim Result As Collection
     Set Result = New Collection
+    
     Dim i As Long
     For i = LBound(InputArray) To UBound(InputArray)
         Result.Add Item:=InputArray(i)
     Next i
+    
     Set ToCollection = Result
 End Function

@@ -52,11 +52,13 @@ Private Sub CreateRemoteFieldVMs()
     
     Dim SortIndex As Variant
     ReDim SortIndex(1 To This.RemoteFields.Count, 1 To 2)
+    
     Dim i As Long
     For i = 1 To This.RemoteFields.Count
         SortIndex(i, 1) = This.RemoteFields.Item(i).Path & "\" & This.RemoteFields.Item(i).Caption
         SortIndex(i, 2) = i
     Next i
+    
     ArraySort.QuickSort2 SortIndex
     
     For i = 1 To This.RemoteFields.Count
@@ -69,7 +71,7 @@ End Sub
 
 Private Sub CreatePathItems()
     Dim InputArray As Variant
-    ReDim InputArray(1 To Count)
+    ReDim InputArray(1 To Count) As String
     
     Dim i As Long
     For i = 1 To Count
@@ -85,12 +87,12 @@ Private Sub CreatePathItems()
 End Sub
 
 Public Function TrySelectByKey(ByVal Key As String) As Boolean
-    If Key = "#UNMAPPED" Then
+    If Key = FIELD_ID_UNMAPPED Then
         Set This.SelectedItem = Nothing
         Exit Function
     End If
     
-    If Len(Key) <> 40 Then Exit Function
+    If Len(Key) <> HASH_LEN Then Exit Function
     Set This.SelectedItem = This.Items.Item(Key)
     TrySelectByKey = True
 End Function

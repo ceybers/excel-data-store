@@ -93,8 +93,6 @@ Public Function TryMatch() As MatchType
             TryMatch = WORKSHEET_NAME
             Exit Function
         End If
-    'ElseIf This.ListObject.Parent.Parent.Name = This.WorkbookName Then
-        ' Check if there is only 1x list object in the entire workbook
     End If
 End Function
 
@@ -108,11 +106,6 @@ Public Function TryResolve() As MatchType
     ElseIf TryResolveByWorkbookName Then
         TryResolve = MatchType.WORKBOOK_NAME
         Exit Function
-    'Else
-        ' try checking if any workbooks open with same path. this would be the case where the name changed slightly, e.g. dates/rev numbers, but table shape stays the same
-        ' (lo.name should still be the same then...)
-    'Else
-        'try to open file from full path
     End If
     
     TryResolve = NO_MATCH

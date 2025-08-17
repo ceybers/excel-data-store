@@ -122,9 +122,12 @@ Public Sub Show()
 End Sub
 
 Public Sub Rebuild()
-    RebuildRemoteTable This.Workbook.Worksheets.Item(WS_KEYS_NAME), Array("KeyID", "Path", "Key", "Caption", "CreationTime", "ModificationTime", "DeletionTime")
+    RebuildRemoteTable This.Workbook.Worksheets.Item(WS_KEYS_NAME), _
+        Array("KeyID", "Path", "Key", "Caption", "CreationTime", "ModificationTime", "DeletionTime")
     MsgBox MSG_REMOTE_REBUILD_KEYS, vbInformation + vbOKOnly, APP_TITLE
-    RebuildRemoteTable This.Workbook.Worksheets.Item(WS_FIELDS_NAME), Array("FieldID", "Path", "Name", "Caption", "CreationTime", "ModificationTime", "DeletionTime")
+    
+    RebuildRemoteTable This.Workbook.Worksheets.Item(WS_FIELDS_NAME), _
+        Array("FieldID", "Path", "Name", "Caption", "CreationTime", "ModificationTime", "DeletionTime")
     MsgBox MSG_REMOTE_REBUILD_FIELDS, vbInformation + vbOKOnly, APP_TITLE
 End Sub
 
@@ -136,4 +139,3 @@ Public Sub CloseWorkbook()
     This.Workbook.Close
     Set This.Workbook = Nothing
 End Sub
-

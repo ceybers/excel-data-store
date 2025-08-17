@@ -11,10 +11,6 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Type TValueTimelineVM
-    'KeyValue As String
-    'KeyID As String
-    'FieldValue As String
-    'FieldID As String
     Values As RemoteValuesVM
     NumberFormat As String
 End Type

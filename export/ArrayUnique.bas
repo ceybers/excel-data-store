@@ -5,7 +5,7 @@ Option Explicit
 ' Returns a 1-dimensional array that contains all the unique values in the
 ' InputArray. Not particularly performant. Lacks error handling for edge cases.
 Public Function Unique(ByVal InputArray As Variant) As Variant
-    If VarType(InputArray) < vbArray Then Exit Function
+    If Not ArrayCheck.IsOneDimensionalOneBasedArray(InputArray) Then Exit Function
     
     Dim SortedArray As Variant
     SortedArray = InputArray

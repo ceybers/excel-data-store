@@ -134,7 +134,7 @@ Attribute GetStaggeredArrayValues.VB_Description = "Returns the .Value2 of a sta
     If Not TryIntersectRanges(BaseRange, SelectedRange, WorkingRange) Then Exit Function
     
     Dim WorksheetOffset As Long
-    WorksheetOffset = BaseRange.Cells(1, 1).Row - 1
+    WorksheetOffset = BaseRange.Cells.Item(1, 1).Row - 1
     
     Dim BaseRangeValues As Variant
     BaseRangeValues = BaseRange.Value2
@@ -154,7 +154,7 @@ Attribute GetStaggeredArrayValues.VB_Description = "Returns the .Value2 of a sta
         Next RowIndex
     Next AreaIndex
     
-    ArrayClean.ReplaceErrorCells Result
+    ArrayClean.ReplaceErrorCells2 Result
     
     GetStaggeredArrayValues = Result
 End Function

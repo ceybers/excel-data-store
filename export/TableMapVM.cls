@@ -10,7 +10,7 @@ Attribute VB_Exposed = False
 '@Folder "Version4.ViewModels"
 Option Explicit
 
-Private Type TTableMapVM2
+Private Type TTableMapVM
     ListObject As ListObject
     TableMap As TableMap
     Remote As Remote
@@ -19,7 +19,7 @@ Private Type TTableMapVM2
     LocalFields As LocalFieldsVM
     RemoteFields As RemoteFieldsVM
 End Type
-Private This As TTableMapVM2
+Private This As TTableMapVM
 
 Public Property Get Name() As String
     Name = This.ListObject.Name
@@ -44,7 +44,7 @@ Public Property Get IsValid() As Boolean
 End Property
 
 Public Sub Load(ByVal MappedTable As MappedTable, ByVal Remote As Remote)
-    Log.Message "Load()", "TMapVM2"
+    Log.Message "Load()", "TMapVM"
     
     Set This.ListObject = MappedTable.ListObject
     Set This.TableMap = MappedTable.TableMap
@@ -61,8 +61,8 @@ Public Sub Load(ByVal MappedTable As MappedTable, ByVal Remote As Remote)
     Set This.RemoteFields = New RemoteFieldsVM
     This.RemoteFields.Load This.Remote.Fields
     
-    Log.Message "TableID=" & MappedTable.TableID, "TMapVM2"
-    Log.Message "MapID=" & MappedTable.MapID, "TMapVM2"
+    Log.Message "TableID=" & MappedTable.TableID, "TMapVM", verbose_Level
+    Log.Message "MapID=" & MappedTable.MapID, "TMapVM", verbose_Level
 End Sub
 
 Public Sub SelectKeyPathByKey(ByVal Key As String)

@@ -1,9 +1,11 @@
 Attribute VB_Name = "CollectionHelpers"
 '@IgnoreModule ProcedureNotUsed
-'@Folder("Helpers")
+'@Folder "Helpers.Collection"
 Option Explicit
 
+'@Description "Removes all the items in a Collection."
 Public Sub CollectionClear(ByVal Collection As Collection)
+Attribute CollectionClear.VB_Description = "Removes all the items in a Collection."
     If Collection Is Nothing Then Exit Sub
     Do While Collection.Count > 0
         Collection.Remove Collection.Count

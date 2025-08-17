@@ -2,7 +2,8 @@ Attribute VB_Name = "MappedTableFactory"
 '@Folder "TableMapMatcher.Factories"
 Option Explicit
 
-Public Function TryCreateBestMappedTable(ByVal Remote As Remote, ByRef OutMappedTable As MappedTable) As Boolean
+Public Function TryCreateBestMappedTable(ByVal Remote As Remote, _
+    ByRef OutMappedTable As MappedTable) As Boolean
     Log.Message "CreateMappedTable()", "MapTablFct"
     
     Dim ListObject As ListObject

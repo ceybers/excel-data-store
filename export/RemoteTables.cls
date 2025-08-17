@@ -11,7 +11,6 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Const ARRAY_WIDTH As Long = 9
-Private Const HASH_LEN  As Long = 40
 
 Private Type TState
     Worksheet As Worksheet
@@ -39,9 +38,7 @@ Public Sub Load(ByVal Worksheet As Worksheet)
 End Sub
 
 Private Sub LoadFromWorksheet()
-    Do While This.Item.Count > 0
-        This.Item.Remove 1
-    Loop
+    CollectionClear This.Item
     
     SortWorksheet
     

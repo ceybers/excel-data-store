@@ -22,7 +22,6 @@ Public Function BinarySearch(ByRef ArrayToSearch As Variant, ByVal SearchItem As
         
         If ArrayToSearch(MiddleIndex) < SearchItem Then
             LeftIndex = MiddleIndex + 1
-            
         ElseIf ArrayToSearch(MiddleIndex) > SearchItem Then
             RightIndex = MiddleIndex - 1
         Else
@@ -52,7 +51,6 @@ Public Function BinarySearch2(ByRef ArrayToSearch As Variant, ByVal SearchItem A
         
         If ArrayToSearch(MiddleIndex, 1) < SearchItem Then
             LeftIndex = MiddleIndex + 1
-            
         ElseIf ArrayToSearch(MiddleIndex, 1) > SearchItem Then
             RightIndex = MiddleIndex - 1
         Else
