@@ -54,7 +54,8 @@ End Sub
 
 Private Sub cmdShow_Click()
     This.ViewModel.DoShow
-    Me.cmdShow.Enabled = False
+    'Me.cmdShow.Enabled = False
+    Me.Hide
 End Sub
 
 Private Function IView_ShowDialog(ByVal ViewModel As Object) As Boolean
