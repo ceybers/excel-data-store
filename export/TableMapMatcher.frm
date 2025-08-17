@@ -13,7 +13,6 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-
 '@IgnoreModule ArgumentWithIncompatibleObjectType, HungarianNotation
 '@Folder("TableMapMatcher.Views")
 Option Explicit
@@ -99,9 +98,9 @@ Private Sub LoadListViewFromMatches(ByVal ListView As ListView, ByVal Matches As
     
     With ListView.ColumnHeaders
         .Clear
-        .Add Text:="Caption", Width:=142
-        .Add Text:="Score", Width:=32
-        .Add Text:="Timestamp", Width:=82
+        .Add Text:=LV_COL_CAP, Width:=142
+        .Add Text:=LV_COL_SCORE, Width:=32
+        .Add Text:=LV_COL_TIME, Width:=88
     End With
     
     Dim i As Long
@@ -113,7 +112,7 @@ Private Sub LoadListViewFromMatches(ByVal ListView As ListView, ByVal Matches As
         Set ListItem = ListView.ListItems.Add(Text:=TableMapMatch.Caption)
         With ListItem
             .ListSubItems.Add Text:=TableMapMatch.Score
-            .ListSubItems.Add Text:=Format$(TableMapMatch.Timestamp, "yyyy/mm/dd hh:MM")
+            .ListSubItems.Add Text:=Format$(TableMapMatch.Timestamp, FMT_TIMESTAMP)
             If TableMapMatch.Score = 0 Then
                 .ForeColor = RGB(128, 128, 128)
                 .ListSubItems.Item(1).ForeColor = RGB(128, 128, 128)
@@ -133,9 +132,9 @@ Private Sub LoadListViewFromMatch(ByVal ListView As ListView, ByVal Match As Tab
     End With
     With ListView.ColumnHeaders
         .Clear
-        .Add Text:="Item", Width:=64
-        .Add Text:="Value", Width:=140
-        .Add Text:="Match?", Width:=64
+        .Add Text:=LV_COL_ITEM, Width:=64
+        .Add Text:=LV_COL_VAL, Width:=140
+        .Add Text:=LV_COL_MATCH, Width:=64
     End With
     
     Dim i As Long
@@ -145,7 +144,7 @@ Private Sub LoadListViewFromMatch(ByVal ListView As ListView, ByVal Match As Tab
         With ListItem
             .ListSubItems.Add Text:=Match.Results(i, 2)
             If VarType(Match.Results(i, 3)) = vbBoolean Then
-                .ListSubItems.Add Text:=IIf(Match.Results(i, 3), "OK", "No Match")
+                .ListSubItems.Add Text:=IIf(Match.Results(i, 3), LV_COL_MATCHY, LV_COL_MATCHN)
             Else
                 .ListSubItems.Add Text:=Match.Results(i, 3)
             End If
