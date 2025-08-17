@@ -296,7 +296,7 @@ Private Sub UpsertValue(ByVal KeyID As String, ByVal FieldID As String, ByVal Va
         Else
             This.IsDirty = True ' CHG (A -> B)
             ExistingLatestRemoteValue.Latest = vbNullString
-            ExistingLatestRemoteValue.ModificationTime = Application.Evaluate("=NOW()")
+            ExistingLatestRemoteValue.ModificationTime = Application.Evaluate("=NOW()") - 0.0000012 ' 1/10th of a second
         End If
     Else
         This.IsDirty = True ' NEW (0 -> A)
