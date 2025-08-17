@@ -50,6 +50,13 @@ Public Sub SelectField(ByVal ListColumnName As String)
     Next i
 End Sub
 
+Public Sub SelectAllFields()
+    Dim i As Long
+    For i = 1 To Count
+        This.Items.Item(i).Selected = True
+    Next i
+End Sub
+
 Public Sub UnselectAllFields()
     Dim i As Long
     For i = 1 To Count

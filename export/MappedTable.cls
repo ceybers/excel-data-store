@@ -53,47 +53,68 @@ Public Sub Load(ByVal ListObject As ListObject, ByVal TableMap As TableMap)
     Set This.TableMap = TableMap
 End Sub
 
-Public Sub SelectKeys(ByVal Partial As Boolean)
+Public Sub SelectKeysAndFields(ByVal PartialSelection As Boolean)
+    SelectKeys PartialSelection
+    ResolveKeyIDs RemoteFactory.GetRemote
+    SelectFields PartialSelection
+End Sub
+
+Private Sub SelectKeys(ByVal Partial As Boolean)
     Dim KeyListColumn As ListColumn
-    If Not TryGetListColumn(This.TableMap.KeyMap.KeyColumnName, This.ListObject, KeyListColumn) Then Exit Sub
+    If Not TryGetListColumn(This.TableMap.KeyMap.KeyColumnName, This.ListObject, KeyListColumn) Then
+        Exit Sub
+    End If
     
-    Dim SelectedKeys As Range
+    Dim BaseRange As Range
+    Set BaseRange = KeyListColumn.DataBodyRange
+    
+    Dim KeyValues As Variant
+    
     If Partial Then
         Dim SelectedRange As Range
         If Not TryGetSelectionRange(SelectedRange) Then Exit Sub
-        If Not TryIntersectRanges(SelectedRange.EntireRow, KeyListColumn.DataBodyRange, SelectedKeys) Then Exit Sub
+        Dim SelectedKeys As Range
+        If Not TryIntersectRanges(SelectedRange.EntireRow, BaseRange, SelectedKeys) Then Exit Sub
+        KeyValues = RangeHelpers.GetStaggeredArrayValues(BaseRange, SelectedKeys)
     Else
-        Set SelectedKeys = KeyListColumn.DataBodyRange
+        KeyValues = BaseRange.Value2
     End If
     
-    Dim Cell As Range
-    For Each Cell In SelectedKeys.Cells
-        If VarType(Cell.Value2) = vbError Then
-            This.TableMap.KeyMap.Add KeyValue:=vbNullString, RowIndex:=Cell.Row - This.ListObject.Range.Row
-        Else
-            This.TableMap.KeyMap.Add KeyValue:=Cell.Value2, RowIndex:=Cell.Row - This.ListObject.Range.Row
-        End If
-    Next Cell
+    This.TableMap.KeyMap.AddMany Values:=KeyValues, RowOffset:=This.ListObject.Range.Row - 1
+    'Dim Cell As Range
+    'For Each Cell In SelectedKeys.Cells
+    '    If VarType(Cell.Value2) = vbError Then
+    '        This.TableMap.KeyMap.Add KeyValue:=vbNullString, RowIndex:=Cell.Row - This.ListObject.Range.Row
+    '    Else
+    '        This.TableMap.KeyMap.Add KeyValue:=Cell.Value2, RowIndex:=Cell.Row - This.ListObject.Range.Row
+    '    End If
+    'Next Cell
 End Sub
 
-Public Sub ResolveKeyIDs(ByVal Remote As Remote)
+Private Sub ResolveKeyIDs(ByVal Remote As Remote)
     This.TableMap.KeyMap.ResolveIDs Remote
 End Sub
 
-Public Sub SelectFields(ByVal Partial As Boolean)
+Private Sub SelectFields(ByVal Partial As Boolean)
     This.TableMap.FieldMap.UnselectAllFields
     
-    Dim SelectedHeaders As Range
-    If Partial Then
-        If Not TryIntersectRanges(Selection.EntireColumn, This.ListObject.HeaderRowRange, SelectedHeaders) Then Exit Sub
-    Else
-        Set SelectedHeaders = This.ListObject.HeaderRowRange
+    If Partial = False Then
+        This.TableMap.FieldMap.SelectAllFields
+        Exit Sub
     End If
     
-    Dim Cell As Range
-    For Each Cell In SelectedHeaders.Cells
-        This.TableMap.FieldMap.SelectField Cell.Value2
-    Next Cell
+    Dim SelectedHeaders As Range
+    Set SelectedHeaders = This.ListObject.HeaderRowRange
+    
+    If TryIntersectRanges(Selection.EntireColumn, _
+        This.ListObject.HeaderRowRange, _
+        SelectedHeaders) Then
+        
+        Dim Cell As Range
+        For Each Cell In SelectedHeaders.Cells
+            This.TableMap.FieldMap.SelectField Cell.Value2
+        Next Cell
+    End If
 End Sub
 
 Public Function GetListColumnFromFieldID(ByVal FieldID As String) As ListColumn

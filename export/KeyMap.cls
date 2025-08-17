@@ -38,7 +38,14 @@ Public Property Get Count() As Long
     Count = This.Items.Count
 End Property
 
+Private Sub Class_Initialize()
+    Set This.Items = New Collection
+    Set This.KeyIDs = New Collection
+End Sub
+
 Public Sub Add(ByVal KeyValue As String, ByVal RowIndex As Long)
+    If KeyValue = vbNullString Then Exit Sub
+    
     Dim MappedKey As MappedKey
     Set MappedKey = New MappedKey
     With MappedKey
@@ -46,6 +53,14 @@ Public Sub Add(ByVal KeyValue As String, ByVal RowIndex As Long)
         .RowIndex = RowIndex
     End With
     This.Items.Add Item:=MappedKey
+End Sub
+
+Public Sub AddMany(ByVal Values As Variant, ByVal RowOffset As Long)
+    Dim i As Long
+    For i = 1 To UBound(Values, 1)
+        Debug.Assert VarType(Values(i, 1)) <> vbError
+        Add Values(i, 1), i - RowOffset
+    Next i
 End Sub
 
 Public Function Serialize() As String
@@ -64,10 +79,6 @@ Public Sub Deserialize(ByVal SerializedString As String)
     KeyPath = SplitString(1)
 End Sub
 
-Private Sub Class_Initialize()
-    Set This.Items = New Collection
-    Set This.KeyIDs = New Collection
-End Sub
 
 Public Sub ResolveIDs(ByVal Remote As Remote)
     If Count = 0 Then Exit Sub
