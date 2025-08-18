@@ -170,7 +170,7 @@ Public Function GetValues(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant) As
     Dim FieldIndex As Long
     For FieldIndex = 1 To UBound(FieldIDs)
         Dim FieldPartitionIndex As Long
-        FieldPartitionIndex = PartitionIndexOf(FieldPartitions, FieldIDs(FieldIndex))
+        FieldPartitionIndex = ArraySearch.BinarySearch2(FieldPartitions, FieldIDs(FieldIndex))
         If FieldPartitionIndex > -1 Then
             Dim ThisKeyIDs As Variant
             ThisKeyIDs = FieldPartitions(FieldPartitionIndex, 4).Columns.Item(COL_KEY_ID).Value2
@@ -189,16 +189,6 @@ Public Function GetValues(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant) As
     
     GetValues = Result
     Log.Message "GetValues() End", "RValues"
-End Function
-
-Private Function PartitionIndexOf(ByRef Partitions As Variant, ByVal Key As String) As Long
-    Dim i As Long
-    For i = 1 To UBound(Partitions, 1)
-        If Partitions(i, 1) = Key Then
-            PartitionIndexOf = i
-            Exit Function
-        End If
-    Next i
 End Function
 
 Private Function GetValue(ByVal KeyID As String, ByVal FieldID As String) As Variant
