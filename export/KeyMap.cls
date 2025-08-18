@@ -55,11 +55,11 @@ Public Sub Add(ByVal KeyValue As String, ByVal RowIndex As Long)
     This.Items.Add Item:=MappedKey
 End Sub
 
-Public Sub AddMany(ByVal Values As Variant, ByVal RowOffset As Long)
+Public Sub AddMany(ByVal Values As Variant)
     Dim i As Long
     For i = 1 To UBound(Values, 1)
         Debug.Assert VarType(Values(i, 1)) <> vbError
-        Add Values(i, 1), i - RowOffset
+        Add Values(i, 1), i
     Next i
 End Sub
 

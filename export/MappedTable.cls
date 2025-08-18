@@ -85,7 +85,7 @@ Private Sub SelectKeys(ByVal Partial As Boolean)
     
     ArrayClean.ReplaceErrorCells2 KeyValues
     
-    This.TableMap.KeyMap.AddMany Values:=KeyValues, RowOffset:=This.ListObject.Range.Row - 1
+    This.TableMap.KeyMap.AddMany Values:=KeyValues
 End Sub
 
 Private Sub ResolveKeyIDs(ByVal Remote As Remote)
