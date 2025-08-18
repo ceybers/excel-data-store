@@ -146,10 +146,14 @@ Private Sub SetNumberFormats()
 End Sub
 
 Public Function GetValues(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant) As Variant
+    If This.Worksheet.UsedRange.Rows.Count = 1 Then Exit Sub
+    
     Dim Result As Variant
     ReDim Result(1 To UBound(KeyIDs), 1 To UBound(FieldIDs))
     
     This.Worksheet.AutoFilterMode = False
+    This.Worksheet.UsedRange.Sort Header:=xlYes, _
+        Key1:=This.Worksheet.Columns.Item(COL_LATEST_HASH)
     This.Worksheet.UsedRange.AutoFilter Field:=COL_LATEST_HASH, Criteria1:="<>"
     
     Dim FilteredRange As Range
@@ -158,14 +162,15 @@ Public Function GetValues(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant) As
     On Error GoTo 0
     
     This.Worksheet.AutoFilterMode = False
+    
     If FilteredRange Is Nothing Then Exit Function
     
-    FilteredRange.Sort Header:=False, _
-        Key1:=This.Worksheet.Columns.Item(COL_FIELD_ID), Order1:=xlAscending, _
-        Key1:=This.Worksheet.Columns.Item(COL_KEY_ID), Order1:=xlAscending
+    'FilteredRange.Sort Header:=xlNo, _
+    '    Key1:=This.Worksheet.Columns.Item(COL_FIELD_ID), Order1:=xlAscending, _
+    '    Key2:=This.Worksheet.Columns.Item(COL_KEY_ID), Order2:=xlAscending
     
     Dim FieldPartitions As Variant
-    FieldPartitions = PartitionRange(FilteredRange, COL_FIELD_ID)
+    FieldPartitions = RangeHelpers.PartitionRange(FilteredRange, COL_FIELD_ID)
     
     Dim FieldIndex As Long
     For FieldIndex = 1 To UBound(FieldIDs)
@@ -174,8 +179,10 @@ Public Function GetValues(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant) As
         If FieldPartitionIndex > -1 Then
             Dim ThisKeyIDs As Variant
             ThisKeyIDs = FieldPartitions(FieldPartitionIndex, 4).Columns.Item(COL_KEY_ID).Value2
+            
             Dim ThisValues As Variant
             ThisValues = FieldPartitions(FieldPartitionIndex, 4).Columns.Item(COL_VALUE).Value2
+            
             Dim KeyIndex As Long
             For KeyIndex = 1 To UBound(KeyIDs)
                 Dim SearchResult As Long
@@ -265,7 +272,11 @@ Private Function CreateNewValue(ByVal KeyID As String, ByVal FieldID As String, 
     Set CreateNewValue = NewRemoteValue
 End Function
 
+' Returns an array containing RemoteValue elements for the given combination of KeyID and FieldID.
+' Returns Nothing if it cannot find any RemoteValues.
 Public Function GetAllValues(ByVal KeyID As String, ByVal FieldID As String) As Variant
+    If This.Worksheet.UsedRange.Rows.Count = 1 Then Exit Function
+    
     This.Worksheet.AutoFilterMode = False
     This.Worksheet.UsedRange.Sort Header:=xlYes, _
         Key1:=This.Worksheet.Columns.Item(COL_KEY_ID), Order1:=xlAscending, _
@@ -273,32 +284,32 @@ Public Function GetAllValues(ByVal KeyID As String, ByVal FieldID As String) As 
         Key3:=This.Worksheet.Columns.Item(COL_MTIME), Order3:=xlDescending
         
     Dim KeyPartitions As Variant
-    KeyPartitions = PartitionRange(GetWorksheetDatabodyRange(This.Worksheet), COL_KEY_ID)
+    KeyPartitions = RangeHelpers.PartitionRange(GetWorksheetDatabodyRange(This.Worksheet), COL_KEY_ID)
     
     Dim KeyIndex As Long
     KeyIndex = ArraySearch.BinarySearch2(KeyPartitions, KeyID)
-    If KeyIndex < 1 Then Exit Function
+    If KeyIndex = -1 Then Exit Function
     
     Dim FieldPartitions As Variant
-    FieldPartitions = PartitionRange(KeyPartitions(KeyIndex, 4), COL_FIELD_ID)
+    FieldPartitions = RangeHelpers.PartitionRange(KeyPartitions(KeyIndex, 4), COL_FIELD_ID)
     
     Dim FieldIndex As Long
     FieldIndex = ArraySearch.BinarySearch2(FieldPartitions, FieldID)
-    If FieldIndex < 1 Then Exit Function
+    If FieldIndex = -1 Then Exit Function
     
-    Dim Values As Variant
-    Values = FieldPartitions(FieldIndex, COL_VALUE).Value2
+    Dim WorksheetValues As Variant
+    WorksheetValues = FieldPartitions(FieldIndex, COL_VALUE).Value2
     
-    Dim Values2 As Variant
-    ReDim Values2(1 To UBound(Values, 1))
+    Dim Result As Variant
+    ReDim Result(1 To UBound(WorksheetValues, 1))
     
     Dim i As Long
-    For i = 1 To UBound(Values, 1)
+    For i = 1 To UBound(WorksheetValues, 1)
         Dim NewRemoteValue As RemoteValue
         Set NewRemoteValue = New RemoteValue
-        NewRemoteValue.LoadFromArray Values, i
-        Set Values2(i) = NewRemoteValue
+        NewRemoteValue.LoadFromArray WorksheetValues, i
+        Set Result(i) = NewRemoteValue
     Next i
     
-    GetAllValues = Values2
+    GetAllValues = Result
 End Function

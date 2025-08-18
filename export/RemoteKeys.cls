@@ -226,16 +226,6 @@ Private Function TryGetKeyIDFast(ByVal Key As String) As String
     TryGetKeyIDFast = This.LookupKeyIDs(Index, 2)
 End Function
 
-'Private Function TryGetKey(ByVal KeyPath As String, ByVal Key As String, ByRef OutRemoteKey As RemoteKey) As Boolean
-'    Dim ThisRemoteKey As RemoteKey
-'    For Each ThisRemoteKey In This.Item
-'        If ThisRemoteKey.Path = KeyPath And ThisRemoteKey.Key = Key Then
-'            Set OutRemoteKey = ThisRemoteKey
-'            TryGetKey = True
-'            Exit Function
-'        End If
-'    Next ThisRemoteKey
-'End Function
 
 Private Function CreateNewKey(ByVal KeyPath As String, ByVal Key As String) As RemoteKey
     Dim NewRemoteKey As RemoteKey
