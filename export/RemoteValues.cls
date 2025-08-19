@@ -293,6 +293,8 @@ Public Function GetAllValues(ByVal KeyID As String, ByVal FieldID As String) As 
     Dim FieldPartitions As Variant
     FieldPartitions = RangeHelpers.PartitionRange(KeyPartitions(KeyIndex, 4), COL_FIELD_ID)
     
+    If IsEmpty(FieldPartitions) Then Exit Function
+    
     Dim FieldIndex As Long
     FieldIndex = ArraySearch.BinarySearch2(FieldPartitions, FieldID)
     If FieldIndex = -1 Then Exit Function
