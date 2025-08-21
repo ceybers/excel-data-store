@@ -53,7 +53,7 @@ Private Sub cmdSaveClose_Click()
 End Sub
 
 Private Sub cmdShow_Click()
-    This.ViewModel.DoShow
+    This.ViewModel.Show
     'Me.cmdShow.Enabled = False
     Me.Hide
 End Sub
