@@ -16,6 +16,7 @@ Implements IDebugEx
 Private Const DEFAULT_TOPIC As String = "default"
 Private Const SYSTEM_TOPIC As String = "System"
 Private Const MAX_MANY_ITEMS_PRINT As Long = 10
+Private Const TIMESTAMP_FORMAT As String = "00:00.000"
 
 Private Type TState
     StartTime As Double
@@ -117,10 +118,10 @@ Private Sub IDebugEx_Many(ByVal ArrayToLog As Variant, Optional ByVal Topic As V
     Dim i As Long
     For i = FirstIndex To LastIndex
         If Rank = 1 Then
-            IDebugEx_Variable "• " & Format(i, "00") & ": " & (ArrayToLog(i)), Topic, LogLevel
+            IDebugEx_Variable "ï¿½ " & Format(i, "00") & ": " & (ArrayToLog(i)), Topic, LogLevel
         Else
             If IsError(ArrayToLog(i, 1)) Then
-                IDebugEx_Variable "• " & Format(i, "00") & ": " & CStr(ArrayToLog(i, 1)), Topic, LogLevel
+                IDebugEx_Variable "ï¿½ " & Format(i, "00") & ": " & CStr(ArrayToLog(i, 1)), Topic, LogLevel
             Else
                 ' Need to change this to separate prefix (bullet and index) from variant
                 IDebugEx_Variable (ArrayToLog(i, 1)), Topic, LogLevel
@@ -196,7 +197,7 @@ Private Function ConvertOptionalTopic(ByVal Topic As Variant, ByVal WasMissing A
 End Function
 
 Private Function GetDuration() As String
-    GetDuration = Format$(Timer() - This.StartTime, "00:00.00")
+    GetDuration = Format$(Timer() - This.StartTime, TIMESTAMP_FORMAT)
 End Function
 
 Private Sub IDebugEx_AddProvider(ByVal Provider As ILoggingProvider)
