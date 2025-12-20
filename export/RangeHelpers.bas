@@ -45,11 +45,12 @@ End Function
 '  Error values in the Partitioning Column will be replaced with Empty.
 Public Function PartitionRange(ByVal Range As Range, ByVal Column As Long) As Variant
     If Range Is Nothing Then Exit Function
+    If Range.Areas.Count <> 1 Then Exit Function
+    If Range.Rows.Count = 1 Then Exit Function
+    If Not Range.ListObject Is Nothing Then Exit Function
+    
     If Column < 1 Then Exit Function
     If Column > Range.Columns.Count Then Exit Function
-    
-    ' handle this odd case
-    If Range.Rows.Count = 1 Then Exit Function
     
     Range.Sort Key1:=Range.Columns.Item(Column), Order1:=xlAscending, Header:=xlNo
     
@@ -66,11 +67,11 @@ Public Function PartitionRange(ByVal Range As Range, ByVal Column As Long) As Va
     Dim Partitions As Variant
     ReDim Partitions(1 To Range.Rows.Count, 1 To 3)
     
-    Partitions(1, 1) = vv(1, 1)
-    Partitions(1, 2) = 1
-    
     Dim Cursor As Long
     Cursor = 1
+    
+    Partitions(Cursor, 1) = vv(1, 1)
+    Partitions(Cursor, 2) = 1
     
     For i = 2 To Range.Rows.Count
         If vv(i - 1, 1) <> vv(i, 1) Then
@@ -80,6 +81,7 @@ Public Function PartitionRange(ByVal Range As Range, ByVal Column As Long) As Va
             Partitions(Cursor, 2) = i
         End If
     Next i
+    
     Partitions(Cursor, 3) = i - 1
     
     Dim Partitions2 As Variant
