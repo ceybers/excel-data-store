@@ -146,7 +146,7 @@ Private Sub SetNumberFormats()
 End Sub
 
 Public Function GetValues(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant) As Variant
-    If This.Worksheet.UsedRange.Rows.Count = 1 Then Exit Sub
+    If This.Worksheet.UsedRange.Rows.Count = 1 Then Exit Function
     
     Dim Result As Variant
     ReDim Result(1 To UBound(KeyIDs), 1 To UBound(FieldIDs))
