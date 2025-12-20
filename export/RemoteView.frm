@@ -120,7 +120,7 @@ Private Sub LoadRemoteKeyPathsToTreeView(ByVal KeyPaths As Collection, ByVal Tre
     RootNode.Expanded = True
 End Sub
 
-Private Sub LoadRemoteKeysToListView(ByVal RemoteKeys As RemoteKeys, ByVal ListView As ListView)
+Private Sub LoadRemoteKeysToListView(ByVal RemoteKeys As RemoteKeys2, ByVal ListView As ListView)
     With ListView
         .ListItems.Clear
         .LabelEdit = lvwManual

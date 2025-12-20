@@ -19,7 +19,7 @@ Private Const WS_TABLES_NAME  As String = "Tables"
 
 Private Type TState
     Workbook As Workbook
-    RemoteKeys As RemoteKeys
+    RemoteKeys As RemoteKeys2
     RemoteFields As RemoteFields
     RemoteValues As RemoteValues
     RemoteCommits As RemoteCommits
@@ -33,7 +33,7 @@ Public Property Get IsValid() As Boolean
     IsValid = Not This.Workbook Is Nothing
 End Property
 
-Public Property Get Keys() As RemoteKeys
+Public Property Get Keys() As RemoteKeys2
     Log.Message "Remote.Keys Property Get", "Remote", verbose_Level
     Set Keys = This.RemoteKeys
 End Property
@@ -68,10 +68,14 @@ End Property
 
 Public Property Get Tables() As RemoteTables
     Log.Message "Remote.Tables Property Get", "Remote", verbose_Level
+    Log.Message "  If", "RTables", Debug_level
     If This.RemoteTables Is Nothing Then
+        Log.Message "  Set new", "RTables", Debug_level
         Set This.RemoteTables = New RemoteTables
+        Log.Message "  Load", "RTables", Debug_level
         This.RemoteTables.Load This.Workbook.Worksheets.Item(WS_TABLES_NAME)
     End If
+    Log.Message "  Set Prop", "RTables", Debug_level
     Set Tables = This.RemoteTables
 End Property
 
@@ -92,7 +96,7 @@ End Sub
 Public Sub Reload()
     Log.Message "Remote.Reload()", "Remote", Debug_level
     With This
-        Set .RemoteKeys = New RemoteKeys
+        Set .RemoteKeys = New RemoteKeys2
         .RemoteKeys.Load This.Workbook.Worksheets.Item(WS_KEYS_NAME)
         
         If Not .RemoteFields Is Nothing Then

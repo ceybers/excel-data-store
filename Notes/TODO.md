@@ -1,7 +1,13 @@
 # TODO
 ## General
 - [x] ~~BUG FIX Partial Pull, Partial Push and Highlight Changes not working properly.~~
-
+- [x] ~~BUG Issue with RemoteKeys if there is only 1 key for a Path.~~
+- [ ] BUG Pulling or Partial Pulling with Filters applied results in unexpected behaviour.
+- [ ] BUG Tables with more than one local column mapped to the same Remote Field results in error 457 key already associated.
+- [ ] Conditional Push if nothing present in Remote store.
+- [ ] Conditional Pull if nothing present in Local table.
+- [ ] Ribbon > Remote > Save/Close to only proceed if Remote store is already open.
+ 
 ## Keys
 - Synonym resolving for Keys (sym-links).
 - Pull Keys-only action
@@ -22,13 +28,16 @@
 - GUI to browse Cell (KeyxField) history. i.e., Timeline of changes.
   - [x] Single Value read-only history
   - [x] Formating using the NumberFormat of selected cell. 
-  - [ ] Roll back to previous value
+  - [ ] Modeless UI that traps `Worskheet_SelectionChange`
   - [ ] Multiple Key(s) and Field(s) modeless dialog
+  - [ ] Roll back to previous value
 
 ## Commits
 - Pull by specific Commit
 - Rollback Commits.
 - Backdating Commits (i.e., storing Historical SCD data)
+- Bulk Ingest data
+  - i.e., Local table has columns for Key, Field, Value _and_ Date. Optionally also a column for Commit Caption.
 
 ## Maps
 - [x] ~~BUG Pull/Push not using the most recent Map for a table when it has more than one map.~~
