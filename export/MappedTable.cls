@@ -54,12 +54,16 @@ Public Sub Load(ByVal ListObject As ListObject, ByVal TableMap As TableMap)
 End Sub
 
 Public Sub SelectKeysAndFields(ByVal PartialSelection As Boolean)
+    Log.Message "MappedTable.SelectKeysAndFields... start", "MappedTbl", Verbose_Level
+    
     Log.Message "SelectKeys", "MappedTbl"
     SelectKeys PartialSelection
     Log.Message "ResolveKeyIDs", "MappedTbl"
     ResolveKeyIDs RemoteFactory.GetRemote
     Log.Message "SelectFields", "MappedTbl"
     SelectFields PartialSelection
+    
+    Log.Message "MappedTable.SelectKeysAndFields... end", "MappedTbl", Verbose_Level
 End Sub
 
 Private Sub SelectKeys(ByVal Partial As Boolean)
