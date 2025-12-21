@@ -102,6 +102,7 @@ Private Sub DoPull(ByVal PartialSelection As Boolean)
     
     If GuardMappedTableNoListObject(MappedTable) Then Exit Sub
     If GuardMappedTableProtected(MappedTable) Then Exit Sub
+    If GuardActiveWindowProtectedView Then Exit Sub
     
     Log.Message "MappedTable.SelectKeysAndFields", "DoPull"
     MappedTable.SelectKeysAndFields PartialSelection:=PartialSelection
@@ -170,6 +171,7 @@ Private Sub DoHighlight(ByVal PartialSelection As Boolean)
     
     If GuardMappedTableNoListObject(MappedTable) Then Exit Sub
     If GuardMappedTableProtected(MappedTable) Then Exit Sub
+    If GuardActiveWindowProtectedView Then Exit Sub
     
     Log.Message "MappedTable.SelectKeysAndFields", "DoHL"
     MappedTable.SelectKeysAndFields PartialSelection:=PartialSelection

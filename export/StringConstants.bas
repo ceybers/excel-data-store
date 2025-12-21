@@ -18,6 +18,7 @@ Public Const MSG_PULL_NO_TABLE As String = "Please select a table first before r
 Public Const MSG_PUSH_NO_TABLE As String = "Please select a table first before running the Push command."
 Public Const MSG_NO_TABLE As String = "Data Store could not find a table to work with."
 Public Const MSG_IS_PROTECTED As String = "Worksheet is Protected. Unprotect it and try again."
+Public Const MSG_IS_PROTECTED_VIEW As String = "Workbook is opened in Protected View. Enable Editing them try again."
 
 Public Const MSG_REMOTE_REBUILD_KEYS As String = "Remote Keys Table rebuild OK!"
 Public Const MSG_REMOTE_REBUILD_FIELDS As String = "Remote Fields Table rebuild OK!"

@@ -31,6 +31,16 @@ Public Function GuardMappedTableProtected(ByVal MappedTable As MappedTable) As B
     GuardMappedTableProtected = True
 End Function
 
+'@Description "Returns True if the active Window is opened in Protected View mode and cannot be edited."
+Public Function GuardActiveWindowProtectedView() As Boolean
+Attribute GuardActiveWindowProtectedView.VB_Description = "Returns True if the active Window is opened in Protected View mode and cannot be edited."
+    If Application.ActiveProtectedViewWindow Is Nothing Then Exit Function
+    
+    MsgBox MSG_IS_PROTECTED_VIEW, vbExclamation + vbOKOnly, APP_TITLE
+    Log.StopLogging
+    GuardActiveWindowProtectedView = True
+End Function
+
 Public Function GuardNoSelectedListObject(ByVal ListObject As ListObject) As Boolean
     If Not ListObject Is Nothing Then Exit Function
     
