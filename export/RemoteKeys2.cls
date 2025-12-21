@@ -114,11 +114,16 @@ Public Function GetIDsFromQuery(ByVal KeyPath As String, ByVal Keys As Variant) 
     
     Dim i As Long
     For i = 1 To UBound(Keys)
-        If RemoteKeysDict.Exists(Keys(i)) Then
-            Result(i) = RemoteKeysDict.Item(Keys(i)).ID
-        Else
-            Result(i) = CreateNewKey(KeyPath, Keys(i))
-            RemoteKeysDict.Add Key:=Keys(i), Item:=Result(i)
+        Dim ThisKeyValue As String
+        ThisKeyValue = Keys(i)
+        
+        If ThisKeyValue <> vbNullString Then
+            If RemoteKeysDict.Exists(ThisKeyValue) Then
+                Result(i) = RemoteKeysDict.Item(ThisKeyValue).ID
+            Else
+                Result(i) = CreateNewKey(KeyPath, ThisKeyValue)
+                RemoteKeysDict.Add Key:=ThisKeyValue, Item:=Result(i)
+            End If
         End If
     Next i
     Log.Message " Dictionary compiled", "RKeys", Info_Level

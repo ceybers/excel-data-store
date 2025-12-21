@@ -114,7 +114,7 @@ Public Sub Save()
 End Sub
 
 Private Sub ClearWorksheet()
-    Log.Message "RemoteKeys.ClearWorksheet", "RKeys", Debug_Level
+    Log.Message "RemoteKeys.ClearWorksheet", "RKeys", debug_Level
     
     This.Worksheet.AutoFilterMode = False
     If This.Worksheet.UsedRange Is Nothing Then Exit Sub
@@ -123,7 +123,7 @@ Private Sub ClearWorksheet()
 End Sub
 
 Private Sub SetNumberFormats()
-    Log.Message "RemoteKeys.SetNumberFormats", "RKeys", Debug_Level
+    Log.Message "RemoteKeys.SetNumberFormats", "RKeys", debug_Level
     
     With This.Worksheet.Columns
         .Item(1).NumberFormat = NUMFMT_TEXT ' ID
