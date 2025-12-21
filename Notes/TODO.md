@@ -2,7 +2,7 @@
 ## General
 - [x] ~~BUG FIX Partial Pull, Partial Push and Highlight Changes not working properly.~~
 - [x] ~~BUG Issue with RemoteKeys if there is only 1 key for a Path.~~
-- [ ] BUG Pulling or Partial Pulling with Filters applied results in unexpected behaviour.
+- [x] ~~BUG Pulling or Partial Pulling with Filters applied results in unexpected behaviour.~~
 - [ ] BUG Tables with more than one local column mapped to the same Remote Field results in error 457 key already associated.
 - [ ] Conditional Push if nothing present in Remote store.
 - [ ] Conditional Pull if nothing present in Local table.

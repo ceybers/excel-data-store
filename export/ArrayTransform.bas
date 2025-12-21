@@ -24,7 +24,15 @@ Public Function ArrayBox(ByVal InputArray As Variant, _
     
     ArrayBox = Result
 End Function
-    
+
+' Returns a 2-dimensional array of size 1x1 with the specified parameter.
+Public Function VariantToArray(ByVal InputVariant As Variant) As Variant
+    Debug.Assert Not IsArray(InputVariant)
+    Dim Result As Variant
+    ReDim Result(1 To 1, 1 To 1)
+    Result(1, 1) = InputVariant
+    VariantToArray = Result
+End Function
 
 ' Transforms a 2-dimensional array of shape (many, one) into a 1-dimensional array.
 ' Useful for .Value2 of a Range that is 1-column wide.

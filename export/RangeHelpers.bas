@@ -18,7 +18,77 @@ Attribute RangeSetValueFromVariant.VB_Description = "Updates the Value2 property
     Debug.Assert ArrayCheck.IsTwoDimensionalOneBasedArray(InputVariantArray)
     
     Log.Message "RangeSetValueFromVariant writing to = " & InputRange.Address(False, False) & " with Variant(" & UBound(InputVariantArray, 1) & " to " & UBound(InputVariantArray, 2) & ")"
-    InputRange.Cells.Item(1, 1).Resize(UBound(InputVariantArray, 1), UBound(InputVariantArray, 2)).Value2 = InputVariantArray
+    Dim OutputRange As Range
+    Set OutputRange = InputRange.Cells.Item(1, 1).Resize(UBound(InputVariantArray, 1), UBound(InputVariantArray, 2))
+    
+    Dim VisibleRange As Range
+    On Error Resume Next
+    Set VisibleRange = OutputRange.SpecialCells(xlCellTypeVisible)
+    On Error GoTo 0
+    
+    If VisibleRange Is Nothing Then
+        VisibleRange.Value2 = InputVariantArray
+        Exit Sub ' All the rows were hidden/filtered-hidden
+    ElseIf VisibleRange.Areas.Count = 1 Then
+        If VisibleRange.Address = InputRange.Address Then
+        VisibleRange.Value2 = InputVariantArray
+        Exit Sub ' All the rows were visible
+    End If
+    End If
+    
+    Dim VisibleAreaCount As Long
+    VisibleAreaCount = VisibleRange.Areas.Count
+    
+    Dim OptimisticAreaCount As Long
+    OptimisticAreaCount = (VisibleRange.Areas.Count * 2) + 1
+    
+    Dim Extents As Variant
+    ReDim Extents(1 To OptimisticAreaCount, 1 To 2)
+    
+    Extents(1, 1) = OutputRange.Cells.Item(1, 1).Row
+    Extents(1, 2) = VisibleRange.Areas.Item(1).Row - 1
+    
+    Dim Cursor As Long
+    Cursor = 1
+    
+    Dim i As Long
+    For i = 1 To VisibleAreaCount
+        Dim ThisVisibleArea As Range
+        Set ThisVisibleArea = VisibleRange.Areas.Item(i)
+        
+        If ThisVisibleArea.Row > Extents(Cursor, 1) Then
+            Extents(Cursor, 2) = ThisVisibleArea.Row - 1
+            
+            Cursor = Cursor + 1
+            Extents(Cursor, 1) = ThisVisibleArea.Row
+            Extents(Cursor, 2) = ThisVisibleArea.Row - 1 + ThisVisibleArea.Rows.Count
+            
+            Cursor = Cursor + 1
+            Extents(Cursor, 1) = Extents(Cursor - 1, 2) + 1
+        End If
+    Next i
+    
+    Extents(Cursor, 2) = OutputRange.Row - 1 + OutputRange.Rows.Count
+    If Extents(Cursor, 1) > Extents(Cursor, 2) Then Extents(Cursor, 1) = Extents(Cursor, 2)
+    
+    Dim ActualExtents As Variant
+    ReDim ActualExtents(1 To Cursor, 1 To 2)
+
+    Dim Offset As Long
+    Offset = Extents(1, 1)
+    
+    For i = 1 To Cursor
+        Dim Height As Long
+        Height = Extents(i, 2) + 1 - Extents(i, 1)
+        
+        Dim ThisRange As Range
+        Set ThisRange = OutputRange.Offset(Extents(i, 1) - Offset).Resize(Height)
+        
+        Dim ThisArray As Variant
+        ThisArray = ArrayBox(InputVariantArray, Extents(i, 1) + 1 - Offset, 1, Height, 1)
+        
+        ThisRange.Value2 = ThisArray
+    Next i
 End Sub
 
 '@Description "Returns a new Range offset and resized from specified input Range. Returns Nothing if the input Range is nothing. Throws an error if any of the indices are zero or negative."
@@ -130,6 +200,11 @@ Public Function GetStaggeredArrayValues(ByVal BaseRange As Range, ByVal Selected
 Attribute GetStaggeredArrayValues.VB_Description = "Returns the Value2 property array of a non-contiguous Range that has multiple Areas. The output Variant array is of the same shape as the BaseRange parameter. Cells that are not in the SelectedRange will be Empty variants."
     If BaseRange Is Nothing Then Exit Function
     If BaseRange.Cells.Count <= 1 Then Exit Function
+    If SelectedRange Is Nothing Then Exit Function
+    
+    On Error Resume Next
+    Set SelectedRange = SelectedRange.SpecialCells(xlCellTypeVisible)
+    On Error GoTo 0
     If SelectedRange Is Nothing Then Exit Function
     
     Dim WorkingRange As Range
