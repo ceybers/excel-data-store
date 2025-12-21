@@ -37,6 +37,11 @@ Public Property Let KeyPath(ByVal RHS As String)
 End Property
 
 Public Property Get Count() As Long
+    If IsEmpty(This.KeyValues) Then
+        Count = 0
+        Exit Property
+    End If
+    
     Count = UBound(This.KeyValues)
 End Property
 

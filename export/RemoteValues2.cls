@@ -172,7 +172,7 @@ Public Function GetAllValues(ByVal KeyID As String, ByVal FieldID As String) As 
     If FieldIndex = -1 Then Exit Function
     
     Dim KeyPartitions As Variant
-    KeyPartitions = PartitionRange(HistoryRange, RV_KEY_ID)
+    KeyPartitions = PartitionRange(FieldPartitions(FieldIndex, 4), RV_KEY_ID)
     If IsEmpty(KeyPartitions) Then Exit Function
     QuickSort2 KeyPartitions
         

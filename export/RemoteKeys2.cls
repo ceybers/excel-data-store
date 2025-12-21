@@ -108,8 +108,7 @@ Public Function GetIDsFromQuery(ByVal KeyPath As String, ByVal Keys As Variant) 
     Dim RemoteKeysDict As Scripting.Dictionary
     
     If Not TryGetKeysInPath(KeyPath, RemoteKeysDict) Then
-        GetIDsFromQuery = Result
-        Exit Function
+        Set RemoteKeysDict = New Scripting.Dictionary
     End If
     
     Dim i As Long
@@ -122,7 +121,6 @@ Public Function GetIDsFromQuery(ByVal KeyPath As String, ByVal Keys As Variant) 
                 Result(i) = RemoteKeysDict.Item(ThisKeyValue).ID
             Else
                 Result(i) = CreateNewKey(KeyPath, ThisKeyValue)
-                RemoteKeysDict.Add Key:=ThisKeyValue, Item:=Result(i)
             End If
         End If
     Next i
@@ -192,6 +190,6 @@ Private Function CreateNewKey(ByVal KeyPath As String, ByVal Key As String) As S
         .ID = Left$(HashSHA1(.Path & "\" & .Key), HASH_LEN)
     End With
     
-    This.NewRemoteKeys.Add Key:=NewRemoteKey.ID, Item:=NewRemoteKey
+    Set This.NewRemoteKeys.Item(NewRemoteKey.ID) = NewRemoteKey
     CreateNewKey = NewRemoteKey.ID
 End Function

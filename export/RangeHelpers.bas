@@ -77,15 +77,18 @@ Attribute RangeSetValueFromVariant.VB_Description = "Updates the Value2 property
     Dim Offset As Long
     Offset = Extents(1, 1)
     
+    Dim RangeWidth As Long
+    RangeWidth = UBound(InputVariantArray, 2)
+    
     For i = 1 To Cursor
         Dim Height As Long
         Height = Extents(i, 2) + 1 - Extents(i, 1)
         
         Dim ThisRange As Range
-        Set ThisRange = OutputRange.Offset(Extents(i, 1) - Offset).Resize(Height)
+        Set ThisRange = OutputRange.Offset(Extents(i, 1) - Offset, 0).Resize(Height, RangeWidth)
         
         Dim ThisArray As Variant
-        ThisArray = ArrayBox(InputVariantArray, Extents(i, 1) + 1 - Offset, 1, Height, 1)
+        ThisArray = ArrayBox(InputVariantArray, Extents(i, 1) + 1 - Offset, 1, Height, RangeWidth)
         
         ThisRange.Value2 = ThisArray
     Next i
