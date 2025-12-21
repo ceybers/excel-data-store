@@ -41,20 +41,20 @@ End Property
 ' Referenced by Remote.Values (property) (getter)
 ' Referenced by Remote.Reload (method)
 Public Sub Load(ByVal Worksheet As Worksheet)
-    Log.Message "RemoteValues.Load", "RValues", Debug_Level
+    Log.Message "RemoteValues.Load", "RValues", debug_Level
     Set This.Worksheet = Worksheet
     
     RebuildCache
 End Sub
 
 Private Sub RebuildCache()
-    Log.Message "RemoteValues.RebuildCache", "RValues", Debug_Level
+    Log.Message "RemoteValues.RebuildCache", "RValues", debug_Level
     SortWorksheet
     LoadLatestFromWorksheet
 End Sub
 
 Private Sub SortWorksheet()
-    Log.Message "RemoteValues.SortWorksheet", "RValues", Debug_Level
+    Log.Message "RemoteValues.SortWorksheet", "RValues", debug_Level
     This.Worksheet.AutoFilterMode = False
     This.Worksheet.UsedRange.Sort Header:=xlYes, _
         Key1:=This.Worksheet.Columns.Item(COL_LATEST_HASH)
@@ -163,7 +163,7 @@ End Function
 'End Function
 
 Private Sub Save()
-    Log.Message "RemoteValues.Save", "RValues", Debug_Level
+    Log.Message "RemoteValues.Save", "RValues", debug_Level
     If This.IsDirty = False Then Exit Sub
     
     ClearWorksheet
@@ -204,7 +204,7 @@ Private Sub SetNumberFormats()
 End Sub
 
 Private Sub ClearWorksheet()
-    Log.Message "RemoteValues.ClearWorksheet", "RValues", Debug_Level
+    Log.Message "RemoteValues.ClearWorksheet", "RValues", debug_Level
     This.Worksheet.AutoFilterMode = False
     If This.Worksheet.UsedRange Is Nothing Then Exit Sub
     If This.Worksheet.UsedRange.Rows.Count = 1 Then Exit Sub
@@ -228,7 +228,7 @@ End Sub
 ' Returns Nothing if it cannot find any RemoteValues.
 ' Referenced by: ValueTimelineQuery.Run (method)
 Public Function GetAllValues(ByVal KeyID As String, ByVal FieldID As String) As Variant
-    Log.Message "RemoteValues.GetAllValues", "RValues", Debug_Level
+    Log.Message "RemoteValues.GetAllValues", "RValues", debug_Level
     If This.Worksheet.UsedRange.Rows.Count = 1 Then Exit Function
     
     This.Worksheet.AutoFilterMode = False

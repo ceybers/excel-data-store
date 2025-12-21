@@ -41,12 +41,28 @@ Public Sub Run()
     Dim KeyIDs As Variant
     KeyIDs = This.MappedTable.TableMap.KeyMap.GetKeyIDs
     If IsEmpty(KeyIDs) Then Exit Sub
-    If UBound(KeyIDs) <> 1 Then Exit Sub
+    
+    Dim KeyID As String
+    KeyID = GetFirstNonEmptyString(KeyIDs)
+    If KeyID = vbNullString Then Exit Sub
     
     Dim FieldIDs As Variant
     FieldIDs = This.MappedTable.TableMap.FieldMap.GetFieldIDs
     If IsEmpty(FieldIDs) Then Exit Sub
-    If UBound(FieldIDs) <> 1 Then Exit Sub
     
-    This.Results = This.Remote.Values.GetAllValues(KeyIDs(1), FieldIDs(1))
+    Dim FieldID As String
+    FieldID = GetFirstNonEmptyString(FieldIDs)
+    If FieldID = vbNullString Then Exit Sub
+
+    This.Results = This.Remote.Values.GetAllValues(KeyID, FieldID)
 End Sub
+
+Private Function GetFirstNonEmptyString(ByVal ThisArray As Variant) As Variant
+    Dim i As Long
+    For i = 1 To UBound(ThisArray)
+        If ThisArray(i) <> vbNullString Then
+            GetFirstNonEmptyString = ThisArray(i)
+            Exit Function
+        End If
+    Next i
+End Function
