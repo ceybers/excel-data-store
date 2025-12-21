@@ -36,10 +36,12 @@ Public Function IsWorkbookOpen(ByVal Workbook As Workbook) As Boolean
 Attribute IsWorkbookOpen.VB_Description = "Returns True if the specified variable is referencing a Workbook that is still open. Returns False if the variable is referencing a Workbook that has been closed, or if the variable is set to Nothing."
     If Workbook Is Nothing Then Exit Function
     
+    '@Ignore VariableNotUsed
     Dim TestWorkbook As String
     On Error GoTo ErrorInIsWorkbookOpen
+    '@Ignore AssignmentNotUsed
     TestWorkbook = Workbook.Name
-    On Error Resume Next
+    On Error GoTo 0
     
     IsWorkbookOpen = True
     Exit Function

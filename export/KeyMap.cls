@@ -70,8 +70,6 @@ Public Sub ResolveIDs(ByVal Remote As Remote)
     
     If Count = 0 Then Exit Sub
     
-    Log.Message " KeyMap ResolveIDs", "KeyMap"
-    Dim KeyIDs As Variant
     Log.Message " Remote.Keys.GetIDsFromQuery", "KeyMap", Verbose_Level
     This.KeyIDs = Remote.Keys.GetIDsFromQuery(KeyPath, This.KeyValues)
     

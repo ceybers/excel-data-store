@@ -83,7 +83,7 @@ Private Sub Save()
     Next i
     
     Dim NewKeysRange As Range
-    Set NewKeysRange = This.Worksheet.Cells(This.Worksheet.UsedRange.Rows.Count + 1, 1)
+    Set NewKeysRange = This.Worksheet.Cells.Item(This.Worksheet.UsedRange.Rows.Count + 1, 1)
     RangeSetValueFromVariant NewKeysRange, vv
     
     Log.Message "RemoteKeys.Save saved " & NewKeyCount & " keys", "RKeys", Info_Level
