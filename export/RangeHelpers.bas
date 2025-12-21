@@ -31,9 +31,9 @@ Attribute RangeSetValueFromVariant.VB_Description = "Updates the Value2 property
         Exit Sub ' All the rows were hidden/filtered-hidden
     ElseIf VisibleRange.Areas.Count = 1 Then
         If VisibleRange.Address = InputRange.Address Then
-        VisibleRange.Value2 = InputVariantArray
-        Exit Sub ' All the rows were visible
-    End If
+            VisibleRange.Value2 = InputVariantArray
+            Exit Sub ' All the rows were visible
+        End If
     End If
     
     Dim VisibleAreaCount As Long

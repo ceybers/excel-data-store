@@ -118,7 +118,7 @@ Private Sub DoPull(ByVal PartialSelection As Boolean)
 End Sub
 
 '@EntryPoint Push > Push
-Public Sub Push()
+Public Sub PushAll()
     DoPush PartialSelection:=False
 End Sub
 
