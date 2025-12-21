@@ -61,8 +61,8 @@ Public Sub Load(ByVal MappedTable As MappedTable, ByVal Remote As Remote)
     Set This.RemoteFields = New RemoteFieldsVM
     This.RemoteFields.Load This.Remote.Fields
     
-    Log.Message "TableID=" & MappedTable.TableID, "TMapVM", verbose_Level
-    Log.Message "MapID=" & MappedTable.MapID, "TMapVM", verbose_Level
+    Log.Message "TableID=" & MappedTable.TableID, "TMapVM", Verbose_Level
+    Log.Message "MapID=" & MappedTable.MapID, "TMapVM", Verbose_Level
 End Sub
 
 Public Sub SelectKeyPathByKey(ByVal Key As String)

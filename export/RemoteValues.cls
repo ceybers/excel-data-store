@@ -39,17 +39,20 @@ Public Property Get Item(ByVal Index As Long) As RemoteValue
 End Property
 
 Public Sub Load(ByVal Worksheet As Worksheet)
+    Log.Message "RemoteValues.Load", "RValues", Debug_Level
     Set This.Worksheet = Worksheet
     
     RebuildCache
 End Sub
 
 Public Sub RebuildCache()
+    Log.Message "RemoteValues.RebuildCache", "RValues", Debug_Level
     SortWorksheet
     LoadLatestFromWorksheet
 End Sub
 
 Private Sub SortWorksheet()
+    Log.Message "RemoteValues.SortWorksheet", "RValues", Debug_Level
     This.Worksheet.AutoFilterMode = False
     This.Worksheet.UsedRange.Sort Header:=xlYes, _
         Key1:=This.Worksheet.Columns.Item(COL_LATEST_HASH)
@@ -86,6 +89,7 @@ Private Sub LoadLatestFromWorksheet()
 End Sub
 
 Public Sub Save()
+    Log.Message "RemoteValues.Save", "RValues", Debug_Level
     If This.IsDirty = False Then Exit Sub
     
     ClearWorksheet
@@ -114,6 +118,7 @@ Public Sub Save()
 End Sub
 
 Private Sub ClearWorksheet()
+    Log.Message "RemoteValues.ClearWorksheet", "RValues", Debug_Level
     This.Worksheet.AutoFilterMode = False
     If This.Worksheet.UsedRange Is Nothing Then Exit Sub
     If This.Worksheet.UsedRange.Rows.Count = 1 Then Exit Sub
@@ -146,6 +151,7 @@ Private Sub SetNumberFormats()
 End Sub
 
 Public Function GetValues(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant) As Variant
+    Log.Message "GetValues() Start", "RValues", Info_Level
     If This.Worksheet.UsedRange.Rows.Count = 1 Then Exit Function
     
     Dim Result As Variant
@@ -165,12 +171,15 @@ Public Function GetValues(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant) As
     
     If FilteredRange Is Nothing Then Exit Function
     
+    Log.Message " Sorted and Filtered", "RValues", Verbose_Level
+    
     'FilteredRange.Sort Header:=xlNo, _
     '    Key1:=This.Worksheet.Columns.Item(COL_FIELD_ID), Order1:=xlAscending, _
     '    Key2:=This.Worksheet.Columns.Item(COL_KEY_ID), Order2:=xlAscending
     
     Dim FieldPartitions As Variant
     FieldPartitions = RangeHelpers.PartitionRange(FilteredRange, COL_FIELD_ID)
+    Log.Message " Partitioned on Fields (" & FilteredRange.Address & ")", "RValues", Verbose_Level
     
     Dim FieldIndex As Long
     For FieldIndex = 1 To UBound(FieldIDs)
@@ -192,10 +201,11 @@ Public Function GetValues(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant) As
                 End If
             Next KeyIndex
         End If
+        Log.Message "  Partitioned on Field #" & FieldIndex, "RValues", Verbose_Level
     Next FieldIndex
     
     GetValues = Result
-    Log.Message "GetValues() End", "RValues"
+    Log.Message "GetValues() End", "RValues", Info_Level
 End Function
 
 Private Function GetValue(ByVal KeyID As String, ByVal FieldID As String) As Variant
@@ -275,6 +285,7 @@ End Function
 ' Returns an array containing RemoteValue elements for the given combination of KeyID and FieldID.
 ' Returns Nothing if it cannot find any RemoteValues.
 Public Function GetAllValues(ByVal KeyID As String, ByVal FieldID As String) As Variant
+    Log.Message "RemoteValues.GetAllValues", "RValues", Debug_Level
     If This.Worksheet.UsedRange.Rows.Count = 1 Then Exit Function
     
     This.Worksheet.AutoFilterMode = False

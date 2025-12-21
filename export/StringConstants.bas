@@ -3,7 +3,7 @@ Attribute VB_Name = "StringConstants"
 Option Explicit
 
 Public Const APP_TITLE As String = "Excel Data Store Tool"
-Public Const APP_VERSION As String = "Version 0.6.6-beta"
+Public Const APP_VERSION As String = "Version 0.7.1-beta"
 Public Const APP_COPYRIGHT As String = "2025 Craig Eybers" & vbCrLf & "All rights reserved."
 
 Public Const ASCII_US As Long = 164 '31

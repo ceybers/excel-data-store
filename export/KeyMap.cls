@@ -11,10 +11,10 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Type TKeyMap
-    Items As Collection
+    Items As Collection ' ? Collection<MappedKey>
     KeyColumnName As String
     KeyPath As String
-    KeyIDs As Collection
+    KeyIDs As Collection ' ? Collection<String>
 End Type
 Private This As TKeyMap
 
@@ -80,7 +80,7 @@ Public Sub Deserialize(ByVal SerializedString As String)
 End Sub
 
 Public Sub ResolveIDs(ByVal Remote As Remote)
-    Log.Message "ResolveIDs()", "KeyMap"
+    Log.Message "ResolveIDs()... starts", "KeyMap", Info_Level
     
     If Count = 0 Then Exit Sub
     
@@ -89,28 +89,51 @@ Public Sub ResolveIDs(ByVal Remote As Remote)
     ReDim Keys(1 To Count) As String
     
     CollectionClear This.KeyIDs
+    Log.Message " This.KeyIDs cleared", "KeyMap", Verbose_Level
     
+    Log.Message " For i = 1 to " & Count, "KeyMap", Verbose_Level
+    Log.Message "  Keys(i) = This.Items.Item(i).KeyValue", "KeyMap", Verbose_Level
     Dim i As Long
+    
+    
+    Log.Message "Test Keys(i)... starts", "KeyMap", Error_Level
     For i = 1 To Count
+        Keys(i) = Keys(i)
+    Next i
+    Log.Message "Test Keys(i)... done", "KeyMap", Error_Level
+    
+    Log.Message "Test This.Items.Item(i).KeyValue... starts", "KeyMap", Error_Level
+    For i = 1 To Count
+        This.Items.Item(i).KeyValue = This.Items.Item(i).KeyValue
+    Next i
+    ' TODO FIX This loop takes 200ms for 1000 items!!!
+    Log.Message "Test This.Items.Item(i).KeyValue... done", "KeyMap", Error_Level
+    
+    For i = 1 To Count
+        ' Keys(i) = Variant/String(1 to 1002)
+        ' This.Items = Collection<MappedKey>
         Keys(i) = This.Items.Item(i).KeyValue
     Next i
+    Log.Message " Next i", "KeyMap", Verbose_Level
     
     Dim KeyIDs As Variant
-    Log.Message " Remote.Keys.GetIDsFromQuery", "KeyMap"
+    Log.Message " Remote.Keys.GetIDsFromQuery", "KeyMap", Verbose_Level
     KeyIDs = Remote.Keys.GetIDsFromQuery(KeyPath, Keys)
     
-    Log.Message " For i; This.KeyIDs.Add", "KeyMap"
+    Log.Message " For i = 1 to " & Count & "; This.KeyIDs.Add", "KeyMap", Verbose_Level
     For i = 1 To Count
         This.Items.Item(i).KeyID = KeyIDs(i)
         If KeyIDs(i) <> vbNullString Then
             ' FIX TODO Assumes Key Column has no duplicates. Crashes if not!
-            On Error Resume Next
+            'On Error Resume Next
             This.KeyIDs.Add Item:=This.Items.Item(i).RowIndex, Key:=KeyIDs(i)
-            On Error GoTo 0
+            'On Error GoTo 0
         End If
+        
+        'If i Mod 100 = 0 Then Log.Message "  " & i, "KeyMap", Verbose_Level
     Next i
     
-    Log.Message "ResolveIDs() End", "KeyMap"
+    Log.Message "ResolveIDs()... end", "KeyMap", Info_Level
 End Sub
 
 Public Function GetRowFromKeyID(ByVal KeyID As String) As Long

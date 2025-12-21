@@ -34,12 +34,12 @@ Public Property Get IsValid() As Boolean
 End Property
 
 Public Property Get Keys() As RemoteKeys2
-    Log.Message "Remote.Keys Property Get", "Remote", verbose_Level
+    Log.Message "Remote.Keys Property Get", "Remote", Verbose_Level
     Set Keys = This.RemoteKeys
 End Property
 
 Public Property Get Fields() As RemoteFields
-    Log.Message "Remote.Fields Property Get", "Remote", verbose_Level
+    Log.Message "Remote.Fields Property Get", "Remote", Verbose_Level
     If This.RemoteFields Is Nothing Then
             Set This.RemoteFields = New RemoteFields
             This.RemoteFields.Load This.Workbook.Worksheets.Item(WS_FIELDS_NAME)
@@ -48,7 +48,7 @@ Public Property Get Fields() As RemoteFields
 End Property
 
 Public Property Get Values() As RemoteValues
-    Log.Message "Remote.Values Property Get", "Remote", verbose_Level
+    Log.Message "Remote.Values Property Get", "Remote", Verbose_Level
     If This.RemoteValues Is Nothing Then
         Set This.RemoteValues = New RemoteValues
         This.RemoteValues.Load This.Workbook.Worksheets.Item(WS_VALUES_NAME)
@@ -57,25 +57,25 @@ Public Property Get Values() As RemoteValues
 End Property
 
 Public Property Get Commits() As RemoteCommits
-    Log.Message "Remote.Commits Property Get", "Remote", verbose_Level
+    Log.Message "Remote.Commits Property Get", "Remote", Verbose_Level
     Set Commits = This.RemoteCommits
 End Property
 
 Public Property Get Maps() As RemoteMaps
-    Log.Message "Remote.Maps Property Get", "Remote", verbose_Level
+    Log.Message "Remote.Maps Property Get", "Remote", Verbose_Level
     Set Maps = This.RemoteMaps
 End Property
 
 Public Property Get Tables() As RemoteTables
-    Log.Message "Remote.Tables Property Get", "Remote", verbose_Level
-    Log.Message "  If", "RTables", Debug_level
+    Log.Message "Remote.Tables Property Get", "Remote", Verbose_Level
+    'Log.Message "  If", "RTables", Debug_Level
     If This.RemoteTables Is Nothing Then
-        Log.Message "  Set new", "RTables", Debug_level
+        'Log.Message "  Set new", "RTables", Debug_Level
         Set This.RemoteTables = New RemoteTables
-        Log.Message "  Load", "RTables", Debug_level
+        'Log.Message "  Load", "RTables", Debug_Level
         This.RemoteTables.Load This.Workbook.Worksheets.Item(WS_TABLES_NAME)
     End If
-    Log.Message "  Set Prop", "RTables", Debug_level
+    'Log.Message "  Set Prop", "RTables", Debug_Level
     Set Tables = This.RemoteTables
 End Property
 
@@ -89,12 +89,12 @@ Public Sub Load(ByVal Workbook As Workbook)
         This.Workbook.Worksheets.Item(WS_FIELDS_NAME).UsedRange.Rows.Count & "f " & _
         This.Workbook.Worksheets.Item(WS_VALUES_NAME).UsedRange.Rows.Count & "v"
     
-    Log.Message DEBUGRepoState, "Remote", Debug_level
+    Log.Message DEBUGRepoState, "Remote", Debug_Level
     Reload
 End Sub
 
 Public Sub Reload()
-    Log.Message "Remote.Reload()", "Remote", Debug_level
+    Log.Message "Remote.Reload()", "Remote", Debug_Level
     With This
         Set .RemoteKeys = New RemoteKeys2
         .RemoteKeys.Load This.Workbook.Worksheets.Item(WS_KEYS_NAME)
@@ -118,7 +118,7 @@ Public Sub Reload()
         Set .RemoteCommits = New RemoteCommits
         .RemoteCommits.Load This.Workbook.Worksheets.Item(WS_COMMITS_NAME)
     End With
-    Log.Message "Remote.Reload() End", "Remote", Debug_level
+    Log.Message "Remote.Reload() End", "Remote", Debug_Level
 End Sub
 
 Public Sub Show()

@@ -12,7 +12,7 @@ Attribute ResizeRangeToArray.VB_Description = "Returns a new Range with the same
 End Function
 
 '@Description "Updates the Value2 property of the cells in a Range with the values from a 2-dimensional Variant array. If the array is smaller than the Range, only the cells from the top-left to the extents of the array will be updated. If the Range is larger than the Range, the function will update cells outside of the given Range."
-Public Sub RangeSetValueFromVariant(ByVal InputRange As Range, ByVal InputVariant As Variant)
+Public Sub RangeSetValueFromVariant(ByVal InputRange As Range, ByVal InputVariantArray As Variant)
 Attribute RangeSetValueFromVariant.VB_Description = "Updates the Value2 property of the cells in a Range with the values from a 2-dimensional Variant array. If the array is smaller than the Range, only the cells from the top-left to the extents of the array will be updated. If the Range is larger than the Range, the function will update cells outside of the given Range."
     Debug.Assert Not InputRange Is Nothing
     Debug.Assert ArrayCheck.IsTwoDimensionalOneBasedArray(InputVariantArray)

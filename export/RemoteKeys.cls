@@ -15,7 +15,7 @@ Private Const ARRAY_WIDTH As Long = 7
 
 Private Type TState
     Worksheet As Worksheet
-    Item As Collection
+    Item As Collection ' Collection<RemoteKey>
     UniquePaths As Collection
     IsDirty As Boolean
     
@@ -114,6 +114,8 @@ Public Sub Save()
 End Sub
 
 Private Sub ClearWorksheet()
+    Log.Message "RemoteKeys.ClearWorksheet", "RKeys", Debug_Level
+    
     This.Worksheet.AutoFilterMode = False
     If This.Worksheet.UsedRange Is Nothing Then Exit Sub
     If This.Worksheet.UsedRange.Rows.Count = 1 Then Exit Sub
@@ -121,6 +123,8 @@ Private Sub ClearWorksheet()
 End Sub
 
 Private Sub SetNumberFormats()
+    Log.Message "RemoteKeys.SetNumberFormats", "RKeys", Debug_Level
+    
     With This.Worksheet.Columns
         .Item(1).NumberFormat = NUMFMT_TEXT ' ID
         .Item(5).NumberFormat = NUMFMT_DATE ' CTime
@@ -157,10 +161,11 @@ End Function
 
 Private Sub UpdateLookupKeyValues()
     ' Sort Path A-Z; Key A-Z
-    Log.Message "UpdateLookupKeyValues Sorting Path; Key", "RKeys"
+    Log.Message "UpdateLookupKeyValues Sorting Path; Key...", "RKeys"
     This.Worksheet.UsedRange.Sort Header:=xlYes, _
         Key1:=This.Worksheet.Columns.Item(2), _
         Key1:=This.Worksheet.Columns.Item(3)
+    Log.Message "UpdateLookupKeyValues Sorting Path; Key... done.", "RKeys"
         
     Dim Partitions As Variant
     Partitions = RangeHelpers.PartitionRange(GetWorksheetDatabodyRange(This.Worksheet), 2)
@@ -226,7 +231,6 @@ Private Function TryGetKeyIDFast(ByVal Key As String) As String
     TryGetKeyIDFast = This.LookupKeyIDs(Index, 2)
 End Function
 
-
 Private Function CreateNewKey(ByVal KeyPath As String, ByVal Key As String) As RemoteKey
     Dim NewRemoteKey As RemoteKey
     Set NewRemoteKey = New RemoteKey
@@ -240,4 +244,3 @@ Private Function CreateNewKey(ByVal KeyPath As String, ByVal Key As String) As R
     
     Set CreateNewKey = NewRemoteKey
 End Function
-

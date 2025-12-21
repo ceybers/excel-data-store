@@ -44,7 +44,7 @@ Private Sub IDebugEx_StartLogging()
     This.StartTime = Timer()
     This.ItemCount = 0
     This.CurrentLevel = NoOutput_Level
-    This.FilterLevel = verbose_Level
+    This.FilterLevel = Verbose_Level
     This.ManyItemsPrint = MAX_MANY_ITEMS_PRINT
     IDebugEx_Message "Logging started...", SYSTEM_TOPIC, UI_Level
 End Sub
@@ -118,10 +118,10 @@ Private Sub IDebugEx_Many(ByVal ArrayToLog As Variant, Optional ByVal Topic As V
     Dim i As Long
     For i = FirstIndex To LastIndex
         If Rank = 1 Then
-            IDebugEx_Variable "ï¿½ " & Format(i, "00") & ": " & (ArrayToLog(i)), Topic, LogLevel
+            IDebugEx_Variable "• " & Format(i, "00") & ": " & (ArrayToLog(i)), Topic, LogLevel
         Else
             If IsError(ArrayToLog(i, 1)) Then
-                IDebugEx_Variable "ï¿½ " & Format(i, "00") & ": " & CStr(ArrayToLog(i, 1)), Topic, LogLevel
+                IDebugEx_Variable "• " & Format(i, "00") & ": " & CStr(ArrayToLog(i, 1)), Topic, LogLevel
             Else
                 ' Need to change this to separate prefix (bullet and index) from variant
                 IDebugEx_Variable (ArrayToLog(i, 1)), Topic, LogLevel
@@ -163,11 +163,11 @@ Private Function LogLevelToColor(ByVal LogLevel As Variant) As String
     Select Case LogLevel
         Case UI_Level: LogLevelToColor = "Blue"
         Case NoOutput_Level: LogLevelToColor = "White" 'default
-        Case Error_level: LogLevelToColor = "DarkRed"
+        Case Error_Level: LogLevelToColor = "DarkRed"
         Case Warning_Level: LogLevelToColor = "Magenta"
         Case Info_Level: LogLevelToColor = "White"
-        Case Debug_level: LogLevelToColor = "DarkYellow"
-        Case verbose_Level: LogLevelToColor = "Green"
+        Case Debug_Level: LogLevelToColor = "DarkYellow"
+        Case Verbose_Level: LogLevelToColor = "Green"
     End Select
 End Function
 
