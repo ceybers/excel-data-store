@@ -17,7 +17,7 @@ End Type
 Private This As TMappedTable
 
 Public Property Get IsProtected() As Boolean
-    IsProtected = ListObjectHelpers.TestIfProtected(This.ListObject)
+    IsProtected = ListObjectHelpers.IsListObjectProtected(This.ListObject)
 End Property
 
 Public Property Get ListObject() As ListObject
@@ -219,4 +219,5 @@ Public Sub HighlightMappedFields()
     
     RangeHighlighter.HighlightRange HighlightRange, hcHeaders
 End Sub
+
 

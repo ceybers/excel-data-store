@@ -3,29 +3,30 @@ Attribute VB_Name = "RangeHelpers"
 '@Folder "Helpers.Range"
 Option Explicit
 
-' Returns a range with the same shape as the specified 2-dimensional InputArray, starting
-' from the top-most cell in the specified InputRange.
+'@Description "Returns a new Range with the same shape as the specified 2-dimensional array, starting, from the top-left cell in the specified Range. Throws an error if the input Range is Nothing or if the array is not 2-dimensional."
 Public Function ResizeRangeToArray(ByVal InputRange As Range, ByVal InputArray As Variant) As Range
+Attribute ResizeRangeToArray.VB_Description = "Returns a new Range with the same shape as the specified 2-dimensional array, starting, from the top-left cell in the specified Range. Throws an error if the input Range is Nothing or if the array is not 2-dimensional."
     Debug.Assert Not InputRange Is Nothing
     Debug.Assert ArrayCheck.IsTwoDimensionalOneBasedArray(InputArray)
     Set ResizeRangeToArray = InputRange.Cells.Item(1, 1).Resize(UBound(InputArray, 1), UBound(InputArray, 2))
 End Function
 
-' Updates the .Value2 property of all the cells in the InputRange with the Variant Values
-' in the specified 2-dimensional InputArray.
+'@Description "Updates the Value2 property of the cells in a Range with the values from a 2-dimensional Variant array. If the array is smaller than the Range, only the cells from the top-left to the extents of the array will be updated. If the Range is larger than the Range, the function will update cells outside of the given Range."
 Public Sub RangeSetValueFromVariant(ByVal InputRange As Range, ByVal InputVariant As Variant)
+Attribute RangeSetValueFromVariant.VB_Description = "Updates the Value2 property of the cells in a Range with the values from a 2-dimensional Variant array. If the array is smaller than the Range, only the cells from the top-left to the extents of the array will be updated. If the Range is larger than the Range, the function will update cells outside of the given Range."
     Debug.Assert Not InputRange Is Nothing
-    Debug.Assert ArrayCheck.IsTwoDimensionalOneBasedArray(InputVariant)
+    Debug.Assert ArrayCheck.IsTwoDimensionalOneBasedArray(InputVariantArray)
     
-    Log.Message "RangeSetValueFromVariant writing to = " & InputRange.Address(False, False) & " with Variant(" & UBound(InputVariant, 1) & " to " & UBound(InputVariant, 2) & ")"
-    InputRange.Cells.Item(1, 1).Resize(UBound(InputVariant, 1), UBound(InputVariant, 2)).Value2 = InputVariant
+    Log.Message "RangeSetValueFromVariant writing to = " & InputRange.Address(False, False) & " with Variant(" & UBound(InputVariantArray, 1) & " to " & UBound(InputVariantArray, 2) & ")"
+    InputRange.Cells.Item(1, 1).Resize(UBound(InputVariantArray, 1), UBound(InputVariantArray, 2)).Value2 = InputVariantArray
 End Sub
 
-' Returns a range with the offset and size of the specified input parameters, starting from the
-' top-most cell in the InputRange. Row = 1 and Column = 1 start the box from the top-left cell.
-' e.g., RangeBox(Range("A1"), 1, 2, 4, 8).Address = B1:I4
+'@Description "Returns a new Range offset and resized from specified input Range. Returns Nothing if the input Range is nothing. Throws an error if any of the indices are zero or negative."
 Public Function RangeBox(ByVal InputRange As Range, ByVal Row As Long, ByVal Column As Long, _
     ByVal Rows As Long, ByVal Columns As Long) As Range
+Attribute RangeBox.VB_Description = "Returns a new Range offset and resized from specified input Range. Returns Nothing if the input Range is nothing. Throws an error if any of the indices are zero or negative."
+    ' Row = 1 and Column = 1 start the box from the top-left cell.
+    ' e.g., RangeBox(Range("A1"), 1, 2, 4, 8).Address = B1:I4
     Debug.Assert Not InputRange Is Nothing
     Debug.Assert Row > 0
     Debug.Assert Column > 0
@@ -97,9 +98,9 @@ Public Function PartitionRange(ByVal Range As Range, ByVal Column As Long) As Va
     PartitionRange = Partitions2
 End Function
 
-'@Description "Returns the Selection object if it is a valid Range."
+'@Description "Returns True if the Selection object is of type Range and sets the variable to the Range object. Returns False if Selection is Nothing or is not a Range."
 Public Function TryGetSelectionRange(ByRef OutRange As Range) As Boolean
-Attribute TryGetSelectionRange.VB_Description = "Returns the Selection object if it is a valid Range."
+Attribute TryGetSelectionRange.VB_Description = "Returns True if the Selection object is of type Range and sets the variable to the Range object. Returns False if Selection is Nothing or is not a Range."
     If Selection Is Nothing Then Exit Function
     If Not TypeOf Selection Is Range Then Exit Function
     
@@ -107,9 +108,9 @@ Attribute TryGetSelectionRange.VB_Description = "Returns the Selection object if
     TryGetSelectionRange = True
 End Function
 
-'@Description "Tries to return the Intersection of two ranges by reference, testing both ranges before, and handling errors if they do not intersect."
+'@Description "Returns True if the two specified Ranges can be intersected and sets the output variable to the intersected Range. Returns False if they cannot be intersected or if one or both of the Range are Nothing."
 Public Function TryIntersectRanges(ByVal Range1 As Range, ByVal Range2 As Range, ByRef OutRange As Range) As Boolean
-Attribute TryIntersectRanges.VB_Description = "Tries to return the Intersection of two ranges by reference, testing both ranges before, and handling errors if they do not intersect."
+Attribute TryIntersectRanges.VB_Description = "Returns True if the two specified Ranges can be intersected and sets the output variable to the intersected Range. Returns False if they cannot be intersected or if one or both of the Range are Nothing."
     If Range1 Is Nothing Then Exit Function
     If Range2 Is Nothing Then Exit Function
     
@@ -124,10 +125,9 @@ Attribute TryIntersectRanges.VB_Description = "Tries to return the Intersection 
     TryIntersectRanges = True
 End Function
 
-'@Description "Returns the .Value2 of a staggered or non-contiguous Range that consists of multiple Areas."
-' The output Variant is of the same shape as the BaseRange. Cells that are not in the SelectedRange will be Empty variants.
+'@Description "Returns the Value2 property array of a non-contiguous Range that has multiple Areas. The output Variant array is of the same shape as the BaseRange parameter. Cells that are not in the SelectedRange will be Empty variants."
 Public Function GetStaggeredArrayValues(ByVal BaseRange As Range, ByVal SelectedRange As Range) As Variant
-Attribute GetStaggeredArrayValues.VB_Description = "Returns the .Value2 of a staggered or non-contiguous Range that consists of multiple Areas."
+Attribute GetStaggeredArrayValues.VB_Description = "Returns the Value2 property array of a non-contiguous Range that has multiple Areas. The output Variant array is of the same shape as the BaseRange parameter. Cells that are not in the SelectedRange will be Empty variants."
     If BaseRange Is Nothing Then Exit Function
     If BaseRange.Cells.Count <= 1 Then Exit Function
     If SelectedRange Is Nothing Then Exit Function

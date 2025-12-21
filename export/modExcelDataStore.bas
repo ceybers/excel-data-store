@@ -207,8 +207,8 @@ End Sub
 '@EntryPoint Compare > Clear
 Public Sub HighlightRemove()
     Dim ListObject As ListObject
-    If Not TryGetActiveSheetListObject(ListObject) Then Exit Sub
-    If TestIfProtected(ListObject) Then Exit Sub
+    If Not ListObjectHelpers.TryGetSingleListObjectInActiveSheet(ListObject) Then Exit Sub
+    If ListObjectHelpers.IsListObjectProtected(ListObject) Then Exit Sub
     
     RangeHighlighter.RemoveHighlights ListObject
 End Sub

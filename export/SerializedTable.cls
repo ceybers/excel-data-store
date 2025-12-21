@@ -116,10 +116,10 @@ Private Function TryResolveByListObjectName() As Boolean
     If Not TryGetWorkbook(This.WorkbookName, Workbook) Then Exit Function
     
     Dim Worksheet As Worksheet
-    If Not WorksheetHelpers.TryGetWorksheet(Workbook, This.WorksheetName, Worksheet) Then Exit Function
+    If Not WorksheetHelpers.TryGetWorksheet(This.WorksheetName, Workbook, Worksheet) Then Exit Function
     
     Dim ListObject As ListObject
-    If Not TryGetListObject(Worksheet, This.ListObjectName, ListObject) Then Exit Function
+    If Not TryGetListObjectInWorksheet(This.ListObjectName, Worksheet, ListObject) Then Exit Function
     
     Set This.ListObject = ListObject
     TryResolveByListObjectName = True
@@ -130,7 +130,7 @@ Private Function TryResolveByWorksheetName() As Boolean
     If Not TryGetWorkbook(This.WorkbookName, Workbook) Then Exit Function
     
     Dim Worksheet As Worksheet
-    If Not WorksheetHelpers.TryGetWorksheet(Workbook, This.WorksheetName, Worksheet) Then Exit Function
+    If Not WorksheetHelpers.TryGetWorksheet(This.WorksheetName, Workbook, Worksheet) Then Exit Function
         
     If Worksheet.ListObjects.Count <> 1 Then Exit Function
     
