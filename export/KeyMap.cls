@@ -11,10 +11,12 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Type TKeyMap
-    Items As Collection
+    KeyValues As Variant ' 1 to n
+    KeyIDs As Variant ' 1 to n
+    KeyIDtoRow As Variant ' 1 to n, 1 to 2
+    
     KeyColumnName As String
     KeyPath As String
-    KeyIDs As Collection
 End Type
 Private This As TKeyMap
 
@@ -35,31 +37,20 @@ Public Property Let KeyPath(ByVal RHS As String)
 End Property
 
 Public Property Get Count() As Long
-    Count = This.Items.Count
+    If IsEmpty(This.KeyValues) Then
+        Count = 0
+        Exit Property
+    End If
+    
+    Count = UBound(This.KeyValues)
 End Property
 
-Private Sub Class_Initialize()
-    Set This.Items = New Collection
-    Set This.KeyIDs = New Collection
-End Sub
-
-Public Sub Add(ByVal KeyValue As String, ByVal RowIndex As Long)
-    If KeyValue = vbNullString Then Exit Sub
+Public Sub AddMany(ByVal Values As Variant)
+    ReDim This.KeyValues(1 To UBound(Values))
     
-    Dim MappedKey As MappedKey
-    Set MappedKey = New MappedKey
-    With MappedKey
-        .KeyValue = KeyValue
-        .RowIndex = RowIndex
-    End With
-    This.Items.Add Item:=MappedKey
-End Sub
-
-Public Sub AddMany(ByVal Values As Variant, ByVal RowOffset As Long)
     Dim i As Long
     For i = 1 To UBound(Values, 1)
-        Debug.Assert VarType(Values(i, 1)) <> vbError
-        Add Values(i, 1), i - RowOffset
+        This.KeyValues(i) = Values(i, 1)
     Next i
 End Sub
 
@@ -80,53 +71,33 @@ Public Sub Deserialize(ByVal SerializedString As String)
 End Sub
 
 Public Sub ResolveIDs(ByVal Remote As Remote)
-    Log.Message "ResolveIDs()", "KeyMap"
+    Log.Message "ResolveIDs()... starts", "KeyMap", Info_Level
     
     If Count = 0 Then Exit Sub
     
-    Log.Message " KeyMap ResolveIDs", "KeyMap"
-    Dim Keys As Variant
-    ReDim Keys(1 To Count) As String
+    Log.Message " Remote.Keys.GetIDsFromQuery", "KeyMap", Verbose_Level
+    This.KeyIDs = Remote.Keys.GetIDsFromQuery(KeyPath, This.KeyValues)
     
-    CollectionClear This.KeyIDs
-    
+    ReDim This.KeyIDtoRow(1 To Count, 1 To 2)
     Dim i As Long
     For i = 1 To Count
-        Keys(i) = This.Items.Item(i).KeyValue
+        This.KeyIDtoRow(i, 1) = This.KeyIDs(i)
+        This.KeyIDtoRow(i, 2) = i
     Next i
     
-    Dim KeyIDs As Variant
-    Log.Message " Remote.Keys.GetIDsFromQuery", "KeyMap"
-    KeyIDs = Remote.Keys.GetIDsFromQuery(KeyPath, Keys)
+    ArraySort.QuickSort2 This.KeyIDtoRow
     
-    Log.Message " For i; This.KeyIDs.Add", "KeyMap"
-    For i = 1 To Count
-        This.Items.Item(i).KeyID = KeyIDs(i)
-        If KeyIDs(i) <> vbNullString Then
-            ' FIX TODO Assumes Key Column has no duplicates. Crashes if not!
-            On Error Resume Next
-            This.KeyIDs.Add Item:=This.Items.Item(i).RowIndex, Key:=KeyIDs(i)
-            On Error GoTo 0
-        End If
-    Next i
-    
-    Log.Message "ResolveIDs() End", "KeyMap"
+    Log.Message "ResolveIDs()... end", "KeyMap", Info_Level
 End Sub
 
 Public Function GetRowFromKeyID(ByVal KeyID As String) As Long
-    GetRowFromKeyID = This.KeyIDs.Item(KeyID)
+    Dim ResultIndex As Long
+    ResultIndex = ArraySearch.BinarySearch2(This.KeyIDtoRow, KeyID)
+    If ResultIndex = -1 Then Exit Function
+    
+    GetRowFromKeyID = This.KeyIDtoRow(ResultIndex, 2)
 End Function
 
 Public Function GetKeyIDs() As Variant
-    If Count = 0 Then Exit Function
-    
-    Dim Result As Variant
-    ReDim Result(1 To Count) As String
-    
-    Dim i As Long
-    For i = 1 To Count
-        Result(i) = This.Items.Item(i).KeyID
-    Next i
-    
-    GetKeyIDs = Result
+    GetKeyIDs = This.KeyIDs
 End Function

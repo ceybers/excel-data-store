@@ -37,7 +37,7 @@ Public Sub Run()
     Log.Message "PullDryQuery.Run()", "DryQuery", Info_Level
     
     Log.Message "This.Remote.Reload", "DryQuery", Info_Level
-    This.Remote.Reload
+    'This.Remote.Reload
     
     RangeHighlighter.RemoveHighlights This.MappedTable.ListObject
     

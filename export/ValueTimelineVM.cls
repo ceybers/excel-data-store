@@ -40,4 +40,3 @@ Public Sub Load(ByVal Values As Variant, ByVal Remote As Remote)
     Set This.Values = New RemoteValuesVM
     This.Values.Load Values, Remote
 End Sub
-

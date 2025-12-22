@@ -89,7 +89,7 @@ Private Sub UpdateFromRemote(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant,
     Log.Message "PullQuery.UpdateFromRemote creating KeyIndexes", "PullQuery", Info_Level
     
     Dim KeyIndexes As Variant
-    ReDim KeyIndexes(1 To UBound(KeyIDs)) As String
+    ReDim KeyIndexes(1 To UBound(KeyIDs)) As Long
     
     Dim i As Long
     For i = 1 To UBound(KeyIDs)
@@ -106,14 +106,19 @@ Private Sub UpdateFromRemote(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant,
         
         Dim vv As Variant
         vv = ListColumn.DataBodyRange.Value2
+        If Not IsArray(vv) Then
+            vv = VariantToArray(vv)
+        End If
         
         Dim k As Long
         For k = 1 To UBound(KeyIndexes)
             If IsEmpty(KeyIndexes(k)) = False Then
-                vv(KeyIndexes(k), 1) = NewValues(k, f)
+                If KeyIndexes(k) > 0 Then
+                    vv(KeyIndexes(k), 1) = NewValues(k, f)
+                End If
             End If
         Next k
         
-        RangeSetValueFromVariant ListColumn.DataBodyRange, vv
+        RangeValues.UpdateFilteredColumnRangeWithValues ListColumn.DataBodyRange, vv
     Next f
 End Sub

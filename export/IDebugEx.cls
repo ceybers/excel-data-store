@@ -15,11 +15,11 @@ Option Explicit
 Public Enum LogLevel
     NoOutput_Level = 1
     UI_Level
-    Error_level
+    Error_Level
     Warning_Level
     Info_Level
-    Debug_level
-    verbose_Level
+    Debug_Level
+    Verbose_Level
 End Enum
 
 Public Sub Many(ByVal ArrayToLog As Variant, Optional ByVal Topic As Variant, Optional ByVal LogLevel As LogLevel = -1)

@@ -53,8 +53,9 @@ Private Sub cmdSaveClose_Click()
 End Sub
 
 Private Sub cmdShow_Click()
-    This.ViewModel.DoShow
-    Me.cmdShow.Enabled = False
+    This.ViewModel.Show
+    'Me.cmdShow.Enabled = False
+    Me.Hide
 End Sub
 
 Private Function IView_ShowDialog(ByVal ViewModel As Object) As Boolean
@@ -119,7 +120,7 @@ Private Sub LoadRemoteKeyPathsToTreeView(ByVal KeyPaths As Collection, ByVal Tre
     RootNode.Expanded = True
 End Sub
 
-Private Sub LoadRemoteKeysToListView(ByVal RemoteKeys As RemoteKeys, ByVal ListView As ListView)
+Private Sub LoadRemoteKeysToListView(ByVal RemoteKeys As RemoteKeys2, ByVal ListView As ListView)
     With ListView
         .ListItems.Clear
         .LabelEdit = lvwManual

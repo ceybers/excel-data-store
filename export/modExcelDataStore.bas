@@ -102,6 +102,7 @@ Private Sub DoPull(ByVal PartialSelection As Boolean)
     
     If GuardMappedTableNoListObject(MappedTable) Then Exit Sub
     If GuardMappedTableProtected(MappedTable) Then Exit Sub
+    If GuardActiveWindowProtectedView Then Exit Sub
     
     Log.Message "MappedTable.SelectKeysAndFields", "DoPull"
     MappedTable.SelectKeysAndFields PartialSelection:=PartialSelection
@@ -117,7 +118,7 @@ Private Sub DoPull(ByVal PartialSelection As Boolean)
 End Sub
 
 '@EntryPoint Push > Push
-Public Sub Push()
+Public Sub PushAll()
     DoPush PartialSelection:=False
 End Sub
 
@@ -162,23 +163,28 @@ End Sub
 
 Private Sub DoHighlight(ByVal PartialSelection As Boolean)
     Log.StartLogging
-    Log.Message "DoHighlight()", "DoHL"
+    Log.Message "DoHighlight()", "DoHilight", Info_Level
     
-    Log.Message "MappedTableFactory.TryCreateBestMappedTable", "DoHL"
+    Log.Message "MappedTableFactory.TryCreateBestMappedTable", "DoHilight", Info_Level
     Dim MappedTable As MappedTable
     MappedTableFactory.TryCreateBestMappedTable RemoteFactory.GetRemote, MappedTable
     
     If GuardMappedTableNoListObject(MappedTable) Then Exit Sub
     If GuardMappedTableProtected(MappedTable) Then Exit Sub
+    If GuardActiveWindowProtectedView Then Exit Sub
     
-    Log.Message "MappedTable.SelectKeysAndFields", "DoHL"
+    Log.Message "MappedTable.SelectKeysAndFields", "DoHilight", Info_Level
     MappedTable.SelectKeysAndFields PartialSelection:=PartialSelection
     
-    Log.Message "New PullDryRunQuery", "DoHL"
+    Log.Message "New PullDryRunQuery", "DoHilight", Info_Level
     With New PullDryRunQuery
+        Log.Message " Set MappedTable", "DoHilight", Verbose_Level
         Set .MappedTable = MappedTable
+        Log.Message " Set Remote", "DoHilight", Verbose_Level
         Set .Remote = RemoteFactory.GetRemote
+        Log.Message " PullDryRunQuery.Run()...", "DoHilight", Verbose_Level
         .Run
+        Log.Message " PullDryRunQuery.Run()... done", "DoHilight", Verbose_Level
     End With
     
     Log.StopLogging
@@ -205,8 +211,8 @@ End Sub
 '@EntryPoint Compare > Clear
 Public Sub HighlightRemove()
     Dim ListObject As ListObject
-    If Not TryGetActiveSheetListObject(ListObject) Then Exit Sub
-    If TestIfProtected(ListObject) Then Exit Sub
+    If Not ListObjectHelpers.TryGetSingleListObjectInActiveSheet(ListObject) Then Exit Sub
+    If ListObjectHelpers.IsListObjectProtected(ListObject) Then Exit Sub
     
     RangeHighlighter.RemoveHighlights ListObject
 End Sub
@@ -271,6 +277,7 @@ Public Sub DataStoreUI()
     Log.Message "Entering UserForm...", "DataStoreUI", UI_Level
     If RemoteView.ShowDialog(ViewModel) Then
         Log.Message "...exited UserForm", "DataStoreUI", UI_Level
+        If ViewModel.DoShow Then RemoteFactory.GetRemote.Show
         If ViewModel.DoClose Then RemoteFactory.GetRemote.CloseWorkbook
         Exit Sub
     Else

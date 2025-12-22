@@ -17,7 +17,7 @@ End Type
 Private This As TMappedTable
 
 Public Property Get IsProtected() As Boolean
-    IsProtected = ListObjectHelpers.TestIfProtected(This.ListObject)
+    IsProtected = ListObjectHelpers.IsListObjectProtected(This.ListObject)
 End Property
 
 Public Property Get ListObject() As ListObject
@@ -54,12 +54,16 @@ Public Sub Load(ByVal ListObject As ListObject, ByVal TableMap As TableMap)
 End Sub
 
 Public Sub SelectKeysAndFields(ByVal PartialSelection As Boolean)
+    Log.Message "MappedTable.SelectKeysAndFields... start", "MappedTbl", Verbose_Level
+    
     Log.Message "SelectKeys", "MappedTbl"
     SelectKeys PartialSelection
     Log.Message "ResolveKeyIDs", "MappedTbl"
     ResolveKeyIDs RemoteFactory.GetRemote
     Log.Message "SelectFields", "MappedTbl"
     SelectFields PartialSelection
+    
+    Log.Message "MappedTable.SelectKeysAndFields... end", "MappedTbl", Verbose_Level
 End Sub
 
 Private Sub SelectKeys(ByVal Partial As Boolean)
@@ -78,14 +82,14 @@ Private Sub SelectKeys(ByVal Partial As Boolean)
         If Not TryGetSelectionRange(SelectedRange) Then Exit Sub
         Dim SelectedKeys As Range
         If Not TryIntersectRanges(SelectedRange.EntireRow, BaseRange, SelectedKeys) Then Exit Sub
-        KeyValues = RangeHelpers.GetStaggeredArrayValues(BaseRange, SelectedKeys)
+        KeyValues = GetStaggeredArrayValues(BaseRange, SelectedKeys)
     Else
         KeyValues = BaseRange.Value2
     End If
     
     ArrayClean.ReplaceErrorCells2 KeyValues
     
-    This.TableMap.KeyMap.AddMany Values:=KeyValues, RowOffset:=This.ListObject.Range.Row - 1
+    This.TableMap.KeyMap.AddMany Values:=KeyValues
 End Sub
 
 Private Sub ResolveKeyIDs(ByVal Remote As Remote)
@@ -219,4 +223,5 @@ Public Sub HighlightMappedFields()
     
     RangeHighlighter.HighlightRange HighlightRange, hcHeaders
 End Sub
+
 

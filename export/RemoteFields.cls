@@ -88,7 +88,7 @@ Public Sub Save()
     
     SetNumberFormats
     
-    RangeHelpers.RangeSetValueFromVariant This.Worksheet.Range("A2"), UpdatedValues
+    RangeSetValueFromVariant This.Worksheet.Range("A2"), UpdatedValues
     
     SortWorksheet
 End Sub

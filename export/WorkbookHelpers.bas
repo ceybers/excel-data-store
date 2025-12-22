@@ -2,9 +2,9 @@ Attribute VB_Name = "WorkbookHelpers"
 '@Folder "Helpers.Workbook"
 Option Explicit
 
-'@Description "Tries to return the Workbook with the given name if it is currently open in this instance of Excel."
+'@Description "Returns True if a Workbook with the specified name is open in Excel and sets the provided variable to the Workbook object. Returns False if nothing is found."
 Public Function TryGetWorkbook(ByVal WorkbookName As String, ByRef OutWorkbook As Workbook) As Boolean
-Attribute TryGetWorkbook.VB_Description = "Tries to return the Workbook with the given name if it is currently open in this instance of Excel."
+Attribute TryGetWorkbook.VB_Description = "Returns True if a Workbook with the specified name is open in Excel and sets the provided variable to the Workbook object. Returns False if nothing is found."
     If WorkbookName = vbNullString Then Exit Function
     
     Dim Workbook As Workbook
@@ -17,9 +17,9 @@ Attribute TryGetWorkbook.VB_Description = "Tries to return the Workbook with the
     Next Workbook
 End Function
 
-'@Description "Returns True if the given Workbook is opened in Protected View"
+'@Description "Returns True if the specified Workbook is opened in Protected View. Returns False if it is not, or if the variable is set to Nothing."
 Public Function IsWorkbookProtectedView(ByVal WorkbookName As String) As Boolean
-Attribute IsWorkbookProtectedView.VB_Description = "Returns True if the given Workbook is opened in Protected View"
+Attribute IsWorkbookProtectedView.VB_Description = "Returns True if the specified Workbook is opened in Protected View. Returns False if it is not, or if the variable is set to Nothing."
     If WorkbookName = vbNullString Then Exit Function
     
     Dim ProtectedViewWindow As ProtectedViewWindow
@@ -31,15 +31,21 @@ Attribute IsWorkbookProtectedView.VB_Description = "Returns True if the given Wo
     Next ProtectedViewWindow
 End Function
 
-'@Description "Returns True if a Workbook is still open. Returns False if the workbook is closed but the reference is still present."
+'@Description "Returns True if the specified variable is referencing a Workbook that is still open. Returns False if the variable is referencing a Workbook that has been closed, or if the variable is set to Nothing."
 Public Function IsWorkbookOpen(ByVal Workbook As Workbook) As Boolean
-Attribute IsWorkbookOpen.VB_Description = "Returns True if a Workbook is still open. Returns False if the workbook is closed but the reference is still present."
+Attribute IsWorkbookOpen.VB_Description = "Returns True if the specified variable is referencing a Workbook that is still open. Returns False if the variable is referencing a Workbook that has been closed, or if the variable is set to Nothing."
     If Workbook Is Nothing Then Exit Function
+    
+    '@Ignore VariableNotUsed
     Dim TestWorkbook As String
-    On Error Resume Next
+    On Error GoTo ErrorInIsWorkbookOpen
+    '@Ignore AssignmentNotUsed
     TestWorkbook = Workbook.Name
     On Error GoTo 0
-    If TestWorkbook = vbNullString Then Exit Function
     
     IsWorkbookOpen = True
+    Exit Function
+    
+ErrorInIsWorkbookOpen:
+    Exit Function
 End Function

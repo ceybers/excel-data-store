@@ -14,9 +14,14 @@ Private Type TState
     Remote As Remote
     SelectedRemoteField As RemoteField
     SelectedKeyPath As String
+    DoShow As Boolean
     DoClose As Boolean
 End Type
 Private This As TState
+
+Public Property Get DoShow() As Boolean
+    DoShow = This.DoShow
+End Property
 
 Public Property Get DoClose() As Boolean
     DoClose = This.DoClose
@@ -26,7 +31,7 @@ Public Property Get KeyPaths() As Collection
     Set KeyPaths = This.Remote.Keys.Paths
 End Property
 
-Public Property Get Keys() As RemoteKeys
+Public Property Get Keys() As RemoteKeys2
     Set Keys = This.Remote.Keys
 End Property
 
@@ -76,6 +81,6 @@ Public Sub DoSave()
     This.DoClose = True
 End Sub
 
-Public Sub DoShow()
-    This.Remote.Show
+Public Sub Show()
+    This.DoShow = True
 End Sub

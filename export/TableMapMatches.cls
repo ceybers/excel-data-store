@@ -31,7 +31,7 @@ Public Property Get Item(ByVal Index As Long) As TableMapMatch
 End Property
 
 Public Sub Load(ByVal Remote As Remote)
-    Log.Message "Load()", "TMapMatchs"
+    Log.Message "Load()", "TMapMtchs"
     
     Dim Tables As RemoteTables
     Set Tables = Remote.Tables
@@ -51,7 +51,7 @@ Public Sub Load(ByVal Remote As Remote)
         End If
     Next i
     
-    Log.Message "Load() end", "TMapMatchs"
+    Log.Message "Load() end", "TMapMtchs"
 End Sub
 
 Private Sub AddTableMapMatch(ByVal RemoteTable As RemoteTable, ByVal RemoteMap As RemoteMap)

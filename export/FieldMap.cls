@@ -97,7 +97,7 @@ Public Function GetFieldIDs() As Variant
     If Count = 0 Then Exit Function
     
     Dim Result As Variant
-    ReDim Result(1 To Count)
+    ReDim Result(1 To Count) As String
     
     Dim Cursor As Long
     

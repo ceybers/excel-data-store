@@ -47,7 +47,7 @@ Private Function IView_ShowDialog(ByVal ViewModel As Object) As Boolean
     InitializeControls
     UpdateControls
     
-    Me.Show
+    Me.Show vbModeless
     
     IView_ShowDialog = Not This.IsCancelled
 End Function

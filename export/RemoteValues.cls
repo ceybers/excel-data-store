@@ -12,7 +12,11 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Const ARRAY_WIDTH As Long = 9
+Private Const COL_KEY_ID As Long = 2
+Private Const COL_FIELD_ID As Long = 3
+Private Const COL_VALUE As Long = 4
 Private Const COL_LATEST_HASH As Long = 5
+Private Const COL_MTIME As Long = 7
 
 Private Type TState
     Worksheet As Worksheet
@@ -34,21 +38,31 @@ Public Property Get Item(ByVal Index As Long) As RemoteValue
     Set Item = This.Item.Item(Index)
 End Property
 
+' Referenced by Remote.Values (property) (getter)
+' Referenced by Remote.Reload (method)
 Public Sub Load(ByVal Worksheet As Worksheet)
+    Log.Message "RemoteValues.Load", "RValues", Debug_Level
     Set This.Worksheet = Worksheet
     
     RebuildCache
 End Sub
 
-Public Sub RebuildCache()
-    LoadFromWorksheet
-    LoadLatestHash
+Private Sub RebuildCache()
+    Log.Message "RemoteValues.RebuildCache", "RValues", Debug_Level
+    SortWorksheet
+    LoadLatestFromWorksheet
 End Sub
 
-Private Sub LoadFromWorksheet()
-    SortWorksheet
-    
+Private Sub SortWorksheet()
+    Log.Message "RemoteValues.SortWorksheet", "RValues", Debug_Level
+    This.Worksheet.AutoFilterMode = False
+    This.Worksheet.UsedRange.Sort Header:=xlYes, _
+        Key1:=This.Worksheet.Columns.Item(COL_LATEST_HASH)
+End Sub
+
+Private Sub LoadLatestFromWorksheet()
     CollectionClear This.Item
+    This.LatestHash = Empty
     
     Dim DataBodyRange As Range
     Set DataBodyRange = GetWorksheetDatabodyRange(This.Worksheet)
@@ -56,12 +70,12 @@ Private Sub LoadFromWorksheet()
     
     Dim LatestHashRange As Range
     Set LatestHashRange = This.Worksheet.Columns.Item(COL_LATEST_HASH).SpecialCells(xlCellTypeConstants)
-    If Not LatestHashRange Is Nothing Then
-        Log.Message "RemoteValues.LoadFromWorksheet taking intersect of " & DataBodyRange.Address(False, False) & " and " & LatestHashRange.Address(False, False), "RValues", Info_Level
-        If Not TryIntersectRanges(DataBodyRange, LatestHashRange.EntireRow, DataBodyRange) Then Exit Sub
-    End If
+    If LatestHashRange.Rows.Count = 1 Then Exit Sub
     
-    If DataBodyRange Is Nothing Then Exit Sub
+    This.LatestHash = ArrayTransform.ColumnToArray(LatestHashRange.Value2)
+    
+    Log.Message "RemoteValues.LoadFromWorksheet taking intersect of " & DataBodyRange.Address(False, False) & " and " & LatestHashRange.Address(False, False), "RValues", Info_Level
+    If Not TryIntersectRanges(DataBodyRange, LatestHashRange.EntireRow, DataBodyRange) Then Exit Sub
     
     Dim WorksheetValues As Variant
     Log.Message "RemoteValues.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False), "RValues", Info_Level
@@ -76,28 +90,85 @@ Private Sub LoadFromWorksheet()
     Next i
 End Sub
 
-Private Sub LoadLatestHash()
-    Dim LatestHash As Variant
-    LatestHash = This.Worksheet.Columns.Item(COL_LATEST_HASH).SpecialCells(xlCellTypeConstants).Value2
+' Referenced by: PushQuery.Run (method)
+' Referenced by: PullQuery.Run (method)
+' Referenced by: PullDryRunQuery.Run (method)
+Public Function GetValues(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant) As Variant
+    Log.Message "GetValues() Start", "RValues", Info_Level
+    If This.Worksheet.UsedRange.Rows.Count = 1 Then Exit Function
     
-    If VarType(LatestHash) < vbArray Then
-        This.LatestHash = Empty
-    Else
-        This.LatestHash = ArrayTransform.ColumnToArray(LatestHash)
-    End If
-End Sub
-
-Private Sub SortWorksheet()
+    Dim Result As Variant
+    ReDim Result(1 To UBound(KeyIDs), 1 To UBound(FieldIDs))
+    
+    This.Worksheet.AutoFilterMode = False
     This.Worksheet.UsedRange.Sort Header:=xlYes, _
         Key1:=This.Worksheet.Columns.Item(COL_LATEST_HASH)
-End Sub
-
-Public Sub Save()
-    Debug.Assert Not This.Worksheet Is Nothing
+    This.Worksheet.UsedRange.AutoFilter Field:=COL_LATEST_HASH, Criteria1:="<>"
     
+    Dim FilteredRange As Range
+    On Error Resume Next
+    Set FilteredRange = GetWorksheetDatabodyRange(This.Worksheet).SpecialCells(xlCellTypeVisible)
+    On Error GoTo 0
+    
+    This.Worksheet.AutoFilterMode = False
+    
+    If FilteredRange Is Nothing Then Exit Function
+    
+    Log.Message " Sorted and Filtered", "RValues", Verbose_Level
+    
+    'FilteredRange.Sort Header:=xlNo, _
+    '    Key1:=This.Worksheet.Columns.Item(COL_FIELD_ID), Order1:=xlAscending, _
+    '    Key2:=This.Worksheet.Columns.Item(COL_KEY_ID), Order2:=xlAscending
+    
+    Dim FieldPartitions As Variant
+    FieldPartitions = PartitionRangeByColumn(FilteredRange, COL_FIELD_ID)
+    Log.Message " Partitioned on Fields (" & FilteredRange.Address & ")", "RValues", Verbose_Level
+    
+    Dim FieldIndex As Long
+    For FieldIndex = 1 To UBound(FieldIDs)
+        Dim FieldPartitionIndex As Long
+        FieldPartitionIndex = ArraySearch.BinarySearch2(FieldPartitions, FieldIDs(FieldIndex))
+        If FieldPartitionIndex > -1 Then
+            Dim ThisKeyIDs As Variant
+            ThisKeyIDs = FieldPartitions(FieldPartitionIndex, 4).Columns.Item(COL_KEY_ID).Value2
+            
+            Dim ThisValues As Variant
+            ThisValues = FieldPartitions(FieldPartitionIndex, 4).Columns.Item(COL_VALUE).Value2
+            
+            Dim KeyIndex As Long
+            For KeyIndex = 1 To UBound(KeyIDs)
+                Dim SearchResult As Long
+                SearchResult = ArraySearch.BinarySearch2(ThisKeyIDs, KeyIDs(KeyIndex))
+                If SearchResult > -1 Then
+                    Result(KeyIndex, FieldIndex) = ThisValues(SearchResult, 1)
+                End If
+            Next KeyIndex
+        End If
+        Log.Message "  Partitioned on Field #" & FieldIndex, "RValues", Verbose_Level
+    Next FieldIndex
+    
+    GetValues = Result
+    Log.Message "GetValues() End", "RValues", Info_Level
+End Function
+
+'Private Function GetValue(ByVal KeyID As String, ByVal FieldID As String) As Variant
+'    Dim Query As String
+'    Query = KeyID & "x" & FieldID
+'
+'    Dim Index As Long
+'    Index = ArraySearch.BinarySearch(This.LatestHash, Query)
+'    If Index = -1 Then Exit Function
+'
+'    GetValue = This.Item.Item(Index - 1).Value
+'End Function
+
+Private Sub Save()
+    Log.Message "RemoteValues.Save", "RValues", Debug_Level
     If This.IsDirty = False Then Exit Sub
     
     ClearWorksheet
+    
+    SetNumberFormats
     
     Dim UpdatedValues As Variant
     ReDim UpdatedValues(1 To Count, 1 To ARRAY_WIDTH)
@@ -109,8 +180,6 @@ Public Sub Save()
         ThisRemoteValue.SaveToArray UpdatedValues, i
     Next i
     
-    SetNumberFormats
-    
     If This.Worksheet.UsedRange.Rows.Count = 1 Then
         RangeSetValueFromVariant This.Worksheet.Cells.Item(2, 1), UpdatedValues
     Else
@@ -120,26 +189,6 @@ Public Sub Save()
     SortWorksheet
     
     RebuildCache
-End Sub
-
-Private Sub ClearWorksheet()
-    This.Worksheet.AutoFilterMode = False
-    If This.Worksheet.UsedRange Is Nothing Then Exit Sub
-    If This.Worksheet.UsedRange.Rows.Count = 1 Then Exit Sub
-    
-    This.Worksheet.UsedRange.AutoFilter Field:=5, Criteria1:="<>"
-    
-    Dim FilteredDataBodyRange As Range
-    
-    On Error Resume Next
-    Set FilteredDataBodyRange = GetWorksheetDatabodyRange(This.Worksheet).SpecialCells(xlCellTypeVisible)
-    On Error GoTo 0
-    
-    If Not FilteredDataBodyRange Is Nothing Then
-        FilteredDataBodyRange.EntireRow.Delete
-    End If
-    
-    This.Worksheet.AutoFilterMode = False
 End Sub
 
 Private Sub SetNumberFormats()
@@ -154,124 +203,74 @@ Private Sub SetNumberFormats()
     End With
 End Sub
 
-Public Function GetChangeMask(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, _
-    ByVal Values As Variant) As Variant
-    Dim Result As Variant
-    ReDim Result(1 To UBound(KeyIDs), 1 To UBound(FieldIDs))
-
-    If IsEmpty(This.LatestHash) Then
-        SetFullChangeMask Result
-        GetChangeMask = Result
-        Exit Function
+Private Sub ClearWorksheet()
+    Log.Message "RemoteValues.ClearWorksheet", "RValues", Debug_Level
+    This.Worksheet.AutoFilterMode = False
+    If This.Worksheet.UsedRange Is Nothing Then Exit Sub
+    If This.Worksheet.UsedRange.Rows.Count = 1 Then Exit Sub
+    
+    This.Worksheet.UsedRange.AutoFilter Field:=COL_LATEST_HASH, Criteria1:="<>"
+    
+    Dim FilteredDataBodyRange As Range
+    
+    On Error Resume Next
+    Set FilteredDataBodyRange = GetWorksheetDatabodyRange(This.Worksheet).SpecialCells(xlCellTypeVisible)
+    On Error GoTo 0
+    
+    If Not FilteredDataBodyRange Is Nothing Then
+        FilteredDataBodyRange.EntireRow.Delete
     End If
-    
-    Dim KeyIndex As Long
-    For KeyIndex = 1 To UBound(KeyIDs)
-        Dim FieldIndex As Long
-        For FieldIndex = 1 To UBound(FieldIDs)
-            Result(KeyIndex, FieldIndex) = IIf(Values(KeyIndex, FieldIndex) = GetValue(KeyIDs(KeyIndex), FieldIDs(FieldIndex)), 0, 1)
-        Next FieldIndex
-    Next KeyIndex
-    
-    GetChangeMask = Result
-End Function
-
-Public Function GetChangeCount(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, ByVal Values As Variant) As Long
-    Dim Result As Long
-
-    If IsEmpty(This.LatestHash) Then
-        GetChangeCount = UBound(KeyIDs) * UBound(FieldIDs)
-        Exit Function
-    End If
-    
-    Dim i As Long
-    For i = 1 To UBound(KeyIDs)
-        Dim j As Long
-        For j = 1 To UBound(FieldIDs)
-            If Values(i, j) <> GetValue(KeyIDs(i), FieldIDs(j)) Then
-                Result = Result + 1
-            End If
-        Next j
-    Next i
-    
-    GetChangeCount = Result
-End Function
-
-Private Sub SetFullChangeMask(ByRef ValuesVariant As Variant)
-    Dim i As Long
-    For i = 1 To UBound(ValuesVariant, 1)
-        Dim j As Long
-        For j = 1 To UBound(ValuesVariant, 2)
-            ValuesVariant(i, j) = 1
-        Next j
-    Next i
-End Sub
-
-Public Function GetValues(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant) As Variant
-    Dim Result As Variant
-    ReDim Result(1 To UBound(KeyIDs), 1 To UBound(FieldIDs))
     
     This.Worksheet.AutoFilterMode = False
-    This.Worksheet.UsedRange.AutoFilter Field:=5, Criteria1:="<>"
+End Sub
+
+' Returns an array containing RemoteValue elements for the given combination of KeyID and FieldID.
+' Returns Nothing if it cannot find any RemoteValues.
+' Referenced by: ValueTimelineQuery.Run (method)
+Public Function GetAllValues(ByVal KeyID As String, ByVal FieldID As String) As Variant
+    Log.Message "RemoteValues.GetAllValues", "RValues", Debug_Level
+    If This.Worksheet.UsedRange.Rows.Count = 1 Then Exit Function
     
-    Dim FilteredRange As Range
-    On Error Resume Next
-    Set FilteredRange = GetWorksheetDatabodyRange(This.Worksheet).SpecialCells(xlCellTypeVisible)
-    On Error GoTo 0
-    If FilteredRange Is Nothing Then Exit Function
+    This.Worksheet.AutoFilterMode = False
+    This.Worksheet.UsedRange.Sort Header:=xlYes, _
+        Key1:=This.Worksheet.Columns.Item(COL_KEY_ID), Order1:=xlAscending, _
+        Key2:=This.Worksheet.Columns.Item(COL_FIELD_ID), Order2:=xlAscending, _
+        Key3:=This.Worksheet.Columns.Item(COL_MTIME), Order3:=xlDescending
+        
+    Dim KeyPartitions As Variant
+    KeyPartitions = PartitionRangeByColumn(GetWorksheetDatabodyRange(This.Worksheet), COL_KEY_ID)
     
-    FilteredRange.Sort Header:=False, _
-        Key1:=This.Worksheet.Columns.Item(3), Order1:=xlAscending, _
-        Key1:=This.Worksheet.Columns.Item(2), Order1:=xlAscending
+    Dim KeyIndex As Long
+    KeyIndex = ArraySearch.BinarySearch2(KeyPartitions, KeyID)
+    If KeyIndex = -1 Then Exit Function
     
     Dim FieldPartitions As Variant
-    FieldPartitions = PartitionRange(FilteredRange, 3)
+    FieldPartitions = PartitionRangeByColumn(KeyPartitions(KeyIndex, 4), COL_FIELD_ID)
+    
+    If IsEmpty(FieldPartitions) Then Exit Function
     
     Dim FieldIndex As Long
-    For FieldIndex = 1 To UBound(FieldIDs)
-        Dim FieldPartitionIndex As Long
-        FieldPartitionIndex = PartitionIndexOf(FieldPartitions, FieldIDs(FieldIndex))
-        If FieldPartitionIndex > -1 Then
-            Dim ThisKeyIDs As Variant
-            ThisKeyIDs = FieldPartitions(FieldPartitionIndex, 4).Columns.Item(2).Value2
-            Dim ThisValues As Variant
-            ThisValues = FieldPartitions(FieldPartitionIndex, 4).Columns.Item(4).Value2
-            Dim KeyIndex As Long
-            For KeyIndex = 1 To UBound(KeyIDs)
-                Dim SearchResult As Long
-                SearchResult = ArraySearch.BinarySearch2(ThisKeyIDs, KeyIDs(KeyIndex))
-                If SearchResult > -1 Then
-                    Result(KeyIndex, FieldIndex) = ThisValues(SearchResult, 1)
-                End If
-            Next KeyIndex
-        End If
-    Next FieldIndex
+    FieldIndex = ArraySearch.BinarySearch2(FieldPartitions, FieldID)
+    If FieldIndex = -1 Then Exit Function
     
-    GetValues = Result
-    Log.Message "GetValues() End", "RValues"
-End Function
-
-Private Function PartitionIndexOf(ByRef Partitions As Variant, ByVal Key As String) As Long
+    Dim WorksheetValues As Variant
+    WorksheetValues = FieldPartitions(FieldIndex, COL_VALUE).Value2
+    
+    Dim Result As Variant
+    ReDim Result(1 To UBound(WorksheetValues, 1))
+    
     Dim i As Long
-    For i = 1 To UBound(Partitions, 1)
-        If Partitions(i, 1) = Key Then
-            PartitionIndexOf = i
-            Exit Function
-        End If
+    For i = 1 To UBound(WorksheetValues, 1)
+        Dim NewRemoteValue As RemoteValue
+        Set NewRemoteValue = New RemoteValue
+        NewRemoteValue.LoadFromArray WorksheetValues, i
+        Set Result(i) = NewRemoteValue
     Next i
-End Function
-
-Private Function GetValue(ByVal KeyID As String, ByVal FieldID As String) As Variant
-    Dim Query As String
-    Query = KeyID & "x" & FieldID
-        
-    Dim Index As Long
-    Index = ArraySearch.BinarySearch(This.LatestHash, Query)
-    If Index = -1 Then Exit Function
     
-    GetValue = This.Item.Item(Index - 1).Value
+    GetAllValues = Result
 End Function
 
+' Referenced by: PushQuery.Run (method)
 Public Sub UpsertValuesWithMask(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, _
     ByVal Values As Variant, ByVal ChangeMask As Variant, _
     ByVal CommitID As String)
@@ -296,7 +295,7 @@ Private Sub UpsertValue(ByVal KeyID As String, ByVal FieldID As String, ByVal Va
         Else
             This.IsDirty = True ' CHG (A -> B)
             ExistingLatestRemoteValue.Latest = vbNullString
-            ExistingLatestRemoteValue.ModificationTime = Application.Evaluate("=NOW()")
+            ExistingLatestRemoteValue.ModificationTime = Application.Evaluate("=NOW()") - 0.0000012 ' 1/10th of a second
         End If
     Else
         This.IsDirty = True ' NEW (0 -> A)
@@ -335,39 +334,3 @@ Private Function CreateNewValue(ByVal KeyID As String, ByVal FieldID As String, 
     Set CreateNewValue = NewRemoteValue
 End Function
 
-Public Function GetAllValues(ByVal KeyID As String, ByVal FieldID As String) As Variant
-    This.Worksheet.UsedRange.Sort Header:=xlYes, _
-        Key1:=This.Worksheet.Columns.Item(2), Order1:=xlAscending, _
-        Key2:=This.Worksheet.Columns.Item(3), Order2:=xlAscending, _
-        Key3:=This.Worksheet.Columns.Item(7), Order3:=xlDescending
-        
-    Dim KeyPartitions As Variant
-    KeyPartitions = PartitionRange(GetWorksheetDatabodyRange(This.Worksheet), 2)
-    
-    Dim KeyIndex As Long
-    KeyIndex = ArraySearch.BinarySearch2(KeyPartitions, KeyID)
-    If KeyIndex < 1 Then Exit Function
-    
-    Dim FieldPartitions As Variant
-    FieldPartitions = PartitionRange(KeyPartitions(KeyIndex, 4), 3)
-    
-    Dim FieldIndex As Long
-    FieldIndex = ArraySearch.BinarySearch2(FieldPartitions, FieldID)
-    If FieldIndex < 1 Then Exit Function
-    
-    Dim Values As Variant
-    Values = FieldPartitions(FieldIndex, 4).Value2
-    
-    Dim Values2 As Variant
-    ReDim Values2(1 To UBound(Values, 1))
-    
-    Dim i As Long
-    For i = 1 To UBound(Values, 1)
-        Dim NewRemoteValue As RemoteValue
-        Set NewRemoteValue = New RemoteValue
-        NewRemoteValue.LoadFromArray Values, i
-        Set Values2(i) = NewRemoteValue
-    Next i
-    
-    GetAllValues = Values2
-End Function

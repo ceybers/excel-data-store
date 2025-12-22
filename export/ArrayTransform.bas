@@ -3,6 +3,37 @@ Attribute VB_Name = "ArrayTransform"
 '@Folder("Helpers.Array")
 Option Explicit
 
+Public Function ArrayBox(ByVal InputArray As Variant, _
+    ByVal Row As Long, ByVal Column As Long, _
+    ByVal Rows As Long, ByVal Columns As Long) As Variant
+    
+    Debug.Assert ArrayCheck.IsTwoDimensionalOneBasedArray(InputArray)
+    Debug.Assert Rows <= UBound(InputArray, 1)
+    Debug.Assert Columns <= UBound(InputArray, 2)
+    
+    Dim Result As Variant
+    ReDim Result(1 To Rows, 1 To Columns)
+    
+    Dim i As Long
+    For i = 1 To Rows
+        Dim j As Long
+        For j = 1 To Columns
+            Result(i, j) = InputArray(Row - 1 + i, Column - 1 + j)
+        Next j
+    Next i
+    
+    ArrayBox = Result
+End Function
+
+' Returns a 2-dimensional array of size 1x1 with the specified parameter.
+Public Function VariantToArray(ByVal InputVariant As Variant) As Variant
+    Debug.Assert Not IsArray(InputVariant)
+    Dim Result As Variant
+    ReDim Result(1 To 1, 1 To 1)
+    Result(1, 1) = InputVariant
+    VariantToArray = Result
+End Function
+
 ' Transforms a 2-dimensional array of shape (many, one) into a 1-dimensional array.
 ' Useful for .Value2 of a Range that is 1-column wide.
 '    (1 to m, 1 to 1) to (1 to m)

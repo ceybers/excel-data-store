@@ -16,6 +16,7 @@ Implements IDebugEx
 Private Const DEFAULT_TOPIC As String = "default"
 Private Const SYSTEM_TOPIC As String = "System"
 Private Const MAX_MANY_ITEMS_PRINT As Long = 10
+Private Const TIMESTAMP_FORMAT As String = "00:00.000"
 
 Private Type TState
     StartTime As Double
@@ -43,7 +44,7 @@ Private Sub IDebugEx_StartLogging()
     This.StartTime = Timer()
     This.ItemCount = 0
     This.CurrentLevel = NoOutput_Level
-    This.FilterLevel = verbose_Level
+    This.FilterLevel = Verbose_Level
     This.ManyItemsPrint = MAX_MANY_ITEMS_PRINT
     IDebugEx_Message "Logging started...", SYSTEM_TOPIC, UI_Level
 End Sub
@@ -162,11 +163,11 @@ Private Function LogLevelToColor(ByVal LogLevel As Variant) As String
     Select Case LogLevel
         Case UI_Level: LogLevelToColor = "Blue"
         Case NoOutput_Level: LogLevelToColor = "White" 'default
-        Case Error_level: LogLevelToColor = "DarkRed"
+        Case Error_Level: LogLevelToColor = "DarkRed"
         Case Warning_Level: LogLevelToColor = "Magenta"
         Case Info_Level: LogLevelToColor = "White"
-        Case Debug_level: LogLevelToColor = "DarkYellow"
-        Case verbose_Level: LogLevelToColor = "Green"
+        Case Debug_Level: LogLevelToColor = "DarkYellow"
+        Case Verbose_Level: LogLevelToColor = "Green"
     End Select
 End Function
 
@@ -196,7 +197,7 @@ Private Function ConvertOptionalTopic(ByVal Topic As Variant, ByVal WasMissing A
 End Function
 
 Private Function GetDuration() As String
-    GetDuration = Format$(Timer() - This.StartTime, "00:00.00")
+    GetDuration = Format$(Timer() - This.StartTime, TIMESTAMP_FORMAT)
 End Function
 
 Private Sub IDebugEx_AddProvider(ByVal Provider As ILoggingProvider)

@@ -4,6 +4,7 @@ Option Explicit
 
 '@Description "Replaces all the cells of VarType vbError with cells of VarType vbEmpty in a 2-dimensional array."
 Public Sub ReplaceErrorCells2(ByRef InputArray As Variant)
+Attribute ReplaceErrorCells2.VB_Description = "Replaces all the cells of VarType vbError with cells of VarType vbEmpty in a 2-dimensional array."
     If Not IsTwoDimensionalOneBasedArray(InputArray) Then Exit Sub
     
     Dim i As Long
@@ -19,6 +20,7 @@ End Sub
 
 '@Description "Replaces all the cells of VarType vbError with cells of VarType vbEmpty in a 1-dimensional array."
 Public Sub ReplaceErrorCells(ByRef InputArray As Variant)
+Attribute ReplaceErrorCells.VB_Description = "Replaces all the cells of VarType vbError with cells of VarType vbEmpty in a 1-dimensional array."
     If Not IsOneDimensionalOneBasedArray(InputArray) Then Exit Sub
     
     Dim i As Long
