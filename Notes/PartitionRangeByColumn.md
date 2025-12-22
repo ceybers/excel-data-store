@@ -1,8 +1,8 @@
-# PartitionRange() method
+# PartitionRangeByColumn() method
 Partitions a Range into multiple smaller Ranges based on the values in a specific column. Each unique value in this Partitioning Column will result in a partitioned Range that contains all the rows with that value.
 
 ## Syntax
-RangeHelpers.**PartitionRange**(Range, Column) As Variant
+RangePartition.**PartitionRangeByColumn**(Range, Column) As Variant
 
 ## Parameters
 | Name | Required/Optional | Data Type | Description |
@@ -50,7 +50,7 @@ Dim InputRange As Range
 Set InputRange = ActiveSheet.Range("A2:D10")
 
 Dim Partitions As Variant
-Partitions = RangeHelpers.PartitionRange(InputRange, 1)
+Partitions = PartitionRangeByColumn(InputRange, 1)
 
 ' Partitions(2, 1) = "bravo"
 ' Partitions(2, 2) = 4
@@ -62,7 +62,7 @@ This example further partitions one of the partitions from the previous example,
 
 ```vb
 Dim SubPartitions As Variant
-SubPartitions = RangeHelpers.PartitionRange(Partitions(2, 4), 2)
+SubPartitions = PartitionRangeByColumn(Partitions(2, 4), 2)
 
 ' SubPartitions(1, 1) = "banana"
 ' SubPartitions(1, 2) = 4
@@ -83,3 +83,6 @@ Index = ArraySearch.BinarySearch2(Partitions, "banana")
 Index = ArraySearch.BinarySearch2(Partitions, "foobar")
 ' Index = -1
 ```
+
+# See Also
+- [Helper Libraries documentation](HelperLibraries.md)

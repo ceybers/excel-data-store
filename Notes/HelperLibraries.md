@@ -96,15 +96,6 @@ ResizeRangeToArray(
     ByVal InputArray As Variant) As Range
 ```
 
-### RangeSetValueFromVariant
- Updates the `Value2` property of the cells in a `Range` with the values from a 2-dimensional Variant array. If the array is smaller than the `Range`, only the cells from the top-left to the extents of the array will be updated. If the `Range` is larger than the `Range`, the function will update cells outside of the given `Range`.
-
-```vb
-RangeSetValueFromVariant(
-    ByVal InputRange As Range, 
-    ByVal InputVariantArray As Variant)
-```
-
 ### RangeBox
 Returns a new `Range` offset and resized from specified input `Range`. Returns `Nothing` if the input `Range` is nothing. Throws an error if any of the indices are zero or negative.
 
@@ -114,8 +105,6 @@ RangeBox(
     ByVal Row As Long, ByVal Column As Long, _
     ByVal Rows As Long, ByVal Columns As Long) As Range
 ```
-### PartitionRange
-See [PartitionRange](Partition.md).
 
 ### TryGetSelectionRange
 Returns `True` if the `Selection` object is of type `Range` and sets the variable to the `Range` object. Returns `False` if `Selection` is `Nothing` or is not a `Range`.
@@ -134,6 +123,20 @@ TryIntersectRanges(
     ByRef OutRange As Range) As Boolean
 ```
 
+## RangePartition
+### PartitionRangeByColumn
+See [PartitionRangeByColumn](PartitionRangeByColumn.md).
+
+## RangeValues
+### RangeSetValueFromVariant
+ Updates the `Value2` property of the cells in a `Range` with the values from a 2-dimensional Variant array. If the array is smaller than the `Range`, only the cells from the top-left to the extents of the array will be updated. If the `Range` is larger than the `Range`, the function will update cells outside of the given `Range`.
+
+```vb
+RangeSetValueFromVariant(
+    ByVal InputRange As Range, 
+    ByVal InputVariantArray As Variant)
+```
+
 ### GetStaggeredArrayValues
 Returns the `Value2` property array of a non-contiguous `Range` that has multiple `Area`s. The output `Variant` array is of the same shape as the `BaseRange` parameter. Cells that are not in the `SelectedRange` will be `Empty` variants.
 
@@ -141,6 +144,15 @@ Returns the `Value2` property array of a non-contiguous `Range` that has multipl
 GetStaggeredArrayValues(
     ByVal BaseRange As Range, 
     ByVal SelectedRange As Range) As Variant
+```
+
+### UpdateFilteredColumnRangeWithValues
+Updates the values of all the cells in a column Range with the values from a Variant array, respecting any filtered and/or hidden columns.
+
+```vb
+UpdateFilteredColumnRangeWithValues(
+    ByVal BaseRange As Range, 
+    ByVal VariantValues As Variant)
 ```
 
 ## WorkbookHelpers
