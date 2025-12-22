@@ -36,7 +36,7 @@ End Sub
 ' Referenced by Remote.Values (property) (getter)
 ' Referenced by Remote.Reload (method)
 Public Sub Load(ByVal Worksheet As Worksheet, ByVal HistoryWorksheet As Worksheet)
-    Log.Message "RemoteValues.Load", "RValues", debug_Level
+    Log.Message "RemoteValues.Load", "RValues", Debug_Level
     Set This.Worksheet = Worksheet
     Set This.HistoryWorksheet = HistoryWorksheet
 End Sub
@@ -114,7 +114,7 @@ Private Sub LazyLoadPartitions()
     Set LatestHashRange = This.Worksheet.Cells.Item(2, 1).Resize(LatestHashCount, ARRAY_WIDTH)
         
     Log.Message " PartitionRange", "RValues", Verbose_Level
-    This.Partitions = PartitionRange(LatestHashRange, RemoteValuesColumnIndexes.RV_FIELD_ID)
+    This.Partitions = PartitionRangeByColumn(LatestHashRange, RemoteValuesColumnIndexes.RV_FIELD_ID)
     QuickSort2 This.Partitions
     
     Log.Message " Get Value2", "RValues", Error_Level
@@ -163,7 +163,7 @@ Public Function GetAllValues(ByVal KeyID As String, ByVal FieldID As String) As 
     Set HistoryRange = WorksheetHelpers.GetWorksheetDatabodyRange(This.HistoryWorksheet)
     
     Dim FieldPartitions As Variant
-    FieldPartitions = PartitionRange(HistoryRange, RV_FIELD_ID)
+    FieldPartitions = PartitionRangeByColumn(HistoryRange, RV_FIELD_ID)
     If IsEmpty(FieldPartitions) Then Exit Function
     QuickSort2 FieldPartitions
     
@@ -172,7 +172,7 @@ Public Function GetAllValues(ByVal KeyID As String, ByVal FieldID As String) As 
     If FieldIndex = -1 Then Exit Function
     
     Dim KeyPartitions As Variant
-    KeyPartitions = PartitionRange(FieldPartitions(FieldIndex, 4), RV_KEY_ID)
+    KeyPartitions = PartitionRangeByColumn(FieldPartitions(FieldIndex, 4), RV_KEY_ID)
     If IsEmpty(KeyPartitions) Then Exit Function
     QuickSort2 KeyPartitions
         
@@ -285,9 +285,9 @@ Private Sub InsertRemoteValuesToWorksheet(ByVal RemoteValues As Collection)
         ThisRemoteValue.Latest = ThisRemoteValue.ID
     Next i
     
-    Log.Message "RemoteValues2.RangeSetValueFromVariant... start", "RValues", debug_Level
+    Log.Message "RemoteValues2.RangeSetValueFromVariant... start", "RValues", Debug_Level
     RangeSetValueFromVariant This.Worksheet.Cells.Item(This.Worksheet.UsedRange.Rows.Count + 1, 1), vv
-    Log.Message "RemoteValues2.RangeSetValueFromVariant... done", "RValues", debug_Level
+    Log.Message "RemoteValues2.RangeSetValueFromVariant... done", "RValues", Debug_Level
     
     Log.Message "RemoteValues2.InsertRemoteValuesToWorksheet... done", "RValues", Info_Level
 End Sub
@@ -328,9 +328,9 @@ Private Sub UpdateRemoteValuesToWorksheet(ByVal RemoteValues As Collection)
         ThisRemoteValue.Latest = OldValueID
     Next ThisRemoteValue
     
-    Log.Message "RemoteValues2.RangeSetValueFromVariant... start", "RValues", debug_Level
+    Log.Message "RemoteValues2.RangeSetValueFromVariant... start", "RValues", Debug_Level
     RangeSetValueFromVariant PartitionRange, vv
-    Log.Message "RemoteValues2.RangeSetValueFromVariant... done", "RValues", debug_Level
+    Log.Message "RemoteValues2.RangeSetValueFromVariant... done", "RValues", Debug_Level
     
     Log.Message "RemoteValues2.UpdateRemoteValuesToWorksheet... done", "RValues", Info_Level
 End Sub
@@ -393,3 +393,4 @@ Private Function CreateNewValue(ByVal KeyID As String, ByVal FieldID As String, 
     End With
     Set CreateNewValue = NewRemoteValue
 End Function
+

@@ -82,7 +82,7 @@ Private Sub SelectKeys(ByVal Partial As Boolean)
         If Not TryGetSelectionRange(SelectedRange) Then Exit Sub
         Dim SelectedKeys As Range
         If Not TryIntersectRanges(SelectedRange.EntireRow, BaseRange, SelectedKeys) Then Exit Sub
-        KeyValues = RangeHelpers.GetStaggeredArrayValues(BaseRange, SelectedKeys)
+        KeyValues = GetStaggeredArrayValues(BaseRange, SelectedKeys)
     Else
         KeyValues = BaseRange.Value2
     End If

@@ -90,12 +90,12 @@ Public Sub Load(ByVal Workbook As Workbook)
         This.Workbook.Worksheets.Item(WS_FIELDS_NAME).UsedRange.Rows.Count & "f " & _
         This.Workbook.Worksheets.Item(WS_VALUES_NAME).UsedRange.Rows.Count & "v"
     
-    Log.Message DEBUGRepoState, "Remote", debug_Level
+    Log.Message DEBUGRepoState, "Remote", Debug_Level
     Reload
 End Sub
 
 Public Sub Reload()
-    Log.Message "Remote.Reload()", "Remote", debug_Level
+    Log.Message "Remote.Reload()", "Remote", Debug_Level
     With This
         Set .RemoteKeys = New RemoteKeys2
         .RemoteKeys.Load This.Workbook.Worksheets.Item(WS_KEYS_NAME)
@@ -119,7 +119,7 @@ Public Sub Reload()
         Set .RemoteCommits = New RemoteCommits
         .RemoteCommits.Load This.Workbook.Worksheets.Item(WS_COMMITS_NAME)
     End With
-    Log.Message "Remote.Reload() End", "Remote", debug_Level
+    Log.Message "Remote.Reload() End", "Remote", Debug_Level
 End Sub
 
 Public Sub Show()

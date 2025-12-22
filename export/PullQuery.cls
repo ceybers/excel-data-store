@@ -119,6 +119,6 @@ Private Sub UpdateFromRemote(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant,
             End If
         Next k
         
-        RangeSetValueFromVariant ListColumn.DataBodyRange, vv
+        RangeValues.UpdateFilteredColumnRangeWithValues ListColumn.DataBodyRange, vv
     Next f
 End Sub

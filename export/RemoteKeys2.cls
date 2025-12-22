@@ -58,7 +58,7 @@ Private Sub LoadFromWorksheet()
     
     Log.Message "RemoteKeys.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False), "RKeys", Info_Level
     
-    This.Partitions = RangeHelpers.PartitionRange(DataBodyRange, PATH_COL_INDEX)
+    This.Partitions = PartitionRangeByColumn(DataBodyRange, PATH_COL_INDEX)
     ArraySort.QuickSort2 This.Partitions
     
     Dim i As Long

@@ -114,7 +114,7 @@ Public Sub Save()
 End Sub
 
 Private Sub ClearWorksheet()
-    Log.Message "RemoteKeys.ClearWorksheet", "RKeys", debug_Level
+    Log.Message "RemoteKeys.ClearWorksheet", "RKeys", Debug_Level
     
     This.Worksheet.AutoFilterMode = False
     If This.Worksheet.UsedRange Is Nothing Then Exit Sub
@@ -123,7 +123,7 @@ Private Sub ClearWorksheet()
 End Sub
 
 Private Sub SetNumberFormats()
-    Log.Message "RemoteKeys.SetNumberFormats", "RKeys", debug_Level
+    Log.Message "RemoteKeys.SetNumberFormats", "RKeys", Debug_Level
     
     With This.Worksheet.Columns
         .Item(1).NumberFormat = NUMFMT_TEXT ' ID
@@ -168,7 +168,7 @@ Private Sub UpdateLookupKeyValues()
     Log.Message "UpdateLookupKeyValues Sorting Path; Key... done.", "RKeys"
         
     Dim Partitions As Variant
-    Partitions = RangeHelpers.PartitionRange(GetWorksheetDatabodyRange(This.Worksheet), 2)
+    Partitions = PartitionRangeByColumn(GetWorksheetDatabodyRange(This.Worksheet), 2)
     
     Dim i As Long
     For i = 1 To UBound(Partitions, 1)
@@ -244,3 +244,4 @@ Private Function CreateNewKey(ByVal KeyPath As String, ByVal Key As String) As R
     
     Set CreateNewKey = NewRemoteKey
 End Function
+
