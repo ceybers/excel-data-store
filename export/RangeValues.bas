@@ -131,18 +131,34 @@ Attribute UpdateFilteredColumnRangeWithValues.VB_Description = "Updates the valu
         AreaExtents(i, 1) = AreaExtents(i, 1) - FirstRow
     Next i
     
+    Dim ExistingValues As Variant
+    ExistingValues = BaseRange.Value2
+    
     For i = 1 To Cursor
         Dim SubVariantValues As Variant
         ReDim SubVariantValues(1 To AreaExtents(i, 2), 1 To 1)
         
+        Dim IsSubRangeChanged As Boolean
+        IsSubRangeChanged = False
+        
         Dim j As Long
         For j = 1 To AreaExtents(i, 2)
             SubVariantValues(j, 1) = VariantValues(AreaExtents(i, 1) + j, 1)
+            If VariantValues(AreaExtents(i, 1) + j, 1) <> ExistingValues(AreaExtents(i, 1) + j, 1) Then
+                IsSubRangeChanged = True
+                Exit For
+            End If
         Next j
         
-        Dim SubRange As Range
-        Set SubRange = BaseRange.Resize(AreaExtents(i, 2)).Rows.Offset(AreaExtents(i, 1))
-        
-        SubRange.Value2 = SubVariantValues
+        If IsSubRangeChanged Then
+            For j = 1 To AreaExtents(i, 2)
+                SubVariantValues(j, 1) = VariantValues(AreaExtents(i, 1) + j, 1)
+            Next j
+            
+            Dim SubRange As Range
+            Set SubRange = BaseRange.Resize(AreaExtents(i, 2)).Rows.Offset(AreaExtents(i, 1))
+            
+            SubRange.Value2 = SubVariantValues
+        End If
     Next i
 End Sub
