@@ -38,6 +38,7 @@ Public Property Get RemoteFields() As RemoteFieldsVM
 End Property
 
 Public Property Get IsValid() As Boolean
+    If This.LocalFields.IsValid = False Then Exit Property
     If This.LocalFields.CanReset = False Then Exit Property
     If This.KeyPaths.IsMapped = False Then Exit Property
     IsValid = True

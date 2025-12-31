@@ -63,7 +63,9 @@ Private Sub LoadFromWorksheet()
     
     Dim i As Long
     For i = 1 To UBound(This.Partitions)
-        This.UniquePaths.Add Item:=This.Partitions(i, 1)
+        If Len(This.Partitions(i, 1)) > 3 Then
+            This.UniquePaths.Add Item:=This.Partitions(i, 1)
+        End If
     Next i
 End Sub
 

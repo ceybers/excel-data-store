@@ -2,7 +2,8 @@
 ## v0.7.2-beta (2025/12/31)
 - [x] View History (Timelime) now updates when changing the selected cell.
 - [x] Pull action now checks if a column contains cells with formulas and prompts the user before overwriting them.
-
+- [x] BUG Fixed bug when trying to make more than one local column to the same column in the remote data store.
+  
 ## v0.7.1-beta (2025/12/22)
 - [x] BUG Fixed bug with trying to Pull All or Pull Partial when the Worksheet was filtered or had hidden rows.
 - [x] BUG Fixed bug when the Remote store only had one Key in a Path.

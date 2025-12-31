@@ -33,3 +33,4 @@ Attribute CollectionToRangeUnion.VB_Description = "Returns a Range which is the 
     
     Set CollectionToRangeUnion = Result
 End Function
+

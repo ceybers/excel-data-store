@@ -39,6 +39,13 @@ Public Property Get CanReset() As Boolean
     Next i
 End Property
 
+Public Property Get IsValid() As Boolean
+    If Count = 0 Then Exit Sub
+    If Not CheckNoDuplicateMappedTo Then Exit Sub
+    
+    IsValid = True
+End Property
+
 Private Sub Class_Initialize()
     Set This.Items = New Collection
 End Sub
@@ -92,7 +99,9 @@ End Sub
 
 Public Sub SaveTo(ByVal TableMap As TableMap)
     TableMap.FieldMap.Clear
-        
+    
+    If Not CheckNoDuplicateMappedTo Then Exit Sub
+    
     Dim i As Long
     For i = 1 To Count
         Dim ThisItem As LocalFieldVM
@@ -138,4 +147,23 @@ Private Function TryGetByName(ByVal FieldName As String, ByRef OutMappedFieldVM 
             TryGetByName = True
         End If
     Next i
+End Function
+
+Private Function CheckNoDuplicateMappedTo() As Boolean
+    Dim CheckMappedTo As Scripting.Dictionary
+    Set CheckMappedTo = New Scripting.Dictionary
+    
+    Dim ThisLocalField As LocalFieldVM
+    For Each ThisLocalField In This.Items
+        If Not ThisLocalField.MappedTo Is Nothing Then
+            If CheckMappedTo.Exists(ThisLocalField.MappedTo.ID) Then
+                CheckNoDuplicateMappedTo = False
+                Exit Function
+            Else
+                CheckMappedTo.Add Key:=ThisLocalField.MappedTo.ID, Item:=True
+            End If
+        End If
+    Next ThisLocalField
+    
+    CheckNoDuplicateMappedTo = True
 End Function
