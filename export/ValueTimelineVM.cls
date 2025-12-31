@@ -12,7 +12,10 @@ Option Explicit
 
 Public Event SelectionChanged()
 
+'@Ignore HungarianNotation
+'@MemberAttribute VB_VarHelpID, -1
 Private WithEvents mWorksheet As Worksheet
+Attribute mWorksheet.VB_VarHelpID = -1
 
 Private Type TValueTimelineVM
     Query As ValueTimelineQuery
@@ -55,6 +58,7 @@ Public Sub Load(ByVal Query As ValueTimelineQuery)
     UpdateSelectedCell
 End Sub
 
+'@Ignore HungarianNotation
 Private Sub mWorksheet_SelectionChange(ByVal Target As Range)
     If GuardSelectionSingleCell Then Exit Sub
     UpdateSelectedCell
