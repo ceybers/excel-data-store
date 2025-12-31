@@ -2,7 +2,7 @@
 ## Next
 - [x] Pull action should check if one or more cells contain a Formula. Ask user before overwriting them.
 - [x] BUG Tables with more than one local column mapped to the same Remote Field results in error 457 key already associated.
-- [ ] BUG Case where Numbers formatted as text get stored in the Remote data store as number Variant types while the original cell is a String Variant type. Both Push and Pull actions will detect these values as different and continuously try to update.
+- [x] BUG Case where Numbers formatted as text get stored in the Remote data store as number Variant types while the original cell is a String Variant type. Both Push and Pull actions will detect these values as different and continuously try to update.
 - [ ] BUG Trying to manually enter a new Key Path changes the focus to Auto Map button on each key press.
 - [ ] Ribbon > Remote > Save/Close to only proceed if Remote store is already open.
 
