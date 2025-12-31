@@ -1,5 +1,4 @@
 Attribute VB_Name = "modRebuildRemoteFields"
-'@IgnoreModule IndexedDefaultMemberAccess
 '@Folder "RemoteDataStore.Factories"
 Option Explicit
 
@@ -10,46 +9,47 @@ Private Const COL_KEY As Long = 3
 Public Sub RebuildRemoteTable(ByVal Worksheet As Worksheet, ByVal ColumnHeadings As Variant)
     RebuildHeaders Worksheet, ColumnHeadings
 
-    RemoveExtraColumns Worksheet, UBound(ColumnHeadings) + 1
+    RemoveExtraColumns Worksheet, ColumnHeadings
     
     RemoveExtraRows Worksheet
     
-    Worksheet.UsedRange.RemoveDuplicates Header:=xlYes, _
-        Columns:=Array(COL_PATH, COL_KEY)
-        
-    Worksheet.UsedRange.Sort Header:=xlYes, _
-        Key1:=Worksheet.Columns.Item(COL_KEY), Order1:=xlDescending
+    RemoveDuplicates Worksheet
 
     RebuildIDs Worksheet
 End Sub
 
 Private Sub RebuildHeaders(ByVal Worksheet As Worksheet, ByVal ColumnHeadings As Variant)
-    RangeSetValueFromVariant Worksheet.Cells(1, 1).Resize(1, UBound(ColumnHeadings) + 1), ArrayTransform.ArrayToRow(ColumnHeadings)
-    
-    Worksheet.UsedRange.Sort Header:=xlYes, _
-        Key1:=Worksheet.Columns.Item(COL_KEY), Order1:=xlDescending
+    ' TODO FIX ArrayTransform.ArrayToRow expects a 1-based array not a 0-based array.
+    RangeSetValueFromVariant Worksheet.Cells.Item(1, 1), ArrayTransform.ArrayToRow(ColumnHeadings)
 End Sub
 
-Private Sub RemoveExtraColumns(ByVal Worksheet As Worksheet, ByVal ColumnCount As Long)
+Private Sub RemoveExtraColumns(ByVal Worksheet As Worksheet, ByVal ColumnHeadings As Variant)
+    Dim ColumnCount As Long
+    ColumnCount = UBound(ColumnHeadings) + 1
+    
     Dim LastCell As Range
-    Set LastCell = Worksheet.UsedRange.Cells(Worksheet.UsedRange.Cells.Count)
+    Set LastCell = Worksheet.UsedRange.Cells.Item(Worksheet.UsedRange.Cells.Count)
     
     If LastCell.Column > ColumnCount Then
         Dim ExtraColumnsToDelete As Range
-        Set ExtraColumnsToDelete = Worksheet.Range(Worksheet.Cells(1, ColumnCount + 1), LastCell).EntireColumn
+        Set ExtraColumnsToDelete = Worksheet.Range(Worksheet.Cells.Item(1, ColumnCount + 1), LastCell).EntireColumn
         ExtraColumnsToDelete.Delete
     End If
 End Sub
 
 Private Sub RemoveExtraRows(ByVal Worksheet As Worksheet)
+    Worksheet.UsedRange.Sort Header:=xlYes, _
+        Key1:=Worksheet.Columns.Item(COL_KEY), _
+        Order1:=xlDescending
+        
     Dim ActualUsedRange As Range
     Set ActualUsedRange = Worksheet.Cells.Columns.Item(COL_KEY).SpecialCells(xlCellTypeConstants)
     
     Dim LastActualCell As Range
-    Set LastActualCell = ActualUsedRange.Cells(ActualUsedRange.Cells.Count)
+    Set LastActualCell = ActualUsedRange.Cells.Item(ActualUsedRange.Cells.Count)
     
     Dim LastCell As Range
-    Set LastCell = Worksheet.UsedRange.Cells(Worksheet.UsedRange.Cells.Count)
+    Set LastCell = Worksheet.UsedRange.Cells.Item(Worksheet.UsedRange.Cells.Count)
     
     If LastActualCell.Row < LastCell.Row Then
         Dim ExtraRowsToDelete As Range
@@ -58,12 +58,16 @@ Private Sub RemoveExtraRows(ByVal Worksheet As Worksheet)
     End If
 End Sub
 
+Private Sub RemoveDuplicates(ByVal Worksheet As Worksheet)
+    Worksheet.UsedRange.RemoveDuplicates Header:=xlYes, Columns:=Array(COL_PATH, COL_KEY)
+End Sub
+
 Private Sub RebuildIDs(ByVal Worksheet As Worksheet)
     Dim DataBodyRange As Range
     Set DataBodyRange = Worksheet.Cells.Columns.Item(COL_KEY).SpecialCells(xlCellTypeConstants)
     
     Dim Range As Range
-    Set Range = Worksheet.Range(Worksheet.Cells(2, 1), DataBodyRange.Cells(DataBodyRange.Cells.Count))
+    Set Range = Worksheet.Range(Worksheet.Cells.Item(2, 1), DataBodyRange.Cells.Item(DataBodyRange.Cells.Count))
     
     Dim vv As Variant
     vv = Range.Value2
@@ -75,5 +79,7 @@ Private Sub RebuildIDs(ByVal Worksheet As Worksheet)
     
     RangeSetValueFromVariant Range, vv
     
-    Worksheet.UsedRange.Sort Header:=xlYes, Key1:=Worksheet.Columns.Item(COL_ID), Order1:=xlAscending
+    Worksheet.UsedRange.Sort Header:=xlYes, _
+        Key1:=Worksheet.Columns.Item(COL_ID), _
+        Order1:=xlAscending
 End Sub

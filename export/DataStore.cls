@@ -7,7 +7,6 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@IgnoreModule ProcedureNotUsed
 '@Folder "RemoteDataStore.Models"
 Option Explicit
 
@@ -40,6 +39,7 @@ End Sub
 Public Sub Unload()
     If This.Workbook Is Nothing Then Exit Sub
     This.Workbook.Close SaveChanges:=True
+    Set This.Workbook = Nothing
 End Sub
 
 Private Sub GetDataStoreFullPath()
@@ -88,9 +88,7 @@ ErrorCouldNotOpenWorkbook:
 End Sub
 
 Private Sub CreateRemote()
-    Debug.Assert Not This.Workbook Is Nothing
-    If This.Workbook Is Nothing Then Exit Sub
-    If This.Workbook.Worksheets.Item(1).Range("A1").Value2 <> MAGIC_PHRASE_A1 Then
+    If Not IsDatastoreWorkbookValid(This.Workbook) Then
         MsgBox MSG_DATASTORE_WB_INVALID, vbExclamation + vbOKOnly, APP_TITLE
         Exit Sub
     End If
@@ -98,3 +96,8 @@ Private Sub CreateRemote()
     Set This.Remote = New Remote
     This.Remote.Load This.Workbook
 End Sub
+
+Private Function IsDatastoreWorkbookValid(ByVal Workbook As Workbook) As Boolean
+    If Workbook Is Nothing Then Exit Function
+    IsDatastoreWorkbookValid = This.Workbook.Worksheets.Item(1).Range("A1").Value2 = MAGIC_PHRASE_A1
+End Function

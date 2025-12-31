@@ -42,8 +42,8 @@ End Property
 Public Property Get Fields() As RemoteFields
     Log.Message "Remote.Fields Property Get", "Remote", Verbose_Level
     If This.RemoteFields Is Nothing Then
-            Set This.RemoteFields = New RemoteFields
-            This.RemoteFields.Load This.Workbook.Worksheets.Item(WS_FIELDS_NAME)
+        Set This.RemoteFields = New RemoteFields
+        This.RemoteFields.Load This.Workbook.Worksheets.Item(WS_FIELDS_NAME)
     End If
     Set Fields = This.RemoteFields
 End Property
@@ -69,14 +69,10 @@ End Property
 
 Public Property Get Tables() As RemoteTables
     Log.Message "Remote.Tables Property Get", "Remote", Verbose_Level
-    'Log.Message "  If", "RTables", Debug_Level
     If This.RemoteTables Is Nothing Then
-        'Log.Message "  Set new", "RTables", Debug_Level
         Set This.RemoteTables = New RemoteTables
-        'Log.Message "  Load", "RTables", Debug_Level
         This.RemoteTables.Load This.Workbook.Worksheets.Item(WS_TABLES_NAME)
     End If
-    'Log.Message "  Set Prop", "RTables", Debug_Level
     Set Tables = This.RemoteTables
 End Property
 
@@ -91,11 +87,13 @@ Public Sub Load(ByVal Workbook As Workbook)
         This.Workbook.Worksheets.Item(WS_VALUES_NAME).UsedRange.Rows.Count & "v"
     
     Log.Message DEBUGRepoState, "Remote", Debug_Level
+    
     Reload
 End Sub
 
 Public Sub Reload()
     Log.Message "Remote.Reload()", "Remote", Debug_Level
+    
     With This
         Set .RemoteKeys = New RemoteKeys2
         .RemoteKeys.Load This.Workbook.Worksheets.Item(WS_KEYS_NAME)
@@ -119,6 +117,7 @@ Public Sub Reload()
         Set .RemoteCommits = New RemoteCommits
         .RemoteCommits.Load This.Workbook.Worksheets.Item(WS_COMMITS_NAME)
     End With
+    
     Log.Message "Remote.Reload() End", "Remote", Debug_Level
 End Sub
 
@@ -142,5 +141,13 @@ End Sub
 
 Public Sub CloseWorkbook()
     This.Workbook.Close
-    Set This.Workbook = Nothing
+    With This
+        Set .Workbook = Nothing
+        Set .RemoteKeys = Nothing
+        Set .RemoteFields = Nothing
+        Set .RemoteValues = Nothing
+        Set .RemoteCommits = Nothing
+        Set .RemoteMaps = Nothing
+        Set .RemoteTables = Nothing
+    End With
 End Sub
