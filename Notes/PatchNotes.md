@@ -1,10 +1,13 @@
 # Patch Notes
+## v0.7.2-beta (2025/12/31)
+- [x] View History (Timelime) now updates when changing the selected cell.
+
 ## v0.7.1-beta (2025/12/22)
 - [x] BUG Fixed bug with trying to Pull All or Pull Partial when the Worksheet was filtered or had hidden rows.
 - [x] BUG Fixed bug when the Remote store only had one Key in a Path.
 - [x] Remote Values table now split into Values-Latest and Values-History (Slowly Changing Dimension Type 4)
-  - [ ] Values-Latest keeps the latest Value for each pair of Field×Key.
-  - [ ] Values-History keeps the history of all values. (e.g., for Timeline UI)
+  - Values-Latest keeps the latest Value for each pair of Field×Key.
+  - Values-History keeps the history of all values. (e.g., for Timeline UI)
 - [x] Refactored more code to partition tables and only operated rows relating to their query.
 - [x] Refactored more code to cache data from the Worksheet instead of constantly fetching it from Worksheets.  
   

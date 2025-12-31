@@ -230,19 +230,26 @@ Public Sub TimelineSingle()
     
     If GuardMappedTableNoListObject(MappedTable) Then Exit Sub
     
-    MappedTable.SelectKeysAndFields PartialSelection:=True
+    'MappedTable.SelectKeysAndFields PartialSelection:=True
     
     Log.Message "New ValueTimelineQuery", "TimeLSngl"
-    With New ValueTimelineQuery
+    
+    Dim Query As ValueTimelineQuery
+    Set Query = New ValueTimelineQuery
+    With Query
         Set .MappedTable = MappedTable
         Set .Remote = RemoteFactory.GetRemote
-        .Run
-        
-        Dim VM As ValueTimelineVM
-        Set VM = New ValueTimelineVM
-        Log.Message "New ValueTimelineVM", "TimeLSngl"
-        VM.Load .Results, RemoteFactory.GetRemote
-        VM.NumberFormat = Selection.NumberFormatLocal
+        '.Run
+    End With
+    
+    Dim VM As ValueTimelineVM
+    Set VM = New ValueTimelineVM
+    Log.Message "New ValueTimelineVM", "TimeLSngl"
+    
+    With VM
+        .NumberFormat = Selection.NumberFormatLocal
+        Set .Worksheet = MappedTable.ListObject.Parent
+        .Load Query
     End With
     
     Dim View As IView
