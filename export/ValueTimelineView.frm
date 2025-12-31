@@ -19,6 +19,7 @@ Option Explicit
 
 Implements IView
 
+'@MemberAttribute VB_VarHelpID, -1
 Private WithEvents mViewModel As ValueTimelineVM
 Attribute mViewModel.VB_VarHelpID = -1
 
@@ -62,6 +63,10 @@ End Sub
 
 Private Sub InitializeControls()
     InitValuesListView Me.lvValues
+    ' This UserForm only gets a reference to the VM and can only catch the
+    ' SelectionChanged event _after_ it has already fired for the first time.
+    LoadValuesToListView mViewModel.Values, Me.lvValues
+    UpdateControls
 End Sub
 
 Private Sub InitValuesListView(ByVal ListView As ListView)
