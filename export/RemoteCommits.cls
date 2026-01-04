@@ -90,14 +90,16 @@ Private Sub ClearWorksheet()
 End Sub
 
 Private Sub SetNumberFormats()
-    With This.Worksheet.Columns
-        .Item(1).NumberFormat = NUMFMT_TEXT ' CommitID
-        .Item(2).NumberFormat = NUMFMT_TEXT ' TableID
-        .Item(3).NumberFormat = NUMFMT_TEXT ' MapID
-        .Item(4).NumberFormat = NUMFMT_TEXT ' Caption
-        .Item(5).NumberFormat = NUMFMT_DATE ' Timestamp
-        .Item(6).NumberFormat = NUMFMT_TEXT ' Message
-    End With
+    SetNumberFormat 1, NUMFMT_TEXT ' CommitID
+    SetNumberFormat 2, NUMFMT_TEXT ' TableID
+    SetNumberFormat 3, NUMFMT_TEXT ' MapID
+    SetNumberFormat 4, NUMFMT_TEXT ' Caption
+    SetNumberFormat 5, NUMFMT_DATE ' Timestamp
+    SetNumberFormat 6, NUMFMT_TEXT ' Message
+End Sub
+
+Private Sub SetNumberFormat(ByVal idx As Long, ByVal Format As String)
+    This.Worksheet.Columns.Item(idx).NumberFormat = Format
 End Sub
 
 Private Sub SortWorksheet()

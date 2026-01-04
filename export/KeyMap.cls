@@ -54,22 +54,6 @@ Public Sub AddMany(ByVal Values As Variant)
     Next i
 End Sub
 
-Public Function Serialize() As String
-    Dim Result As String
-    Result = KeyColumnName & Chr$(ASCII_US) & KeyPath
-    
-    Serialize = Result
-End Function
-
-Public Sub Deserialize(ByVal SerializedString As String)
-    Dim SplitString As Variant
-    SplitString = Split(SerializedString, Chr$(ASCII_US))
-    Debug.Assert UBound(SplitString) = 1
-    
-    KeyColumnName = SplitString(0)
-    KeyPath = SplitString(1)
-End Sub
-
 Public Sub ResolveIDs(ByVal Remote As Remote)
     Log.Message "ResolveIDs()... starts", "KeyMap", Info_Level
     
@@ -79,6 +63,7 @@ Public Sub ResolveIDs(ByVal Remote As Remote)
     This.KeyIDs = Remote.Keys.GetIDsFromQuery(KeyPath, This.KeyValues)
     
     ReDim This.KeyIDtoRow(1 To Count, 1 To 2)
+    
     Dim i As Long
     For i = 1 To Count
         This.KeyIDtoRow(i, 1) = This.KeyIDs(i)
@@ -101,3 +86,19 @@ End Function
 Public Function GetKeyIDs() As Variant
     GetKeyIDs = This.KeyIDs
 End Function
+
+Public Function Serialize() As String
+    Dim Result As String
+    Result = KeyColumnName & Chr$(ASCII_US) & KeyPath
+    
+    Serialize = Result
+End Function
+
+Public Sub Deserialize(ByVal SerializedString As String)
+    Dim SplitString As Variant
+    SplitString = Split(SerializedString, Chr$(ASCII_US))
+    Debug.Assert UBound(SplitString) = 1
+    
+    KeyColumnName = SplitString(0)
+    KeyPath = SplitString(1)
+End Sub

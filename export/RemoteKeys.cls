@@ -12,21 +12,25 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Const ARRAY_WIDTH As Long = 7
+Private Const PATH_COL_INDEX As Long = 2
+Private Const KEY_COL_INDEX As Long = 3
 
 Private Type TState
     Worksheet As Worksheet
-    Item As Collection ' Collection<RemoteKey>
+    Item As Collection
     UniquePaths As Collection
-    IsDirty As Boolean
-    
-    CurrentKeyPath As String
-    LookupKeyIDs As Variant
+
+    Partitions As Variant
+    KeyPaths As Scripting.Dictionary
+    NewRemoteKeys As Scripting.Dictionary
 End Type
 Private This As TState
 
 Private Sub Class_Initialize()
     Set This.Item = New Collection
     Set This.UniquePaths = New Collection
+    Set This.KeyPaths = New Scripting.Dictionary
+    Set This.NewRemoteKeys = New Scripting.Dictionary
 End Sub
 
 Public Property Get Count() As Long
@@ -45,193 +49,139 @@ Public Sub Load(ByVal Worksheet As Worksheet)
     Set This.Worksheet = Worksheet
     
     LoadFromWorksheet
-    GenerateUniquePaths
 End Sub
 
 Private Sub LoadFromWorksheet()
-    SortWorksheet
-    
     Dim DataBodyRange As Range
     Set DataBodyRange = GetWorksheetDatabodyRange(This.Worksheet)
     If DataBodyRange Is Nothing Then Exit Sub
     
-    Dim WorksheetValues As Variant
     Log.Message "RemoteKeys.LoadFromWorksheet reading from " & DataBodyRange.Address(False, False), "RKeys", Info_Level
-    WorksheetValues = DataBodyRange.Value2
+    
+    This.Partitions = PartitionRangeByColumn(DataBodyRange, PATH_COL_INDEX)
+    ArraySort.QuickSort2 This.Partitions
     
     Dim i As Long
-    For i = 1 To UBound(WorksheetValues, 1)
-        Dim NewRemoteKey As RemoteKey
-        Set NewRemoteKey = New RemoteKey
-        NewRemoteKey.LoadFromArray WorksheetValues, i
-        This.Item.Add Item:=NewRemoteKey
-    Next i
-End Sub
-
-Private Sub GenerateUniquePaths()
-    CollectionClear This.UniquePaths
-    
-    If Count = 0 Then Exit Sub
-    
-    Dim AllPaths As Variant
-    ReDim AllPaths(1 To Count) As String
-    
-    Dim i As Long
-    For i = 1 To Count
-        AllPaths(i) = Item(i).Path
-    Next
-    
-    Dim UniquePaths As Variant
-    UniquePaths = ArrayUnique.Unique(AllPaths)
-    
-    For i = 1 To UBound(UniquePaths)
-        This.UniquePaths.Add Item:=UniquePaths(i)
-    Next i
-End Sub
-
-Public Sub Save()
-    Debug.Assert Not This.Worksheet Is Nothing
-    
-    If This.IsDirty = False Then Exit Sub
-    
-    ClearWorksheet
-    
-    Dim UpdatedValues As Variant
-    ReDim UpdatedValues(1 To This.Item.Count, 1 To ARRAY_WIDTH)
-    
-    Dim i As Long
-    For i = 1 To This.Item.Count
-        Dim ThisRemoteKey As RemoteKey
-        Set ThisRemoteKey = This.Item.Item(i)
-        ThisRemoteKey.SaveToArray UpdatedValues, i
-    Next i
-    
-    SetNumberFormats
-    
-    RangeSetValueFromVariant This.Worksheet.Range("A2"), UpdatedValues
-    
-    SortWorksheet
-End Sub
-
-Private Sub ClearWorksheet()
-    Log.Message "RemoteKeys.ClearWorksheet", "RKeys", Debug_Level
-    
-    This.Worksheet.AutoFilterMode = False
-    If This.Worksheet.UsedRange Is Nothing Then Exit Sub
-    If This.Worksheet.UsedRange.Rows.Count = 1 Then Exit Sub
-    This.Worksheet.UsedRange.Offset(1).Delete
-End Sub
-
-Private Sub SetNumberFormats()
-    Log.Message "RemoteKeys.SetNumberFormats", "RKeys", Debug_Level
-    
-    With This.Worksheet.Columns
-        .Item(1).NumberFormat = NUMFMT_TEXT ' ID
-        .Item(5).NumberFormat = NUMFMT_DATE ' CTime
-        .Item(6).NumberFormat = NUMFMT_DATE ' MTime
-        .Item(7).NumberFormat = NUMFMT_DATE ' DTime
-    End With
-End Sub
-
-Private Sub SortWorksheet()
-    ' Column 3 = Key
-    This.Worksheet.UsedRange.Sort Key1:=This.Worksheet.Columns.Item(3), Header:=xlYes
-End Sub
-
-Public Function GetIDsFromQuery(ByVal KeyPath As String, ByVal Keys As Variant) As Variant
-    This.CurrentKeyPath = KeyPath
-    UpdateLookupKeyValues
-    
-    Dim ResultCount As Long
-    ResultCount = UBound(Keys, 1)
-    
-    Dim Result As Variant
-    ReDim Result(1 To ResultCount) As String
-    
-    Dim i As Long
-    For i = 1 To ResultCount
-        Result(i) = GetOrCreateKeyID(KeyPath, Keys(i))
-    Next i
-    
-    Save
-    
-    This.CurrentKeyPath = vbNullString
-    GetIDsFromQuery = Result
-End Function
-
-Private Sub UpdateLookupKeyValues()
-    ' Sort Path A-Z; Key A-Z
-    Log.Message "UpdateLookupKeyValues Sorting Path; Key...", "RKeys"
-    This.Worksheet.UsedRange.Sort Header:=xlYes, _
-        Key1:=This.Worksheet.Columns.Item(2), _
-        Key1:=This.Worksheet.Columns.Item(3)
-    Log.Message "UpdateLookupKeyValues Sorting Path; Key... done.", "RKeys"
-        
-    Dim Partitions As Variant
-    Partitions = PartitionRangeByColumn(GetWorksheetDatabodyRange(This.Worksheet), 2)
-    
-    Dim i As Long
-    For i = 1 To UBound(Partitions, 1)
-        If Partitions(i, 1) = This.CurrentKeyPath Then
-            DoUpdateLookupKeyValues Partitions, i
-            Exit Sub
+    For i = 1 To UBound(This.Partitions)
+        If Len(This.Partitions(i, 1)) > 3 Then
+            This.UniquePaths.Add Item:=This.Partitions(i, 1)
         End If
     Next i
 End Sub
 
-Private Sub DoUpdateLookupKeyValues(ByRef Partitions As Variant, ByVal PartitionIndex As Long)
-    Log.Message "DoUpdateLookupKeyValues found: " & Partitions(PartitionIndex, 2) & " to " & Partitions(PartitionIndex, 3), "RKeys"
-    Dim Range As Range
-    Set Range = Partitions(PartitionIndex, 4)
+Private Sub Save()
+    Dim NewKeyCount As Long
+    NewKeyCount = This.NewRemoteKeys.Count
+    If NewKeyCount = 0 Then Exit Sub
     
-    Dim Result As Variant
-    ReDim Result(1 To Range.Rows.Count, 1 To 2)
+    Dim vv As Variant
+    ReDim vv(1 To NewKeyCount, 1 To ARRAY_WIDTH)
     
-    Dim vvValues As Variant
-    vvValues = Range.Columns.Item(3).Value2
-    Dim vvID As Variant
-    vvID = Range.Columns.Item(1).Value2
-    
+    Dim ThisRemoteKey As RemoteKey
     Dim i As Long
-    For i = 1 To UBound(vvValues)
-        Result(i, 1) = vvValues(i, 1)
-        Result(i, 2) = vvID(i, 1)
+    For i = 1 To NewKeyCount
+        Set ThisRemoteKey = This.NewRemoteKeys.Items(i - 1)
+        ThisRemoteKey.SaveToArray vv, i
     Next i
     
-    ArraySort.QuickSort2 Result
+    Dim NewKeysRange As Range
+    Set NewKeysRange = This.Worksheet.Cells.Item(This.Worksheet.UsedRange.Rows.Count + 1, 1)
+    RangeSetValueFromVariant NewKeysRange, vv
     
-    This.LookupKeyIDs = Result
+    Log.Message "RemoteKeys.Save saved " & NewKeyCount & " keys", "RKeys", Info_Level
 End Sub
 
-Private Function GetOrCreateKeyID(ByVal KeyPath As String, ByVal Key As String) As String
-    If Key = vbNullString Then
-        GetOrCreateKeyID = vbNullString
-        Exit Function
+' Main entry point
+'   KeyPath = "Test\Cities"
+'   Keys = Variant/String(1 to 1002)
+'     Keys(1) = "New York"
+'     Keys(2) = "Los Angeles"
+'   GetIDsFromQuery = Variant/String(1 to 1002)
+'     Result(1) = "1234ABCD"
+'     Result(2) = "ABCD1234"
+Public Function GetIDsFromQuery(ByVal KeyPath As String, ByVal Keys As Variant) As Variant
+    Dim ResultCount As Long
+    ResultCount = UBound(Keys, 1)
+    Log.Message "GetIDsFromQuery (count = " & ResultCount & ")", "RKeys", Info_Level
+    
+    Dim Result As Variant
+    ReDim Result(1 To ResultCount) As String
+    
+    Dim RemoteKeysDict As Scripting.Dictionary
+    
+    If Not TryGetKeysInPath(KeyPath, RemoteKeysDict) Then
+        Set RemoteKeysDict = New Scripting.Dictionary
     End If
     
-    Dim KeyIDFast As String
-    KeyIDFast = TryGetKeyIDFast(Key)
-    If KeyIDFast <> vbNullString Then
-        GetOrCreateKeyID = KeyIDFast
-        Exit Function
+    Dim i As Long
+    For i = 1 To UBound(Keys)
+        Dim ThisKeyValue As String
+        ThisKeyValue = Keys(i)
+        
+        If ThisKeyValue <> vbNullString Then
+            If RemoteKeysDict.Exists(ThisKeyValue) Then
+                Result(i) = RemoteKeysDict.Item(ThisKeyValue).ID
+            Else
+                Result(i) = CreateNewKey(KeyPath, ThisKeyValue)
+            End If
+        End If
+    Next i
+    Log.Message " Dictionary compiled", "RKeys", Info_Level
+    
+    Save
+    
+    GetIDsFromQuery = Result
+    Log.Message "GetIDsFromQuery... done", "RKeys", Info_Level
+End Function
+
+Private Function TryGetKeysInPath(ByVal KeyPath As String, ByRef OutKeyDictionary As Scripting.Dictionary) As Boolean
+    Log.Message " TryGetKeysInPath...", "RKeys", Info_Level
+    
+    If IsEmpty(This.Partitions) Then Exit Function ' There are no existing Keys or Paths in the remote store.
+    If KeyPath = vbNullString Then Exit Function ' Invalid KeyPath.
+    
+    If Not This.KeyPaths.Exists(KeyPath) Then
+        Dim PathIndex As Long
+        PathIndex = ArraySearch.BinarySearch2(This.Partitions, KeyPath)
+        
+        If PathIndex = -1 Then
+            Set OutKeyDictionary = New Scripting.Dictionary
+            TryGetKeysInPath = True
+            Exit Function
+            ' There are no existing Keys in this Path in the remote store.
+            ' Return a blank Dictionary.
+            ' We will create new Keys and add them to this in-memory dictionary and the NewRemoteKeys dict to save later.
+        End If
+        
+        LoadKeyPath KeyPath, This.Partitions(PathIndex, 4)
     End If
     
-    Dim RemoteKey As RemoteKey
-    Set RemoteKey = CreateNewKey(KeyPath, Key)
-    This.Item.Add Item:=RemoteKey
-    This.IsDirty = True
-    GetOrCreateKeyID = RemoteKey.ID
+    Set OutKeyDictionary = This.KeyPaths.Item(KeyPath)
+    TryGetKeysInPath = True
+    Log.Message " TryGetKeysInPath... done", "RKeys", Info_Level
 End Function
 
-Private Function TryGetKeyIDFast(ByVal Key As String) As String
-    Dim Index As Long
-    Index = ArraySearch.BinarySearch2(This.LookupKeyIDs, Key)
-    If Index = -1 Then Exit Function
+Private Sub LoadKeyPath(ByVal KeyPath As String, ByVal Range As Range)
+    Dim vv As Variant
+    vv = Range.Value2
     
-    TryGetKeyIDFast = This.LookupKeyIDs(Index, 2)
-End Function
+    Dim Keys As Scripting.Dictionary
+    Set Keys = New Scripting.Dictionary
+    
+    Dim i As Long
+    For i = 1 To UBound(vv, 1)
+        Dim NewRemoteKey As RemoteKey
+        Set NewRemoteKey = New RemoteKey
+        NewRemoteKey.LoadFromArray vv, i
+        Set Keys.Item(NewRemoteKey.Key) = NewRemoteKey
+    Next i
+    
+    This.KeyPaths.Add Key:=KeyPath, Item:=Keys
+    
+    Log.Message "  LoadKeyPath... " & UBound(vv, 1) & " items", "RKeys", Info_Level
+End Sub
 
-Private Function CreateNewKey(ByVal KeyPath As String, ByVal Key As String) As RemoteKey
+Private Function CreateNewKey(ByVal KeyPath As String, ByVal Key As String) As String
     Dim NewRemoteKey As RemoteKey
     Set NewRemoteKey = New RemoteKey
     
@@ -242,6 +192,6 @@ Private Function CreateNewKey(ByVal KeyPath As String, ByVal Key As String) As R
         .ID = Left$(HashSHA1(.Path & "\" & .Key), HASH_LEN)
     End With
     
-    Set CreateNewKey = NewRemoteKey
+    Set This.NewRemoteKeys.Item(NewRemoteKey.ID) = NewRemoteKey
+    CreateNewKey = NewRemoteKey.ID
 End Function
-

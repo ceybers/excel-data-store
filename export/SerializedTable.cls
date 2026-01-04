@@ -57,31 +57,6 @@ Public Property Set ListObject(ByVal RHS As ListObject)
     Set This.ListObject = RHS
 End Property
 
-Public Function Serialize() As String
-    Dim Tokens(0 To 4) As String
-    Tokens(0) = This.ListObject.Parent.Parent.FullName
-    Tokens(1) = This.ListObject.Parent.Parent.Path ' WB Path only
-    Tokens(2) = This.ListObject.Parent.Parent.Name 'WB
-    Tokens(3) = This.ListObject.Parent.Name ' WS
-    Tokens(4) = This.ListObject.Name ' LO
-    
-    Serialize = Join$(Tokens, Chr$(ASCII_FS))
-End Function
-
-Public Sub Deserialize(ByVal SerializedString As String)
-    Dim Tokens As Variant
-    Tokens = Split(SerializedString, Chr$(ASCII_FS))
-    Debug.Assert UBound(Tokens) = 4
-    
-    With This
-        .WorkbookFullName = Tokens(0)
-        .WorkbookPath = Tokens(1)
-        .WorkbookName = Tokens(2)
-        .WorksheetName = Tokens(3)
-        .ListObjectName = Tokens(4)
-    End With
-End Sub
-
 Public Function TryMatch() As MatchType
     If This.ListObject Is Nothing Then Exit Function
     
@@ -158,3 +133,28 @@ Private Function TryResolveByWorkbookName() As Boolean
         TryResolveByWorkbookName = True
     End If
 End Function
+
+Public Function Serialize() As String
+    Dim Tokens(0 To 4) As String
+    Tokens(0) = This.ListObject.Parent.Parent.FullName
+    Tokens(1) = This.ListObject.Parent.Parent.Path ' WB Path only
+    Tokens(2) = This.ListObject.Parent.Parent.Name 'WB
+    Tokens(3) = This.ListObject.Parent.Name ' WS
+    Tokens(4) = This.ListObject.Name ' LO
+    
+    Serialize = Join$(Tokens, Chr$(ASCII_FS))
+End Function
+
+Public Sub Deserialize(ByVal SerializedString As String)
+    Dim Tokens As Variant
+    Tokens = Split(SerializedString, Chr$(ASCII_FS))
+    Debug.Assert UBound(Tokens) = 4
+    
+    With This
+        .WorkbookFullName = Tokens(0)
+        .WorkbookPath = Tokens(1)
+        .WorkbookName = Tokens(2)
+        .WorksheetName = Tokens(3)
+        .ListObjectName = Tokens(4)
+    End With
+End Sub

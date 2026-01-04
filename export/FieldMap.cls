@@ -7,7 +7,6 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@IgnoreModule ProcedureNotUsed
 '@Folder "Version4.TableMap"
 Option Explicit
 
@@ -28,40 +27,44 @@ Public Property Get Item(ByVal Index As Long) As MappedField
     Set Item = This.Items.Item(Index)
 End Property
 
+Public Sub Clear()
+    CollectionClear This.Items
+End Sub
+
 Public Sub Add(ByVal ListColumnName As String, ByVal FieldID As String)
     Dim NewMappedField As MappedField
     Set NewMappedField = New MappedField
+    
     With NewMappedField
         .ListColumnName = ListColumnName
         .FieldID = FieldID
     End With
+    
     This.Items.Add Item:=NewMappedField, Key:=FieldID
 End Sub
 
 Public Sub SelectField(ByVal ListColumnName As String)
-    Dim i As Long
-    For i = 1 To Count
-        Dim ThisMappedField As MappedField
-        Set ThisMappedField = This.Items.Item(i)
+    Dim ThisMappedField As MappedField
+    For Each ThisMappedField In This.Items
         If ThisMappedField.ListColumnName = ListColumnName Then
             ThisMappedField.Selected = True
             Exit Sub
         End If
-    Next i
+    Next ThisMappedField
 End Sub
 
 Public Sub SelectAllFields()
-    Dim i As Long
-    For i = 1 To Count
-        This.Items.Item(i).Selected = True
-    Next i
+    Dim ThisMappedField As MappedField
+    For Each ThisMappedField In This.Items
+        ThisMappedField.Selected = True
+    Next ThisMappedField
 End Sub
 
 Public Sub UnselectAllFields()
-    Dim i As Long
-    For i = 1 To Count
-        This.Items.Item(i).Selected = False
-    Next i
+    Dim ThisMappedField As MappedField
+    For Each ThisMappedField In This.Items
+        ThisMappedField.Selected = False
+    Next ThisMappedField
 End Sub
 
 Public Function Serialize() As String
@@ -88,7 +91,9 @@ Public Sub Deserialize(ByVal SerializedString As String)
     For i = 0 To UBound(SplitString)
         Dim MappedField As MappedField
         Set MappedField = New MappedField
+        
         MappedField.Deserialize SplitString(i)
+        
         This.Items.Add Item:=MappedField, Key:=MappedField.FieldID
     Next i
 End Sub
@@ -101,19 +106,18 @@ Public Function GetFieldIDs() As Variant
     
     Dim Cursor As Long
     
-    Dim i As Long
-    For i = 1 To Count
-        Dim MappedField As MappedField
-        Set MappedField = This.Items.Item(i)
-        If MappedField.Selected = True Then
+    Dim ThisMappedField As MappedField
+    For Each ThisMappedField In This.Items
+        If ThisMappedField.Selected = True Then
             Cursor = Cursor + 1
-            Result(Cursor) = MappedField.FieldID
+            Result(Cursor) = ThisMappedField.FieldID
         End If
-    Next i
+    Next ThisMappedField
     
     If Cursor = 0 Then Exit Function
     
     ReDim Preserve Result(1 To Cursor)
+    
     GetFieldIDs = Result
 End Function
 
@@ -121,19 +125,13 @@ Public Function GetByFieldID(ByVal FieldID As String) As MappedField
     Set GetByFieldID = This.Items.Item(FieldID)
 End Function
 
-Public Function TryGetMappedFieldByName(ByVal Name As String, ByRef OutMappedField As MappedField) As Boolean
-    Dim i As Long
-    For i = 1 To Count
-        Dim MappedField As MappedField
-        Set MappedField = This.Items.Item(i)
-        If MappedField.ListColumnName = Name Then
-            Set OutMappedField = MappedField
-            TryGetMappedFieldByName = True
-            Exit Function
-        End If
-    Next i
-End Function
-
-Public Sub Clear()
-    CollectionClear This.Items
-End Sub
+'Public Function TryGetMappedFieldByName(ByVal Name As String, ByRef OutMappedField As MappedField) As Boolean
+'    Dim ThisMappedField As MappedField
+'    For Each ThisMappedField In This.Items
+'        If ThisMappedField.ListColumnName = Name Then
+'            Set OutMappedField = ThisMappedField
+'            TryGetMappedFieldByName = True
+'            Exit Function
+'        End If
+'    Next ThisMappedField
+'End Function

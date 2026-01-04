@@ -14,21 +14,21 @@ Public Function Unique(ByVal InputArray As Variant) As Variant
     Dim OutputArray As Variant
     ReDim OutputArray(LBound(SortedArray) To UBound(SortedArray))
     
-    Dim c As Long
-    c = LBound(SortedArray)
+    Dim C As Long
+    C = LBound(SortedArray)
     
-    OutputArray(c) = SortedArray(LBound(SortedArray))
-    c = c + 1
+    OutputArray(C) = SortedArray(LBound(SortedArray))
+    C = C + 1
     
     Dim i As Long
     For i = LBound(SortedArray) + 1 To UBound(SortedArray)
         If SortedArray(i) <> SortedArray(i - 1) Then
-            OutputArray(c) = SortedArray(i)
-            c = c + 1
+            OutputArray(C) = SortedArray(i)
+            C = C + 1
         End If
     Next i
     
-    ReDim Preserve OutputArray(LBound(OutputArray) To (c - 1))
+    ReDim Preserve OutputArray(LBound(OutputArray) To (C - 1))
     
     Unique = OutputArray
 End Function

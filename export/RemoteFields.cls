@@ -101,12 +101,14 @@ Private Sub ClearWorksheet()
 End Sub
 
 Private Sub SetNumberFormats()
-    With This.Worksheet.Columns
-        .Item(1).NumberFormat = NUMFMT_TEXT ' ID
-        .Item(5).NumberFormat = NUMFMT_DATE ' CTime
-        .Item(6).NumberFormat = NUMFMT_DATE ' MTime
-        .Item(7).NumberFormat = NUMFMT_DATE ' DTime
-    End With
+    SetNumberFormat 1, NUMFMT_TEXT ' ID
+    SetNumberFormat 5, NUMFMT_DATE ' CTime
+    SetNumberFormat 6, NUMFMT_DATE ' MTime
+    SetNumberFormat 7, NUMFMT_DATE  ' DTime
+End Sub
+
+Private Sub SetNumberFormat(ByVal idx As Long, ByVal Format As String)
+    This.Worksheet.Columns.Item(idx).NumberFormat = Format
 End Sub
 
 Private Sub SortWorksheet()

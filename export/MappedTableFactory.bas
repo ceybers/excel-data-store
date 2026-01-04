@@ -18,8 +18,10 @@ Attribute TryCreateBestMappedTable.VB_Description = "Returns True if a MappedTab
     With New TableMapMatches
         Log.Message " TableMapMatches.Load", "MapTblFct", Verbose_Level
         .Load Remote
+        
         Log.Message " TableMapMatches.Evaluate", "MapTblFct", Verbose_Level
         .Evaluate ListObject
+        
         Log.Message " TableMapMatches.GetBestMappedTable", "MapTblFct", Verbose_Level
         Set OutMappedTable = .GetBestMappedTable
     End With

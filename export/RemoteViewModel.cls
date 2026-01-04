@@ -31,7 +31,7 @@ Public Property Get KeyPaths() As Collection
     Set KeyPaths = This.Remote.Keys.Paths
 End Property
 
-Public Property Get Keys() As RemoteKeys2
+Public Property Get Keys() As RemoteKeys
     Set Keys = This.Remote.Keys
 End Property
 

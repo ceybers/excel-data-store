@@ -13,9 +13,11 @@ Option Explicit
 Private Type TTableMapMatch
     Caption As String
     Timestamp As Date
+    
     SerializedTable As SerializedTable
     TableMap As TableMap
     ListObject As ListObject
+    
     Score As Long
     Results As Variant
     FieldCount As Long

@@ -58,8 +58,10 @@ Public Sub SelectKeysAndFields(ByVal PartialSelection As Boolean)
     
     Log.Message "SelectKeys", "MappedTbl"
     SelectKeys PartialSelection
+    
     Log.Message "ResolveKeyIDs", "MappedTbl"
     ResolveKeyIDs RemoteFactory.GetRemote
+    
     Log.Message "SelectFields", "MappedTbl"
     SelectFields PartialSelection
     

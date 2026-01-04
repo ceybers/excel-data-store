@@ -14,6 +14,7 @@ Private Type TTableMap
     Caption As String
     TableID As String
     MapID As String
+    
     KeyMap As KeyMap
     FieldMap As FieldMap
 End Type
@@ -23,6 +24,7 @@ Public Property Get IsMapped() As Boolean
     If This.KeyMap.KeyColumnName = vbNullString Then Exit Property
     If This.KeyMap.KeyPath = vbNullString Then Exit Property
     If This.FieldMap.Count = 0 Then Exit Property
+    
     IsMapped = True
 End Property
 
@@ -59,6 +61,10 @@ Private Sub Class_Initialize()
     Set This.FieldMap = New FieldMap
 End Sub
 
+Public Sub SetCaption(ByVal ListObjectName As String)
+    This.Caption = This.KeyMap.KeyColumnName & " @ " & ListObjectName & " [" & This.FieldMap.Count & "]"
+End Sub
+
 Public Function Serialize() As String
     Serialize = This.KeyMap.Serialize & Chr$(ASCII_FS) & This.FieldMap.Serialize
 End Function
@@ -70,8 +76,4 @@ Public Sub Deserialize(ByVal SerializedString As String)
     
     This.KeyMap.Deserialize SplitString(0)
     This.FieldMap.Deserialize SplitString(1)
-End Sub
-
-Public Sub SetCaption(ByVal ListObjectName As String)
-    This.Caption = This.KeyMap.KeyColumnName & " @ " & ListObjectName & " [" & This.FieldMap.Count & "]"
 End Sub
