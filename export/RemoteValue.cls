@@ -117,7 +117,15 @@ Public Sub SaveToArray(ByRef VariantArray As Variant, ByVal Row As Long)
         VariantArray(Row, 1) = .ID
         VariantArray(Row, 2) = .KeyID
         VariantArray(Row, 3) = .FieldID
-        VariantArray(Row, 4) = .Value
+        If VarType(.Value) = vbString Then
+            If IsNumeric(.Value) Then
+                VariantArray(Row, 4) = "'" & .Value
+            Else
+                VariantArray(Row, 4) = .Value
+            End If
+        Else
+            VariantArray(Row, 4) = .Value
+        End If
         VariantArray(Row, 5) = .Latest
         VariantArray(Row, 6) = .CreationTime
         VariantArray(Row, 7) = .ModificationTime

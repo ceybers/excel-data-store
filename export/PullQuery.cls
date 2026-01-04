@@ -76,6 +76,12 @@ Public Sub Run()
         Exit Sub
     End If
     
+    If This.MappedTable.CheckForFormulaInChangedColumns(KeyIDs, FieldIDs, ChangeMask) Then
+        If vbNo = MsgBox(MSG_PULL_FX_CONFIRM, vbExclamation + vbYesNo + vbDefaultButton2, APP_TITLE) Then
+            Exit Sub
+        End If
+    End If
+    
     RangeHighlighter.RemoveHighlights This.MappedTable.ListObject
     This.MappedTable.HighlightChanges KeyIDs, FieldIDs, ChangeMask, hcAfterPull
     

@@ -141,4 +141,3 @@ Public Function TryGetByID(ByVal ID As String, ByRef OutRemoteCommit As RemoteCo
         End If
     Next i
 End Function
-

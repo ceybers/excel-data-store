@@ -19,8 +19,12 @@ Option Explicit
 
 Implements IView
 
+'@MemberAttribute VB_VarHelpID, -1
+Private WithEvents mViewModel As ValueTimelineVM
+Attribute mViewModel.VB_VarHelpID = -1
+
 Private Type TState
-    ViewModel As ValueTimelineVM
+    'ViewModel As ValueTimelineVM
     IsCancelled As Boolean
 End Type
 Private This As TState
@@ -41,7 +45,7 @@ Private Sub UserForm_QueryClose(Cancel As Integer, CloseMode As Integer)
 End Sub
 
 Private Function IView_ShowDialog(ByVal ViewModel As Object) As Boolean
-    Set This.ViewModel = ViewModel
+    Set mViewModel = ViewModel
     This.IsCancelled = False
     
     InitializeControls
@@ -59,8 +63,9 @@ End Sub
 
 Private Sub InitializeControls()
     InitValuesListView Me.lvValues
-    LoadValuesToListView This.ViewModel.Values, Me.lvValues
-    
+    ' This UserForm only gets a reference to the VM and can only catch the
+    ' SelectionChanged event _after_ it has already fired for the first time.
+    LoadValuesToListView mViewModel.Values, Me.lvValues
     UpdateControls
 End Sub
 
@@ -81,10 +86,12 @@ Private Sub InitValuesListView(ByVal ListView As ListView)
 End Sub
 
 Private Sub LoadValuesToListView(ByVal RemoteValues As RemoteValuesVM, ByVal ListView As ListView)
+    ListView.ListItems.Clear
+    
     Dim i As Long
     For i = 1 To RemoteValues.Count
         Dim ListItem As ListItem
-        Set ListItem = ListView.ListItems.Add(Text:=Format$(RemoteValues.Item(i).Value, This.ViewModel.NumberFormat))
+        Set ListItem = ListView.ListItems.Add(Text:=Format$(RemoteValues.Item(i).Value, mViewModel.NumberFormat))
         ListItem.ListSubItems.Add Text:=RemoteValues.Item(i).Timestamp
         ListItem.ListSubItems.Add Text:=RemoteValues.Item(i).Commit
     Next i
@@ -92,4 +99,9 @@ End Sub
 
 Private Sub UpdateControls()
     Exit Sub
+End Sub
+
+Private Sub mViewModel_SelectionChanged()
+    LoadValuesToListView mViewModel.Values, Me.lvValues
+    UpdateControls
 End Sub

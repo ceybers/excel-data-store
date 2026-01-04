@@ -1,10 +1,24 @@
 # TODO
 ## Next
-- [ ] BUG Tables with more than one local column mapped to the same Remote Field results in error 457 key already associated.
+- [x] Pull action should check if one or more cells contain a Formula. Ask user before overwriting them.
+- [x] BUG Tables with more than one local column mapped to the same Remote Field results in error 457 key already associated.
+- [x] BUG Case where Numbers formatted as text get stored in the Remote data store as number Variant types while the original cell is a String Variant type. Both Push and Pull actions will detect these values as different and continuously try to update.
+- [ ] BUG Trying to manually enter a new Key Path changes the focus to Auto Map button on each key press.
 - [ ] Ribbon > Remote > Save/Close to only proceed if Remote store is already open.
 
 ## Nice to Have
 ### Keys
+- Handle cases where the same Key appears multiple times in a table.
+  - Pull action should update all instances, not just the first.
+  - Push action should ignore them with a warning.
+    - Technically it could Push new Values if all the rows have the same new Value, but this seems like a bad pattern to accomodate.
+- Compound Keys/Keys made out of multiple columns.
+  - Could either use a delimiter behind the scenes, or prompt the user for one.
+  - Would need to completely redo the UI for selecting Key column.
+- Multiple Keys in a single table.
+  - Fields would need to associated with a specific Key Column to know which to use when doing a lookup.
+  - Could potentially use the Key Path prefix to match the Field Paths. (Wasn't this the entire point of them?)
+  - Lots of edge cases to handle here. Would require major overhaul/rewriting from scratch. 
 - Synonym resolving for Keys (sym-links).
 - KeyGroups (aka Collections, Key Sets) (Tags?)
 - Key lifecycle management (e.g., soft-deletion, deprecation)
@@ -19,12 +33,13 @@
 - Default Number Formatting for Fields
 
 ## Values
+- When updating Columns, shrink the Range being updated to the sub range of FirstCellAffected to LastCellAffected. This is to minimise the amount of cells written to with `.Value2`.
 - UI for browsing Value history for selected Field×Key. (i.e., Timeline of changes.)
   - [x] Single Value read-only history
   - [x] Formating using the NumberFormat of selected cell. 
+  - [x] Modeless UI that traps `Worskheet_SelectionChange`.
   - [ ] Roll back to previous value.
   - [ ] Multiple Key(s) and Field(s) modeless dialog.
-  - [ ] Modeless UI that traps `Worskheet_SelectionChange`.
 
 ## Push/Pull Actions
 - [ ] Conditional Push/Pull

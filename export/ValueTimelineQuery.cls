@@ -10,12 +10,17 @@ Attribute VB_Exposed = False
 '@Folder("Version4.Queries")
 Option Explicit
 
-Private Type TPullQuery
+Private Type TValueTimelineQuery
     MappedTable As MappedTable
     Remote As Remote
     Results As Variant
+    
+    KeyIDs As Variant
+    KeyID As String
+    FieldIDs As Variant
+    FieldID As String
 End Type
-Private This As TPullQuery
+Private This As TValueTimelineQuery
 
 Public Property Get Results() As Variant
     Results = This.Results
@@ -37,24 +42,28 @@ Public Property Set Remote(ByVal RHS As Remote)
     Set This.Remote = RHS
 End Property
 
-Public Sub Run()
-    Dim KeyIDs As Variant
-    KeyIDs = This.MappedTable.TableMap.KeyMap.GetKeyIDs
-    If IsEmpty(KeyIDs) Then Exit Sub
+Public Property Get CanRun() As Boolean
+    This.KeyIDs = This.MappedTable.TableMap.KeyMap.GetKeyIDs
+    If IsEmpty(This.KeyIDs) Then Exit Property
     
-    Dim KeyID As String
-    KeyID = GetFirstNonEmptyString(KeyIDs)
-    If KeyID = vbNullString Then Exit Sub
+    This.KeyID = GetFirstNonEmptyString(This.KeyIDs)
+    If This.KeyID = vbNullString Then Exit Property
     
-    Dim FieldIDs As Variant
-    FieldIDs = This.MappedTable.TableMap.FieldMap.GetFieldIDs
-    If IsEmpty(FieldIDs) Then Exit Sub
+    This.FieldIDs = This.MappedTable.TableMap.FieldMap.GetFieldIDs
+    If IsEmpty(This.FieldIDs) Then Exit Property
     
-    Dim FieldID As String
-    FieldID = GetFirstNonEmptyString(FieldIDs)
-    If FieldID = vbNullString Then Exit Sub
+    This.FieldID = GetFirstNonEmptyString(This.FieldIDs)
+    If This.FieldID = vbNullString Then Exit Property
+    
+    CanRun = True
+End Property
 
-    This.Results = This.Remote.Values.GetAllValues(KeyID, FieldID)
+Public Sub Run()
+    If Not CanRun Then
+        This.Results = Empty
+    Else
+        This.Results = This.Remote.Values.GetAllValues(This.KeyID, This.FieldID)
+    End If
 End Sub
 
 Private Function GetFirstNonEmptyString(ByVal ThisArray As Variant) As Variant

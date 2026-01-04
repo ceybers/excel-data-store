@@ -224,4 +224,31 @@ Public Sub HighlightMappedFields()
     RangeHighlighter.HighlightRange HighlightRange, hcHeaders
 End Sub
 
+Public Function CheckForFormulaInChangedColumns(ByVal KeyIDs As Variant, ByVal FieldIDs As Variant, ByVal ChangeMask As Variant) As Boolean
+    Dim Changes As Collection
+    Set Changes = New Collection
+    
+    Dim FieldIndex As Long
+    For FieldIndex = 1 To UBound(FieldIDs)
+        Dim ListColumn As ListColumn
+        Set ListColumn = GetListColumnFromFieldID(FieldIDs(FieldIndex))
+        
+        Dim KeyIndex As Long
+        For KeyIndex = 1 To UBound(KeyIDs)
+            If ChangeMask(KeyIndex, FieldIndex) = True Then
+                Changes.Add ListColumn.DataBodyRange
+                Exit For
+            End If
+        Next KeyIndex
+    Next FieldIndex
+    
+    If Changes.Count = 0 Then Exit Function
 
+    Dim ChangeRange As Range
+    For Each ChangeRange In Changes
+        If ChangeRange.HasFormula = True Or IsNull(ChangeRange.HasFormula) Then
+            CheckForFormulaInChangedColumns = True
+            Exit Function
+        End If
+    Next ChangeRange
+End Function
