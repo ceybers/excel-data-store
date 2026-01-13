@@ -24,6 +24,13 @@ TryGetListColumn(
     ByRef OutListColumn As ListColumn) As Boolean
 ```
 
+### TryGetSelectedListColumn
+Returns `True` if the `Selection` object contains at least one cell in exactly one `ListColumn` and sets the provided variable to that `ListColumn` object. Returns `False` if it does not.
+
+```vb
+TryGetSelectedListColumn(ByRef OutListColumn As ListColumn) As Boolean
+```
+
 ### ListColumnExists
 Returns `True` if a `ListColumn` with the specified name exists in the `ListObject`. Returns `False` if it does not.
 
